@@ -18,19 +18,21 @@ bool Virtual::InitBanked(uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pN
 bool Virtual::InitVirtual(uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) {
     uint32_t ix;
 
-    numFreeVirtualPages = pNumVirtualPages;
-    numFreePhysicalPages = pNumPhysicalPages;
-    numUsedVirtualPages = 0;
-    numUsedPhysicalPages = 0;
+    physicalFreePages.clear();
+    physicalUsedPages.clear();
+    virtualFreePages.clear();
+    virtualUsedPages.clear();
     minPhysicalPages = 0;
     minVirtualPages = 0;
     physicalStorage = new uint8_t [MEM_PAGE_SIZE*pNumPhysicalPages];
     virtualPageTable.clear();
-    for (ix = 0; ix < numFreePhysicalPages; ix++) {
+    for (ix = 0; ix < pNumPhysicalPages; ix++) {
         physicalPageBitmap[ix] = false;
+        physicalFreePages.push_back(ix);
     };
-    for (ix = 0; ix < numFreeVirtualPages; ix++) {
+    for (ix = 0; ix < pNumVirtualPages; ix++) {
         virtualPageBitmap[ix] = false;
+        virtualFreePages.push_back(ix);
     };
     swapFile = fopen(swapName, "rw");
     isActive = true;
@@ -70,6 +72,7 @@ bool Virtual::ReadAddress(uint64_t addr, uint8_t *value) {
     uint32_t physPag = virtualPageTable[reqPage].physicalPage;
     *value = physicalStorage[physPag*MEM_PAGE_SIZE+(addr % MEM_PAGE_SIZE)];
     virtualPageTable[reqPage].lastUsed = true;
+    lruCache.push_back(reqPage);
     return true;
 }
 
@@ -97,6 +100,7 @@ bool Virtual::WriteAddress(uint64_t addr, uint8_t value) {
     physicalStorage[physPag*MEM_PAGE_SIZE+(addr % MEM_PAGE_SIZE)] = value;
     virtualPageTable[reqPage].isDirty = true;
     virtualPageTable[reqPage].lastUsed = true;
+    lruCache.push_back(reqPage);
     return true;
 }
 
@@ -127,5 +131,13 @@ bool Virtual::SwapIn(uint32_t page) {
 }
 
 bool Virtual::Swapout(uint32_t page) {
+    return true;
+}
+
+bool Virtual::FindFreePage(uint32_t *page) {
+    return true;
+}
+
+bool Virtual::FreeNPages(uint32_t pPages, uint32_t *pPageList) {
     return true;
 }

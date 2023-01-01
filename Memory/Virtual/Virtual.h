@@ -6,6 +6,7 @@
 #define ONYXSIM_VIRTUAL_H
 #include "../MemInterface.h"
 #include <map>
+#include <vector>
 
 class VirtualMemoryPageInfo {
 public :
@@ -24,13 +25,12 @@ private :
     std::map<uint32_t, bool>                    physicalPageBitmap;
     std::map<uint32_t, bool>                    virtualPageBitmap;
     uint8_t                                     *physicalStorage;
-    uint32_t                                    numFreeVirtualPages;
-    uint32_t                                    numUsedVirtualPages;
-    uint32_t                                    numFreePhysicalPages;
-    uint32_t                                    numUsedPhysicalPages;
     uint32_t                                    minVirtualPages;
     uint32_t                                    minPhysicalPages;
-    const char *swapName;
+    std::vector<uint32_t>                       physicalFreePages, physicalUsedPages;
+    std::vector<uint32_t>                       virtualFreePages, virtualUsedPages;
+    std::vector<uint32_t>                       lruCache;
+    const char                                  *swapName;
     FILE                                        *swapFile;
     bool                                        isActive;
 public :
@@ -44,9 +44,11 @@ public :
     bool SavePage(uint32_t page, uint8_t *buffer) override;
     bool GetBank(uint8_t *bank) override;
     bool SetBank(uint8_t bank) override;
-    bool AllocateNPages(uint32_t pPages, uint32_t *pPagelist) override;
+    bool AllocateNPages(uint32_t pPages, uint32_t *pPagelist) override;\
+    bool FreeNPages(uint32_t pPages, uint32_t *pPageList) override;
     bool SwapIn(uint32_t page) override;
-    bool Swapout(uint32_t page) override;
+    bool Swapout(uint32_t page) override;\
+    bool FindFreePage(uint32_t *page);
 };
 
 

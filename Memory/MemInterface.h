@@ -40,6 +40,7 @@ public :
     virtual bool SetBank(uint8_t bank) = 0;
     virtual bool GetBank(uint8_t *bank) = 0;
     virtual bool AllocateNPages(uint32_t pPages, uint32_t *pPagelist) = 0;
+    virtual bool FreeNPages(uint32_t pPages, uint32_t *pPageList) = 0;
     virtual bool Swapout(uint32_t page) = 0;
     virtual bool SwapIn(uint32_t page)  = 0;
 };
