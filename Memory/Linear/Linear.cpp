@@ -99,12 +99,12 @@ bool Linear::AllocateNPages(uint32_t pPages, uint32_t *pPagelist) {
     return false;
 }
 
-bool Linear::SwapIn(uint32_t page) {
+bool Linear::SwapInPage(uint32_t page) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Linear::Swapout(uint32_t page) {
+bool Linear::SwapoutPage(uint32_t page) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }

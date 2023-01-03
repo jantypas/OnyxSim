@@ -20,6 +20,18 @@
 #define MEMORY_ERROR_FREE_PAGE_ACCESS   4
 #define MEMORY_ERROR_CANT_SWAP_IN_PAGE  5
 #define MEMORY_ERROR_CANT_SWAP_OUT_PAGE 6
+#define MEMORY_ERROR_PAGE_IS_LOCKED     7
+#define MEMORY_ERROR_PAGE_IS_ON_DISK    8
+
+#define PAGE_STATE_IN_USE           0x0001
+#define PAGE_STATE_IS_LOCKED        0x0002
+#define PAGE_STATE_IS_DIRTY         0x0004
+#define PAGE_STATE_IS_ON_DISK       0x0008
+#define PAGE_STATE_PRIV_NORMAL      0x0000
+#define PAGE_STATE_PRIV_SERVICE     0x0010
+#define PAGE_STATE_PRIV_DRIVER      0x0020
+#define PAGE_STATE_PRIV_SYSTEM      0x0030
+
 
 struct MemoryErrorMessage {
     std::string msg;
@@ -41,8 +53,8 @@ public :
     virtual bool GetBank(uint8_t *bank) = 0;
     virtual bool AllocateNPages(uint32_t pPages, uint32_t *pPagelist) = 0;
     virtual bool FreeNPages(uint32_t pPages, uint32_t *pPageList) = 0;
-    virtual bool Swapout(uint32_t page) = 0;
-    virtual bool SwapIn(uint32_t page)  = 0;
+    virtual bool SwapoutPage(uint32_t page) = 0;
+    virtual bool SwapInPage(uint32_t page)  = 0;
 };
 
 extern MemoryErrorMessage   MemoryErrorTable[];
