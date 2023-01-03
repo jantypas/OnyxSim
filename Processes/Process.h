@@ -6,18 +6,22 @@
 #define ONYXSIM_PROCESS_H
 #include <string>
 
+#define SEGMENT_STATE_IN_USE        0x0001
+#define SEGMENT_STATE_IS_LOCKED     0x0002
+#define SEGMENT_STATE_IS_ON_DISK    0x0004
+
+#define PRIV_LEVEL_NORMAL   0x00
+#define PRIV_LEVEL_SERVICE  0x01
+#define PRIV_LEVEL_DRIVER   0x02
+#define PRIV_LEVEL_KERNEL   0x03
+
 class ProcessSegmen {
 public :
     uint16_t        processID;
     std::string     name;
     uint32_t        numVirtualPages;
     uint32_t        *virtualPages;
-    bool            canRead;
-    bool            canWrite;
-    bool            canExecute;
-    bool            requireSuperuser;
-    bool            promoteToSuperuser;
-    bool            lockedInMemory;
+    uint32_t        processState;
 };
 
 class Process {
@@ -26,8 +30,10 @@ public :
     uint32_t        groupid;
     std::string     commandline;
     uint8_t         numSegments;
-    ProcessSegmen   segments;
-    bool            superuser;
+    ProcessSegmen   *segments;
+    uint64_t        *dataRegisters;
+    uint64_t        *addressRegisters;
+    uint8_t         privLevel;
 };
 
 
