@@ -6,7 +6,17 @@
 #ifndef ONYXSIM_ONYXNET_H
 #define ONYXSIM_ONYXNET_H
 
-#define ONYX_PACKET_SIZE    1200
+#define ONYX_PACKET_SIZE                        1200
+#define ONYXNET_PACKET_HEARTBEAT                0x0000'0000
+#define ONYXNET_PACKET_HEARTBEAT_REQUEST        0x0000'0001
+#define ONYXNET_PACKET_HEARTBEAT_ACK            0x0000'0002
+#define ONYXNET_PACKET_CONFIG_REQUEST           0x0000'0003
+#define ONYXNET_PACKET_CONFIG_ACK               0x0000'0004
+#define ONYXNET_PACKET_CONFIG_NAK               0x0000'0005
+#define ONYXNET_PACKET_ROUTE_ANNOUNCEMENT       0x0000'0006
+#define ONYXNET_PACKET_DATA_PACKET              0x0000'0007
+#define ONYXNET_PACKET_DATA_STREAM              0x0000'0008
+
 #define ONYXNET_SPECIAL_DATA       0x0000'0000
 #define ONYXNET_SPECIAL_CONTROL    0x0000'0001
 #define ONYXNET_SPECIAL_PRIORITY   0x0000'0002
@@ -21,19 +31,20 @@ struct OnyxPacketAddress {
 };
 
 struct OnyxPacketHeader { // 64 bytes
-    OnyxPacketAddress source;       // 8 bytes
-    uint32_t          srcChannel;   // 4 bytes
-    OnyxPacketAddress destination;  // 8 bytes
-    uint32_t          destChannel;  // 4 bytes
-    uint32_t          packetType;   // 4 bytes
-    uint64_t          trafficClass; // 8 butes
-    uint32_t          flowID;       // 4 bytes
-    uint32_t          windowID;     // 4 bytes
-    uint32_t          specialBits;  // 4 bytes
-    uint32_t          crc;          // 4 bytes
-    uint16_t          ttl;          // 2 bytes
-    uint16_t          length        // 2 bytes
-    uint8_t           unused[10]    // Future space
+    OnyxPacketAddress source;       // +0 bytes
+    uint32_t          srcChannel;   // +8 bytes
+    OnyxPacketAddress destination;  // +12 bytes
+    uint32_t          destChannel;  // +20 bytes
+    uint32_t          packetType;   // +24 bytes
+    uint64_t          trafficClass; // +32 bytes
+    uint32_t          flowID;       // +36 bytes
+    uint32_t          windowID;     // +40 bytes
+    uint32_t          specialBits;  // +44 bytes
+    uint32_t          crc;          // +48 bytes
+    uint16_t          ttl;          // +50 bytes
+    uint16_t          length        // +52 bytes
+    uint64_t          timestamp;    // +60 bytes
+    uint8_t           unused[12]    // +68 Future space
 };
 
 struct OnyxPacket {
