@@ -10,18 +10,24 @@
 /**
  * We need these macros to make our life easier
  */
-#define CLR_FLAG(x, y) (x &= ~y )
-#define SET_FLAG(x, y) (x &= y )
-#define IS_FLAG_SET(x, y) ((x & y) == y)
-#define IS_FLAG_CLEAR(x, y) ((x & y) != y)
+#define CLR_FLAG(x, y) x &= ~y;
+#define SET_FLAG(x, y) x &= y;
+#define IS_FLAG_CLEAR(x, y) (x & y) != y
+#define IS_FLAG_SET(x, y) (x & y) == y
 
 /**
  * Same here -- this template allows sus to remove all of a given value
  * from a vector.
  */
 template <typename T>
-    void removeAllFromVecetor(std::vector <T> &v, const T &target) {
+    void removeAllFromVector(std::vector <T> &v, const T &target) {
         v.erase(std::remove(v.begin(), v.end(), target), v.end());
+    };
+
+
+template <typename T>
+    void insertAtHeadofVector(std::vector <T> &v, const T &target) {
+        v.insert(v.begin(), target);
     };
 
 /**
@@ -30,23 +36,21 @@ template <typename T>
  * @param page  - The page we want to free
  * @return      - Did we succeed
  */
-bool Virtual::MarkPhysicalPageAsFree(uint32_t page) {
-    // Make sure the page isn't locked or not in use
-    if (page >= numPhysicalPages || IS_FLAG_CLEAR(!physicalPageTable[page].pageState, PAGE_STATE_IN_USE)) {
+bool Virtual::MarkPhysicalPageAsFree(uint32_t page) {\
+    // Check the page range
+    if (page >= numPhysicalPages) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
+        return false;
+    }
+
+    // Make sure that page isn't already free
+    if (IS_FLAG_CLEAR(physicalPageTable[page].pageState, PAGE_STATE_IN_USE)) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_FREE_PAGE_ACCESS];
         return false;
-    };
-    if (IS_FLAG_SET(physicalPageTable[page].pageState, PAGE_STATE_IS_LOCKED)) {
-        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_PAGE_IS_LOCKED];
-        return false;
-    };
-    /**
-     * Mark the page as free and put it on the free queue
-     * then remove ALL of that page from the used queue
-     */
+    }
     CLR_FLAG(physicalPageTable[page].pageState, PAGE_STATE_IN_USE);
-    physicalFreePagesList.insert(physicalFreePagesList.begin(), page);
-    removeAllFromVecetor(physicalUsedPagesList, page);
+    insertAtHeadofVector(physicalFreePagesList, page);
+    removeAllFromVector(physicalUsedPagesList, page);
     return true;
 }
 
@@ -56,51 +60,53 @@ bool Virtual::MarkPhysicalPageAsFree(uint32_t page) {
  * @return - Succcess/failure
  */
 bool Virtual::MarkPhysicalPageAsUsed(uint32_t page) {
-    /**
-     * Check to make sure the page is not locked or already used
-     */
-    if (page >= numPhysicalPages || IS_FLAG_SET(physicalPageTable[page].pageState, PAGE_STATE_IN_USE)) {
-        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_FREE_PAGE_ACCESS];
+    if (page >= numPhysicalPages) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
         return false;
-    };
-    if (IS_FLAG_SET(physicalPageTable[page].pageState, PAGE_STATE_IS_LOCKED)) {
-        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_PAGE_IS_LOCKED];
+    }
+    if (IS_FLAG_SET(physicalPageTable[page].pageState, PAGE_STATE_IN_USE)) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_USED_PAGE_ACCESS];
         return false;
-    };
-    /**
-     * Clear the in use flag
-     */
-    CLR_FLAG(physicalPageTable[page].pageState, PAGE_STATE_IN_USE);
-    physicalUsedPagesList.push_back(page);
-    removeAllFromVecetor(physicalFreePagesList, page);
+    }
+    SET_FLAG(physicalPageTable[page].pageState, PAGE_STATE_IN_USE);
+    removeAllFromVector(physicalFreePagesList, page);
+    insertAtHeadofVector(physicalUsedPagesList, page);
     return true;
 }
 
 /**
  * MarkVirtualPageAsFree - Mark a virtual page as free
+ *
  * @param page - The page we want to mark
  * @return - Success/failure
  */
 bool Virtual::MarkVirtualPageAsFree(uint32_t page) {
-    // Make sure the page is valid, is not already free
-    if (page >= numVirtualPages || IS_FLAG_CLEAR(virtualPageTable[page].pageState, PAGE_STATE_IN_USE) {
-        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_FREE_PAGE_ACCESS];
-        return false;
-    };
-    // Make sure the page isn't locked or on disk'
-    if IS_FLAG_SET(virtualPageTable[page].pageState, PAGE_STATE_IS_LOCKED) {
+    // Check the page limits
+    if (page >= numVirtualPages) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
+        return true;
+    }
+    // Make sure the page isn't locked or on disk
+    uint32_t state = virtualPageTable[page].pageState;
+    if (IS_FLAG_SET(state, PAGE_STATE_IS_LOCKED) || IS_FLAG_SET(state, PAGE_STATE_IS_ON_DISK)) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_PAGE_IS_LOCKED];
         return false;
-    };
-    if IS_FLAG_SET(virtualPageTable[page].pageState, PAGE_STATE_IS_ON_DISK) {
-        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_PAGE_IS_ON_DISK];
+    }
+    // Make sure page isn't free
+    if (IS_FLAG_CLEAR(state, PAGE_STATE_IN_USE)) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_FREE_PAGE_ACCESS];
         return false;
-    };
+    }
+    // Set the free state
     CLR_FLAG(virtualPageTable[page].pageState, PAGE_STATE_IN_USE);
-    MarkPhysicalPageAsFree(virtualPageTable[page].physicalPage);
-    virtualFreePagesList.push_back(page);
-    removeAllFromVecetor(virtualUsedPagesList, page);
-    removeAllFromVecetor(lruCache, page);
+    // Remove the page from the used list and the lruCache
+    removeAllFromVector(virtualUsedPagesList, page);
+    removeAllFromVector(lruCache, page);
+    // Add to the free list
+    insertAtHeadofVector(virtualFreePagesList, page);
+    // Free the physical page associated with it
+    MarkPhysicalPageAsFree(page);
+    // We're done
     return true;
 }
 
@@ -111,30 +117,44 @@ bool Virtual::MarkVirtualPageAsFree(uint32_t page) {
  * @return - Succecss/failure
  */
 bool Virtual::MarkVirtualPageAsUsed(uint32_t page) {
-    if IS_FLAG_SET(page >= numVirtualPages || !virtualPageTable[page].pageState, PAGE_STATE_IN_USE) {
-        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_FREE_PAGE_ACCESS];
+    // Check the page limits
+    if (page >= numVirtualPages) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
+        return true;
+    }
+    // Make sure page isn't in use already
+    if (IS_FLAG_SET(virtualPageTable[page].pageState, PAGE_STATE_IN_USE)) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_USED_PAGE_ACCESS];
         return false;
-    };
-    if IS_FLAG_SET(virtualPageTable[page].pageState, PAGE_STATE_IS_LOCKED) {
-        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_PAGE_IS_LOCKED];
-        return false;
-    };
-    if IS_FLAG_SET(virtualPageTable[page].pageState, PAGE_STATE_IS_ON_DISK) {
-        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_PAGE_IS_ON_DISK];
-        return false;
-    };
-    CLR_FLAG(virtualPageTable[page].pageState, PAGE_STATE_IN_USE);
-    MarkPhysicalPageAsFree(virtualPageTable[page].physicalPage);
-    virtualFreePagesList.push_back(page);
-    removeAllFromVecetor(virtualUsedPagesList, page);
-    removeAllFromVecetor(lruCache, page);
-    return true;
+    }
+    // Set the free state
+    SET_FLAG(virtualPageTable[page].pageState, PAGE_STATE_IN_USE);
+    // Remove the page from the free list and move to the used list
+    removeAllFromVector(virtualFreePagesList, page);
+    insertAtHeadofVector(virtualUsedPagesList, page);
+    // Try to get a new physical page
+    uint32_t newPage;
+    if (AllocateNewPhysicalPage(&newPage)) {
+        virtualPageTable[page].physicalPage = newPage;
+        return true;
+    } else {
+        // We can't get a page -- try a swap out
+        if (SwapAndAllocatePhysicalPage(&newPage)) {
+            virtualPageTable[page].physicalPage = newPage;
+            return true;
+        } else {
+            // Oh well, we trie -- time to die
+            LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NO_PHYSICAL_PAGES];
+            return false;
+        };
+    }
 }
 
 /**
+ * WritePage to swap
  *
- * @param page
- * @return
+ * @param page to write
+ * @return success/failure
  */
 bool Virtual::WritePageToSwap(uint32_t page) {
     uint8_t *buffer = &physicalStorage[virtualPageTable[page].physicalPage*MEM_PAGE_SIZE];
@@ -144,7 +164,7 @@ bool Virtual::WritePageToSwap(uint32_t page) {
 }
 
 /**
- *
+ *ReadPage
  * @param page
  * @return
  */

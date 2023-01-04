@@ -11,7 +11,7 @@
 class VirtualMemoryPageInfo {
 public :
     uint32_t    physicalPage;
-    uint8_t     pageState;
+    uint16_t    pageState;
 };
 
 class PhysicalMemoryPageInfo {
