@@ -1,0 +1,838 @@
+Onyx1 Boot-up messages
+    "What's inside?  You really don't want to know."
+    "Nearly 100 (somewhat) correct opcodes!"
+    "It's inside -- don't let it out!  You have no idea what it takes to catch it."
+    "Now with more blue smoke power!"
+    "The computer your mother wouldn't let you buy when you were a kid."
+    "What's inside? If you're smart you'll step on it before it gets to the children!"
+    "It's inside -- what did you expect for free?  It might even work!"
+    "Whatever is inside, it's not my fault. I had nothing to do with this!"
+    "Yeah, it's inside -- but that's nothing to be proud of."
+    "It's inside, but doctors have medication for it now..."
+
+       First 16           Second 16 (optional.  If XT is set)
+XI JM Opcode  WS #Reg       instr    #reg pairs  regXA     regXB
+ 1  1 10-bits 2   2
+ 1  1 10-bits 2   -         12-bits    4-bits 16-bits   16-bits
+
+    XM = Extended instruction (get another 16 bits)
+    JM = Jump code (0 relative jump, 1 = absolute jump)
+        03 = 64 bits
+        02 = 32 bits
+        01 = 16 bits
+        00 = 8 bits
+    # - Register pairs
+
+Up to 6 registers (3 pairs) can be used
+If XT is set, opcode is now 22-bits, and two extra registers are provided
+
+Registers =
+    RRMM R-
+        RR = Register number (00-FF)
+        MM = Mode (4 bits, 4 unused)
+            00 = Rx
+            01 = Rx,X
+            02 = Rx,Y
+            03 = Rx++
+            04 = Rx--
+            05 = ++Rx
+            06 = --Rx
+
+Instruction Fetch, Decode, Execute Store Steps
+    - Read first 16-bits (opcode)
+    - If Extension bit is set, read another 16 bits and combine to a 32-bit opcode
+    - Using first 16-bits from here on, for each register pair
+        - Read the first register -- we'll store this in a temporary storage entity 'tempstore' (64-bits)
+        - Select on mode:
+            - 00 - If Dx, tempstore = Dx
+                 - If Ax, tempstore = Memory(Ax)
+            - 01 - If Dx, can't be used in storage
+                 - If Ax, tempstore = Memory(Ax+X)
+            - 02 - If Dx, can't be used in storage
+                 - If Ax, tempstore = Memory(Ax+Y)
+            - 03 - If Dx, can't be used in storage
+                 - If Ax, tempstore = Memory(Ax), increment Ax
+            - 04 - If Dx, can't be used in storage
+                 - If Ax, tempstore = Memory(Ax), decrement
+            - 05 - If Dx, can't be used in storage
+                 - If Ax, increment Ax, tempstore = Memory(Ax)
+            - 06 - If Dx, can't be used in storage
+                 - If Ax, decrement Ax, tempstore = Memory(Ax)
+        Further registers:
+            - 00 - If Dx, use this register value
+                 - If Ax, value = Memory(Ax)
+            - 01 - If Dx, value = Dx+X
+                 - If Ax, value = Memory(Ax+X)
+            - 02 - If Dx, value = Dx+Y
+                 - If Ax, value = Memory(Ax+Y)
+            - 03 - If Dx, value = Dx; Dx++
+                 - If Ax, value = Memory(Ax), Ax++
+            - 04 - If Dx, value = Dx; Dx--
+                 - If Ax, value = Memory(Ax); Ax--
+            - 05 - If Dx, Dx++; value = Dx
+                 - If Ax, Ax++; value = Memory(Ax)
+            - 06 - If Dx, Dx--; value = Dx
+                 - If Ax, Ax--; value = Memory(Ax)
+
+Register codes
+    Rx = Dx or Ax
+
+Condition Codes
+    Z = Zero
+    N = Not-Zero
+    G = Greater-Than
+    L = Less-Than
+
+-- System instructions * = Privileged
+ Op  Mod Mode #
+0000  0   0   0   STOP                        Stop the processor
+0010  0   0   0   EXIT                        Exit simulator-
+0020  0   0   0   NOOP                        No operation
+
+0030  0   -   1   MOVE Rx, Ry                 Move Ry -> Rx
+0040  0   -   2   MOVEI Rx, Size, #value      Move litteral value
+0050  0   -   2   COPYM Ax, Ay, Dx            Capy memory Ay -> Ax for Dx units
+0060  0   0   2   COPYP Rx, Ry, Dx            Copy Dx pages from Ry to Rx
+0070  0   0   2   CMP Dx, Rx, Ry              Compare Rx to Rx -> Dx
+0080  0   0   2   CMPP Dx, Dy, Dz             Compare page Dy to Dz result > Dx
+0090  0   0   2   CMPBLK Dx, Ax, Ay, Dy       Compare memory block(Ax) and (Ay), for Dy words, store in Dx
+00A0  1   0   2   MSHIFT Dx, Rx, Dy           Bits Dx..Ry shifted right to Dx
+00B0  3   0   1   INFO Dx, Dy                 Get value from Dx and return it in Dy (value = special page)
+
+0100  0   -   2   IADD Rx, Ry, Rz             Rx = Ry + Rz
+0110  0   -   2   ISUB Rx, Ry, Rz             Rx = Ry - Rz
+0120  0   -   2   IMULT Rx, Ry,Rz             Rx = Ry * Rz
+0130  0   -   2   IDIV Rx, Ry, Rz             Rx = Ry / Rz
+0140  0   -   2   IMOD Rx, Dy, Dz             Rx = Ry % Rz
+0150  0   -   2   IAND Rx, Ry, Rz             Rx = Ry & Rz
+0160  0   -   2   IOR Rx, Ry, Rz              Rx = Ry | Rz
+0170  0   -   2   IXOR Rx, Ry, Rz             Rx = Ry XOR Rz
+0180  0   -   2   ISHIFTL Rx, Ry, Rz          Rx = Ry << Rz
+0190  0   -   2   ISHIFTR Rz, Ry, Rz          Rx = Ry >> Rz
+01A0  0   -   1   INOT Rx, Ry                 Rx = ~Ry
+01B0  1   -   2   FADD Fx, Fy, Fz             Fx = Fy + Fz
+01C0  1   -   2   FSUB Fx, Fy, Fz             Fx = Fy - Fz
+01D0  1   -   2   FMULT Fx, Fy, Fz            Fx = Fy * Fz
+01E0  1   -   2   FDIV Fx, Fy, Fz             Fx = Fy / Fz
+01F0  1   -   1   FSIN Fx, Fy                 Fx = Sin(Fy)
+0200  1   -   1   FCOS Fx, Fy                 Fx = Cos(Fy)
+0210  1   -   1   FTAN Fx, Fy                 Fx = Tan(Fy)
+0220  1   -   1   FASIN Fx, Fy                Fx = Sin-1(Fy)
+0230  1   -   1   FACOS Fx, Fy                Fx = Cos-1(Fy)
+0240  1   -   1   FATAN Fx, Fy                Fx = Tan-1(Fy)
+0250  1   -   1   FLN Fx, Fy                  Fx = Ln(Fy)
+0260  1   -   1   FETOX Fx, Fy                Fx = e^(Fy)
+0270  1   -   2   FPOWER Fx, Fy, Fz           Fx = Fy raised to power Fx
+0280  1   -   2   FROOT Fx, Fy, Fz            Fx = Fy-th Root of Fz
+0290  1   -   1   FTOR Dx, Rx                 Convert Fx -> Dx
+02A0  1   -   1   DTOF Fx, Dx                 Convert Dx -> Fx
+02B0  1   -   2   STRNCPY Dx, Ax, Ay          Copy string Ay to Ax up to Dx units
+02C0  1   -   2   STRLEN  Dx, Ax              Dx = Length of string Ax
+02D0  1   -   2   STRNCMP Dx, Ax, Ay          Compare strings Ax and Ay -> Dx
+02E0  1   -   2   STRFIND Dx, Ax, Ay          Find first occurance of stirng Ay in Ax -> Position to Dx
+02F0  1   -   2   STRCAT Ax, Ay, Az, Dx       Ax = Ay + Az up to Dx units
+
+0400  0   -   2   TEST Dx, Dy, Rx, Ry         Perform test Dy on Rx and Ry, store to Dx
+0410  0   -   2   TBITSET  Dx, Rx, Dy         Dx = Is bit Dy set in Rx
+0420  0   -   2   TBITCLR  Dx, Rx, Dy         Dx = Is bit Dy clear in Rx
+0500  0   -   1   PUSH Rx                     Push value Rx to stack (A5E-- = Rx)a
+0510  0   -   2   PUSHI Size, #Value          Push immediate value onto stack
+0520  0   -   1   POP Rx                      Pop Rx from to of stack (Rx =  A5E++)
+0530  0   -   1   JUMP Ax                     Jump to address Ax )
+0540  0   -   1   JUMPI #value                Jump to 64-bit value
+0550  0   -   1   CALL Ax                     Call subroutine at Ax
+0560  0   -   2   CALLI #value                Call litteral address
+0570  0   0   0   CALLRET                     Return from call
+0580  0   -   2   BRCOND #Cond, Ax            Branch on condition set
+0590  0   -   2   BRCONDI #Cond, #Value       Branch to immediate value on condition
+05A0  0   -   1   TZBR Rx Ax                  If Rx == 0, Branch to Ax
+05B0  0   -   1   TZBR Rx, #Value             If Rx == 0, Branch to immediate
+05C0  0   -   1   TNZBR Rx Ax                 If Rx != 0, Branch to Ax
+05D0  0   -   1   TNZBR Rx, #Value            If Rx != 0, Branch to immediate
+05E0  0   0   0   SERVICERET                  Return from service routine
+05F0  0   0   -   SYSCALL                     Perform system call
+0600  0   0   0   TRAPRET                     Return from trap
+0610  3   0   2   COPROC Dx, Ax, Ay           Call a copressor Dx, passing Call and Data stack Ax, Ay, result in Dx
+
+0700  0   -   1   MSGSEND Dx, Ax, Dy          Send an IPC message on channel Dy, from buffer Ax, result in Dx
+0710  0   -   2   MSGRECV Dx, Ax, Dy          Get an IPC message on channel Dy and put it into Ax, result in Dx
+0720  0   -   1   MSGAVAIL Dx, Dy             Is an IPC message available on channel Dy  Result in Dx
+0730  0   -   2   MSGWAIT Dx, Dy, Dz          Wait on message channel Dy (blocking for Dz ms) -> Dx
+0740  0   -   2   IOREQ Dx, Dy, Dz, Ax        Send an IO Message to Dy with command Dz, data Ax, result in Dx
+0750  0   -   2   BUFFERALLOC Dx, Dy, Ax      Allocate Dy I/O buffers to Ax, Result in Dx
+0760  0   -   1   BUFFERFREE  Dx, Ax          Free Ax I/O buffers
+
+0800  3   -   1   ENCRYPT Ax, Ay              Encrypt a block in Ax to Ay
+0810  3   -   1   DECRYPT Ax, Ay              Decrypt a block in Ax to Ay
+0820  3   -   2   ENCRSETUP Dx, Dy, Ax        Set up encryption mode Dy data from Ax, result in Dx
+0830  3   -   2   HASH Dx, Dy, Ax, Ay         Compute Dy hash of Ax to Ay.  Result in Dx
+0840  2   -   2   ENQUEUE Dx, Dy, Ax          Enqueue 64 bytes into queue Dy. Result in Dx
+0850  2   -   2   DEQUEUE Dx, Dy, Ax          Dequeue 64 bytes from queue Dy.  Result in Dx
+0860  2   -   2   QUEUEPUSH Dx, Dy, Ax        Push (stack) 64 bytes onto queue Dy, Result in Dx
+0870  2   -   2   QUEUEPOP Dx, Dy, Ax         Pop (stack) 64 bytes from queue Dy.  Result in Dx
+0880  2   -   1   QUEUECLR Dx                 Clear queue Dy
+0890  2   -   1   QUEUEEMPTY Dx, Dy           Is  Queue Dy empty -> Dx
+08A0  2   -   2   DICTINS Dx, Dy, Ax, Ay      Insert 64-bytes (Ax) into dictionary Dy with value 64-bytes (Ay)
+08B0  2   -   2   DICTREM Dx, Dy, Ax          Remove Ax from dctionary Dy -> Result in Dx
+08C0  2   -   2   DICTFIND Dx, Dy, Ax, Ay     Find Ax in dictionary Dy.  Result in Dx, Dy
+08D0  2   -   1   DICTCLR Dx                  Clear dictionary Dx
+08E0  3   -   3   SORT Dx, Dy, Ax, Ay, Az     Sort Dx records, Ax to Ay via method Az. Length of record Dy
+08F0  3   -   2   SOUNDEX Dx, Dy, Ax, Ay      Compute soundex code for Ax to Ay using mode Dy.  Result in Dx
+0900  3   -   0   SERESET                     Secure enclave reset59
+0910  3   -   0   SEINSERT Ax, Ay             Secure enclave insert key Ax, value Ay
+0920  3   -   2   SEMATCH Dx, Ax, Ay          Given a key Ax, and a value Ay, are they correct -> Dx
+0930  3   -   1   SEREMOVE Dx, Ax             Remove key Ax from secure enclave -> Dx
+
+0A00  3   0   0   YIELD                       Yield the CPU
+0A10  3   0   1   GETPID Dx                   Return PID in Dx
+0A20  3   0   1   FORK Dx                     Fork a process - return new PID in Dx
+0A30  3   0   0   JOIN                        Join proccessses
+0A40  3   0   2   HALLOC Dx, Dy, Ax           Attempt to get Dy words of memory on the heap and put in address Ax -> Dx
+0A50  3   0   1   HFREE Dx, Ax                Free memory at Ax -> Dx
+0A60  3   0   1   SUPER Dx                    Become super user to privilege Dx -- returns state in Dx
+0A70  3   0   0   MORTAL                      Be a normal user
+0A80  3   0   1   SLEEP Dx                    Sleep a propcess for Dx time units
+0A80  3   0   0   TICK                        Sleep one time cycle
+0A90  3   0   1   NICE Dx                     Set process priotity to Dx
+0AB0  3   0   1   TRYLOCK Dx, Dy              Lock on a key
+0AC0  3   0   1   UNLOCK Dx                   Unlock a key
+
+0C00  3   -   -   *GURU                       Call Guru monitor supervisor function
+0C10  3   -   2   *INPORT Dx, Dy, Dz          Get a word from Port Dz and store in Dy.  Result in Dz
+0C20  3   -   2   *OUTPORT Dx, Dy, Dz         Write a word in Dz to Port Dy.  Result in Dx
+0C30  3   0   0   *RESETCPU                   Reset processor
+0C40  3   0   0   *DEBUG                      Debug break
+0C50  0   0   0   *SYSRET                     Return from system call
+0C60  0   0   -   *TRAP                       Perform system trap
+0C70  3   -   -   *COPROCRET                  Return from coprocessor
+0C80  3   -   0   *TASKSW                     Task switch to value in process/segment register
+
+3FF0  3   0   0   Halt, Catch fire, go boom.  Halt, Catch fire, that's no fire.  Go for full destruction!
+
+Pragmas
+    .manifest
+        .program name                           Defines name of program
+        .version string                         Program version (optional)
+        .author string                          Program author (optional)
+        .created string                         Program creation date (optional)
+        .modified string                        Program modification date (optional)
+        .account name password accountcode      Run as user/password
+        .errorsto email|filename                Send errors to e-mail address or file
+        .inputfrom filename                     Get stdin from filename
+        .outputto email|filenae                 Send stdout to email|filename
+        .maxtime timeunits                      Set maximum runtime to timeunits
+    .proessor name ...values.                  Define parameters for a processor type
+    .memory [flat|kernel|monitor]               Define memory model parameters
+    .format [asm|binary]                        Format of input data
+    .output [oobj|obin] [pic]                   Define binary output format (optional) [position independent]
+    .password xxxxxx xxxxxxx                    Require a password to run (optional)
+    .require [model|feature|memory|iO] [value]  Require a resource to run (optional)
+    .desire [model|feature|memory|iO] [value]   Require a resource to run (optional)
+    .priv [mode]                                Require specific privilege
+    .segment [name] [rwxlnsdlk]                 Define segment permissions code|data|stack read|write|execute|locked|
+                                                                            [normal|service|driver|kernel]
+    .end                                        End of file
+    .include "filename"                         Include a source file
+    .[no]list                                   Enable listing
+    .extern [symbolname]                        Require a symbol that is external
+    .public [symbolname]                        Define a publicly known symbol (often used by extern)a
+    .db xx ...                                  Define a byte set
+    .dw xxxx ...                                Define a word set
+    .dd xxxxxxxx ....                           Define a double world set
+    .dq xxxxxxxxxxxxxxxx ...                    Define a quad word set
+    .das " "                                    Define ASCII8 string
+    .dus " "                                    Define unicode-16 string
+    .df xxxx.xxxx                               Define 64-bit floating point set
+    .macro name ....                            Define a macro
+    .endm                                       End macro definition
+    @name                                       Invoke a macro
+    .func [name] [calling convention]           Function calling convetion (ex: func main clinux)
+    ex: main ccall
+
+OpCode[.A|R|L|Q|D|B] Reg....
+         .A absolute address
+         .R relative address (default)
+         .L(ong) 64-bits
+         .Q(uad) 32-bits
+         .D(ouble) 16-bits
+         .B(yte) 8-bits (default)
+Ex: MOVE.L D04,X D08,Z
+    JUMP.R
+
+Registers =
+    0x00-0x1F   64-bit data registers Dx (32) Can be swapped
+    0x20-0x3F   64-bit address registers Ax (32) Can be swapped
+    0x40-0x5F   64-bit Process control/flag registers Cx (32)
+    0x60-0x7F   64-bit System control/flag registers Cx (32)
+
+Special registers
+    0x1F    Y index
+    0x1E    X index
+
+
+    0x40   Process message interrupt mask
+    0x41   Process Message service table address
+    0x42   Process Trap service table address
+    0x43   Status bits
+        0x----:----:----:---1   - Zero value result
+        0x----:----:----:---2   - Greater-than result
+        0x----:----:----:---4   - Less than result
+        0x----:----:----:---8   - Process received error
+        0x----:----:---1:----   - Error is fatal
+        0x----:----:---2:----   - Inside trap
+        0x----:----:---4:----   - Inside trap service routine
+        0x----:----:---8:----   - Inside I/O serivce routine
+        0x----:---1:----:----   - MMU in "linear" mode
+        0x----:---2:----:----   - MMU in banked mode
+        0x----:---4:----:----   - MMU in protected mode
+        0x----:---8:----:----   - MMU in virtual mode
+        0x----:--1-:----:----   - In privileged mode
+        0x8---:----:----:----   - CPU was just reset
+    0x44    Messages needing service
+    0x45    Process Interrupt service table address
+    0x46    Process Interrupt service table mask
+
+    0x7A   System message interrupt mask
+    0x7B   System message interrupt service table address
+    0x7C   System Message service table address
+    0x7D   System Trap service table address
+    0x7E   System Control
+        0x----:----:----:---1   - Disable shadow stack protection
+        0x----:----:----:---2   - Enable single-step
+        0x----:----:----:-MM-   - Enable memory mode
+                                  0 = Linear
+                                  1 = Banked
+                                  2 = Protected
+                                  3 = Virtual
+        0x8---:----:----:----   - Reset CPU to startup state
+    0x7F    System Process/Task selector
+        0x----:----:PPPP:--SS   - Select a given process/segment
+
+Traps =>
+    IllegalMemoryReferenceTrap(-1)
+    IllegalParameterTrap(-2)
+    IllegalInstructionTrap(-3)
+    IllegalPriviledgeTrap(-4)
+    StackCorruptionTrap(-5)
+
+Messages =>
+    InboundSoftwareMessage
+    InboundHardwareMessage
+    InboundCPUMessage
+
+ProcessContextArray map[PPPP]ProcessContext
+ProcessContext =>
+        Registers[]
+        ShadowStack[]
+
+cpu =>
+    ProcessContext Ptr
+    MonitorInterface
+    IOInterface
+    MemoryInterface
+
+-- IO Descripters
+   16-class 0-0xFFFF
+   16-IO ID 1-0xFFFF (0 = use base class)
+   32-bits IO specific
+
+
+        ;; Write to text console
+        MOVEI D1, 0x0006'0000'0000'0000 ; Class 6, unit 0
+        MOVEI D2, 0x0000'0000'0000'0001 ; Write text
+        MOVE  A0, TextMessage           ; Address of text string
+        IOREQ D0, D1, D2, A0
+
+Examples:
+0000:Bios
+   0001: System data
+                0x0000'0000'0000'0001 -- Get BIOS version
+   0002: Timers
+                0000'0000'0000'0000: Set periodic timer
+                0000'0000'0000'0001: Clear periodic timer
+                0000'0000'0001'0000: Set countdown timer
+                0000'0000'0001'0001: Clear countdown timer
+   0003: Real-time clock
+                0000'0000'0000'0000: Read time in ms
+                0000'0000'0000'0001: Set time in ms
+                0000'0000'0000'0002: Read ascii date/time
+                0000'0000'0000'0003: Read ascii date
+                0000'0000'0000'0004: Read ascii time
+    0004: Boot system
+                0000'0000'0000'0000: Boot OS #
+                0000'0000'0000'0001: Get OS list
+0001: Legacy Card Unit
+    000U: Reader unit #
+                0000'0000'0000'0000 -- Read next card
+                FFFF'FFFF'FFFF'FFFE -- Unit information
+                FFFF'FFFF'FFFF'FFFF -- Unit status
+                 F    E    D    C    B    A    9    8    7    6    5    4    3    2    1    0
+                ----:----:----:----:----:----:----:CCCC:----:----:----:----:----:----:----:--RE
+                R = Unit ready
+                E = Error
+                CCCC = Card size in characters
+    010U: Punch unit #
+                0000'0000'0000'0000 -- Punch a card
+                FFFF'FFFF'FFFF'FFFE -- Unit information
+                FFFF'FFFF'FFFF'FFFF -- Status
+                 F    E    D    C    B    A    9    8    7    6    5    4    3    2    1    0
+                ----:----:----:----:----:----:----:CCCC:----:----:----:----:----:----:----:--RE
+                E = Error
+                R = Unit ready
+                CCCC = Card size in characters
+0002: Legacy Reel tape
+    000U: Tape unit
+                0000'0000'0000'0000 -- Load tape
+                0000'0000'0000'0001 -- Unload tape
+                0000'0000'0000'0002 -- Write blocks
+                0000'0000'0000'0003 -- Read blocks
+                0000'0000'0000'0004 -- Seek to block
+                0000'0000'0000'0005 -- Rewind tape
+                0000'0000'0000'0006 -- Format directory
+                0000'0000'0000'0007 -- Write entry in directory
+                0000'0000'0000'0008 -- Read directory entry
+                FFFF'FFFF'FFFF'FFFE -- Unit information
+                FFFF'FFFF'FFFF'FFFF -- Drive status
+                 F    E    D    C    B    A    9    8    7    6    5    4    3    2    1    0
+                ----:----:----:----:----:----:CCCC:CCCC:BBBB:BBBB:----:----:----:----:--BX:WLRE
+                    R = Ready
+                    L = Loaded
+                    E = End of tape
+                    W = Write protect
+                    X = Error
+                    B = At beginning of tape
+                    CCCC:CCCC Block size
+                    BBBB:BBBB Number of blocks
+0003: Disk pack/Hard drive
+    1CDP: Controller/Disk #/Partition
+                0000'0000'0000'0000 -- Load pack
+                0000'0000'0000'0001 -- Unload pack
+                0000'0000'0000'0002 -- Lock/Unlock pack
+                0000'0000'0000'0003 -- Write/No-write protect
+                0000'0000'0000'0004 -- Write blocks
+                0000'0000'0000'0005 -- Read blocks
+                0000'0000'0000'0006 -- Seek to block
+                0000'0000'0000'0007 -- Mark block as bad
+                FFFF'FFFF'FFFF'FFFE -- Unit Information
+                FFFF'FFFF'FFFF'FFFF -- Drive status?
+                 F    E    D    C    B    A    9    8    7    6    5    4    3    2    1    0
+                ----:----:----:----:----:----:CCCC:CCCC:BBBB:BBBB:----:----:----:----:--ST:XURL
+                    R = Ready
+                    L = Locked
+                    U = Unloaded
+                    X = Error
+                    T = Needs trim
+                    S = SSD/NAND
+                    CCCC:CCCC Block size
+                    BBBB:BBBB # of Blocks
+0004: Printer
+    10UM: Unit #/Mode
+        0000'0000'0000'0000-- Print a line
+        FFFF'FFFF'FFFF'FFFF-- Unit information
+        FFFF'FFFF'FFFF'FFFF-- Printer status
+                 F    E    D    C    B    A    9    8    7    6    5    4    3    2    1    0
+                ----:----:----:----:----:----:----:----:----:DPII:NFOS:NNNN:NNNN:-DGH:PW7C:ITMR
+                R = Ready
+                M = Out of media (Paper)
+                T = Out of toner
+                I = Idle
+                C = Color
+                7 = 70s Cobol control codes
+                W = HTML
+                P = Poscript
+                H = HP Grpahics
+                G = Bitmapped Graphics support
+                D = Drawing (Pen-style) support
+                NNNN:NNNN = Device # of colors (32-bit value)
+                DPIINFOS: DPI Information (32-bit value)
+
+0005: Panel
+    0001: Buttons
+    0002: Bell
+        0000'0000'0000'0000 -- Ring bell
+    0003: Lights
+        0000'0000'0000'0000 -- Set value of light
+0006: HID Device
+    10UU: Text Screen
+        0000'0000'0000'0000 -- Write character
+        0000'0000'0000'0001 -- Write line
+        0000'0000'0000'0002 -- Clear screen
+        0000'0000'0000'0003 -- Move curson to position
+        0000'0000'0000'0004 -- Get screen size
+    20UU: Text Keyboard
+        0000'0000'0000'0000 -- Read character
+        0000'0000'0000'0001 -- Read line
+    30UU: Mouse/Touch screen
+        0000'0000'0000'0000 -- Read mouse position
+        0000'0000'0000'0001 -- Read mouse button
+0007: Leased line services
+    000U: Automatic call unit
+        0000'0000'0000'0000 -- Establish a connection to a channel endpoint
+        0000'0000'0000'0001 -- Disconnect a channel endpoint
+    00UU: Channel Unit
+        0000'0000'0000'0000 -- Send a character
+        0000'0000'0000'0001 -- Send a line
+        0000'0000'0000'0002 -- Send a block
+        0000'0000'0000'0003 -- Receive character
+        0000'0000'0000'0004 -- Receive line
+        0000'0000'0000'0005 -- Receive block
+        FFFF'FFFF'FFFF'FFFE -- Get unit information
+        FFFF'FFFF'FFFF'FFFF -- Get status
+                 F    E    D    C    B    A    9    8    7    6    5    4    3    2    1    0
+                ----:----:----:----:----:----:----:----:----:----:----:----:----:----:---E:SRBC
+                C = Connected
+                B = Busy
+                R = Ready to Receive
+                S = Ready to Send
+                E = Error
+0008: Non IP-LAN (OnyxNet)
+    0000'0000'0000'0000 -- Connect to a node endpoint
+    0000'0000'0000'0001 -- Disconnect to a node endpoint
+    0000'0000'0000'0002 -- Send a block on a stream
+    0000'0000'0000'0003 -- Receive a block on a stream
+    0000'0000'0000'0004 -- Send a unique block
+    0000'0000'0000'0005 -- Receive a unique block
+    0000'0000'0000'0006 -- What is my address?
+    0000'0000'0000'0007 -- Set address
+    FFFF'FFFF'FFFF'FFFF -- Get status
+0009: Graphics
+        0000'0000'0000'0000 -- Send image
+        0000'0000'0000'0001 -- Clear screen
+        0000'0000'0000'0002 -- Dump image to file
+        0000'0000'0000'0003 -- Load image from file
+        0000'0000'0000'0004 -- Get status
+000A: Sound
+    010C: PCM audio
+        0000'0000'0000'0000 -- Send audio
+        0000'0000'0000'0001 -- Receive audio
+    030C: MP3
+        0000'0000'0000'0000 -- Send audio
+        0000'0000'0000'0001 -- Receive audio
+    020C: Beeps and Boops
+        0000'0000'0000'0000 -- Make beep
+000B: USB
+000C: IP Network
+000D: Speech
+    0000'0000'0000'0000 -- Say speech
+    0000'0000'0000'0001 -- Attempt to read speech
+000E: MIDI
+000F: Object Storage
+0010: GPIO/Sensors
+    1UUU: Unit
+        0000'0000'0000'0000: Read the value of a sensor
+        0000'0000'0000'0001: Write the value to a sensor
+0011: Locking daemon
+    0000'0000'0000'0000 -- Lock an object
+    0000'0000'0000'0001 -- Unlock an object
+    0000'0000'0000'0002 -- Is an object locked
+02XX: Real-world devices
+FXXX: Vendor specific devices
+
+Virtual Memory Map (In 4G page spaces) =
+--4-bits---16-bits---12-bits---
+  Region   Process   Segment
+
+Memory Segment =>
+    CanRead         boolean
+    CanWrite        boolean
+    CanExecute      boolean
+    IsInMemory      boolean
+    IsInCode        boolean
+    ProcessID       uint16
+    GroupID         uint16
+    SegmentLength   uint32
+    CodeHandler     CodeReference
+
+VirtualMemoryPage =>
+    SegmentID           Segment
+    PhysicalMemoryPage  uint64
+    InMemory            boolean
+    IsLocked            boolean
+    OnDisk              boolean
+    IsDirty             boolean
+    DiskBlock           uint64
+    LastRead            uint64
+    LastWritten         uint64
+
+
+    0xF-0000-000 System info block
+        Settings:
+            F000:0000:0000:0000 Max Code Pages
+            F000:0000:0000:0001 Max Data Pages
+            F000:0000:0000:0002 Max Stack Pages
+            F000:0000:0000:0003 Max Heap Pages
+            F000:0000:0000:0004 Max Shared Memory
+            F000:0000:0000:0005 Max Buffer pool
+            F000:0000:0000:0006 Max ROM Size
+            F000:0000:0000:0008-F000:0000:0000:000F CPU Model
+            F000:0000:0000:0010-F000:0000:0000:001F Feature Set Bits
+            F000:0000:0000:0020-F000:0000:0000:0023 CPU Serial Number
+           :0000:0000:0030 Rom info jump address
+            F000:0000:0000:0031 System startup address
+            F000:0000:0000:0040 Boot device
+            F000:0000:0000:0041 Memory Mode
+            F000:0000:0000:0042 Max Segments
+            F000:0000:0000:0043 Max Processes
+            F000:0000:0000:0044 Max Banks
+            F000:0000:0000:0045-F000:0000:00048 Node GUID ID
+            F000:0000:0000:0049-F000:0000:0004C Node Zone GUID ID
+            F000:0000:0000:004D Address of monitor entry point
+    0xF-0001-004 UEFI Bios Shadow Stack
+    0xF-0001-003 UEFI Bios Stack
+    0xF-0001-001 UEFI Bios Heap
+    0xF-0001-001 UEFI Bios Data
+    0xF-0001-000 UEFI Bios Code
+    0xF-0002-III I/O Space (III = IO Class)
+    0xF-0003-III Buffer Pool Space (III = IO Class)
+    0xF-0004-000 MMU Control Block
+    0xF-0005-004 Kernel Shadow Stack
+    0xF-0005-003 Kernel Stack
+    0xF-0005:002 Kernel Heap
+    0xF-0005:001 Kernel Data
+    0xF-0005:000 Kernel Code
+    0xF-0006:KKK Shared Memory (KKK = Key)
+    0xF-0067-KKK Shared ROM Space (KKK = Key)
+    0xF-0008-000 Mohitor space
+    0xF-1PPP-P00 Context space
+
+User Program Memory
+    0x0-PPPP-0SS    Code
+    0x0-PPPP-1SS    Static Data
+    0x0-PPPP-2SS    Dynamic Data (Heap)
+    0x0-PPPP-300    Stack
+    0x0-PPPP-301    Shadow Stack
+
+Boot Disk =>
+        Block 0:
+                0000:0007: (8 bytes) flags
+                  F    E    D    C    B    A    9    8    7   6    5    4    3     2   1    9
+                ----:----:----:----:----:----:----:----:----:----:----:----:----:----:---D:AUPB
+                        B = Boot block present
+                        U = UEFI Block present
+                        P = Parition block present
+                        A = Active
+                        D = Dirty
+
+                0007:000F: (8 bytes) Serial #
+                0010:001F: (16 bytes) Disk name (ASCII)
+                0020:0027: (8 bytes) # of blocks on disk
+                0028:002F: (8 bytes) # of bad blocks available
+                0030:0037: (8 bytes) Block # where bad blocks start)
+                0038:003F: Size of block
+                0040:0047: (8 bytes) Block # for UEFI table
+                0048:004F: (8 bytes) Alternate Block # for UEFI table
+                0050:0057: (8 bytes) # of UEFI blocks that follow
+                0058:005F: (8 bytes) Block # for parition table)
+                0060:0067: (8 bytes) Alternate Block # for parition table)
+                0060:006F: (8 bytes) # of partition blocks that follow
+                0070:0077: (8 bytes) Block # for boot code
+                0078:007F: (8 bytes) Alternate # for boot code
+                0080:0087: (8 bytes) # of boot code blocks that follow
+
+UEFI Table => (64 OS's)
+        0000:000F: (16 bytes) ASCII OS Name
+        0010:0013: (4 bytes) Controller/Disk/Parition #
+        0014:001F: (Reserved)
+        0020:002F: (16 bytes) Boot file on UEFI partition // Will be loaded into kernel memory directly
+        0030:003F: (Reserved)
+        ....
+
+Partition Table =>
+        0000:000F: (16 bytes) Parition name
+        0010:0013: (8 bytes) Partition type code
+        0014:001F: (8 bytes) Parition start block group
+        0020:0027: (8 bytes) Partition size (in block groups)
+        0028:003F: Reserved
+
+OnyxFS =>
+        Data Block Group =>
+                0000:0007: Parent block (64-bit block)
+                0008:000F: Block start  (64-bit block)
+                0010:0017: Block length (# of blocks that follow in the run)
+                0018:001F: Next block   (64-bit block)
+                0020:0023: Block type   (32-bit block ID number)
+                0024-002B: Block size   (8-bit how large are blocks in this extent)
+                002C:003F: Reserved
+
+        Superblock =>
+            File System Type        (64-bits)
+            Total Available Blocks  (64-bits)
+            Free Block Count        (64-bits)
+            Root Directory Block    (64-bits)
+
+        Directory Block =>
+            0000:001F Name
+            0010:0017 Permissions block
+            0018:001F Parent block
+            0020:0FFF Sub-blocks (files, directories, indirect) 508 entries per block
+
+        FileSystem =>
+            FIleName (32 bytes)
+            Permission Block Ptr
+            Data Block Group Pointer
+
+        Permissions Block =>
+            0000:0007 User ID
+            0008:000f Group ID
+            0010:0017 Permission Bits
+            0018:001F Reserved
+
+              F   E    D    C    B    A    9    8    7    6    5    4    3    2    1    0
+            ----:----:----:----:----:----:----:----:----:----:----:----:----:----:---A:SXWR
+                S = Super user allowed
+                A = Auto super user
+                R = Readable
+                W = Writable
+                E = Executable
+
+        BlockTypes =>
+            0000'0000'0000'0000 Root block
+            0000'0000'0000'0001 Directory block
+            0000'0000'0000'0002 File block
+            0000'0000'0000'0003 Indirect block
+            0000'0000'0000'0004 Block Group block
+
+        FileSystem Type Codes:
+            0000'0000'0000'0000   Unknown
+            0000'0000'0001'0000   OnyxBootFS 1.0
+            0000'0000'0001'0100   OnyxFS 1.0
+
+        OnyxBootFS Structure
+            Block 0
+                0000:001F Name              (32 chars)
+                0020:0027 Load address      (64-bits)
+                0028:002F Size              (Number of blocks)
+                0030:0037 Next OS Block     (64-bits)
+                0038:007F Reserved
+                0080:00FF Parameters
+            Block 1+(size-1)
+                 ... Blocks follow
+
+Process Stepping
+    CPU Maintenance
+    IO Operations
+    Errors/Traps
+    Load from memory
+    Decode
+    Execute
+    Store to memory
+
+Memory Configurations =>
+  Linear
+    Processes: 1 Segments: 0 Banks: 1
+    Linear =>
+      Single block of uint8
+      func Init, Exit, Read, Write, LoadBlock, SaveBlcok
+    Banked
+      Processes: 1 Segments: 0 Banks: (number)
+      func Init, Exit, Read, Write, SelectBank, GetBank, LoadBlock, SaveBlock
+    Virtual
+      Processes: (number) Segments: (number) VirtualPages (number) Physical Pages (number)
+      func Init, Exit, Read, Write, LoadBlock, SaveBlock,
+            SwapIn, SwapOut
+
+Conifguration =>
+  CPU:
+    Model:
+    Features:
+  Memory:
+    Type: [Linear|Banked|Virtual]
+    Pages: #
+      { Banked }
+        Bank size: #
+        BankNumber #...
+      { Virtual }
+        VirualPages #
+        PhysicalPages #
+
+Programs included:
+    onyxsim         - Program that runs the simulator/monitor
+    onuxasm         - Program that assembles code
+    onyxlink        - Program that links code modules
+    onyxdump        - Dump code object to readable format
+    onyxdisasm      - Disassemble code
+    onyxiodispatch  - I/O Dispatcher for various lower-level services
+    onyxsysmon      - Onyx system monitor
+    onyxnetrtr      - Onyx network router
+    onyxnet         - Onyx network node
+-- Someday perhaps --
+    onyxcc          - Onyx C compiler
+    onyxbas         - Onyx basic interpreter
+    onyxmonkey      - Onyx monkey interpreter
+    onyxasm2nat     - Onyx assembly to native code
+
+Onyx Object Format
+    Data Types
+        End-of-attributes       0x00
+        (64-bit Int              0x01
+        32-bit Int              0x02
+        16-bit Int              0x03
+         8-bit Int              0x04
+        0-terminated string     0x05
+        String attribute        0x06
+
+    .manifest(0000'0000)
+        .program(0000'0001)
+            (06)name)(05)string(00)
+        .version(0000'0002)
+            (05)string(00)
+        .author(0000'0003)
+            (05)string(00)
+        .created(0000'0004)
+            (05)string(00)
+        .modified(0000'0005)
+            (05)string(00)
+        .account(0000'0006)
+            (05)name
+            (05)password
+            (05)accountcode
+            (05)Run as user/password(05)string
+            (00)
+        .errorsto(0000'0007)
+            (05)email|filename
+            (00)
+        .inputfrom(0000'0008)
+            (05)filename
+            (00)
+        .outputto(0000'0009)
+            (05)email|filenae(00)
+        .maxtime(0000'000A)
+            (05)timeunits(00)
+    .proessor(0000'000B)
+        (06)name(05)values(00)
+    .memory(0000'000C)
+        (06)value(00)
+    .format(0000'000D)
+        (06)value(00)
+    .output(0000'000E)
+        (06)value(00)
+    .require(0000'000F)
+        (06)model
+        (06)feature
+        (06)memory
+        (06)iO
+        (06)value
+        (00)
+    .desire(0000'0010)
+        (06)[model
+        (06)feature
+        (06)memory
+        (06)iO
+        (06)[value
+    .priv(0000'0011)
+        (06)mode
+   .segment(0001'0000)
+        (05)name(06)value(00)
+        .segpublicsymbols(0001'0001)
+            symbol(0001'0002)
+                (06)name(05)value(06)value(01)address(00)
+        .symbolextern(0001'0003)
+            symbol(0001'0002)
+                (06)name(05)value(06)value(01)address(00)
+        .priv(0001'0003)
+            (05)value(00)
+    .code(0002'0000)
+        .size(0002'0001)
+            (01)value(00)
+        ... bytes
+.endoffile(ffff'ffff)
