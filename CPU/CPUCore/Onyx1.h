@@ -13,6 +13,9 @@ public :
     uint64_t       *addressRegisters;
     uint64_t       *controlRegisters;
     uint64_t        instructionCount;
+    uint64_t        cpuModel;
+    uint64_t        featureSetA;
+    uint64_t        featureSetB;
     uint64_t        PC;            // Program counter
     uint64_t        SP;            // Stack pointer
     uint64_t        SSP;           // Shadow stack pointer

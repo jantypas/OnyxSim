@@ -7,11 +7,14 @@
 #include "../MemInterface.h"
 #include <map>
 #include <vector>
+#include "../../Configuration/ConfigParameters.h"
+#include "Swapper.h"
 
 class VirtualMemoryPageInfo {
 public :
     uint32_t    physicalPage;
     uint16_t    pageState;
+    bool        recentlyUsed;
 };
 
 class PhysicalMemoryPageInfo {
@@ -33,16 +36,17 @@ private :
     uint8_t                                     *physicalStorage;
     uint32_t                                    minVirtualPages;
     uint32_t                                    minPhysicalPages;
-    const char                                  *swapName;
-    FILE                                        *swapFile;
     bool                                        isActive;
-    bool MarkPhysicalPageAsUsed(uint32_t page);
-    bool MarkPhysicalPageAsFree(uint32_t page);
-    bool MarkVirtualPageAsUsed(uint32_t page);
-    bool MarkVirtualPageAsFree(uint32_t page);
-    bool WritePageToSwap(uint32_t page);
-    bool ReadPageFromSwap(uint32_t page);
-public :
+    Swapper                                     swapper;
+
+    bool markPhysicalPageAsFree(uint32_t page);
+    bool markPhysicalPageAsUsed(uint32_t page);
+    bool markVirtualPageAsFree(uint32_t page);
+    bool markVirtualPageAsUsed(uint32_t page, uint32_t physPage);
+    bool findFreePagesFromTheLRU(std::vector<uint32_t> &pages);
+    bool SwapOutPageList(std::vector<uint32_t> &list);
+    bool SwapInPageList();
+public:
     bool InitLinear(uint32_t pNumPages) override;
     bool InitBanked(uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) override;
     bool InitVirtual(uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) override;
@@ -56,7 +60,7 @@ public :
     bool AllocateNPages(uint32_t pPages, uint32_t *pPagelist) override;\
     bool FreeNPages(uint32_t pPages, uint32_t *pPageList) override;
     bool SwapInPage(uint32_t page) override;
-    bool SwapoutPage(uint32_t page) override;\
+    bool SwapOutPage(uint32_t page) override;
 };
 
 

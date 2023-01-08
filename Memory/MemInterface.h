@@ -7,7 +7,8 @@
 #define ONYXSIM_MEMINTERFACE_H
 
 #define MEM_PAGE_SIZE       4096
-#define MIN_PHTSICAL_PAGES  16
+#define MIN_PHYSICAL_PAGES  16
+#define MIN_SWAPPABLE_PAGES 4
 #define MIN_VIRTUAL_PAGES   32
 #define MIN_MAIN_BANKS      4
 #define MIN_BANK_SIZE       16
@@ -35,6 +36,43 @@
 #define PAGE_STATE_PRIV_DRIVER      0x0020
 #define PAGE_STATE_PRIV_SYSTEM      0x0030
 
+enum MemoryMode {
+    MEMORY_LINEAR,
+    MEMORY_BANKS,
+    MEMORY_VIRTUAL
+};
+
+struct LinearInfo {
+    uint32_t numPages;
+};
+
+struct BankedInfo {
+    uint32_t pageSize;
+    uint32_t numMainBanks;
+    uint32_t numAuxBanks;
+    uint8_t  switchableBank;
+    uint8_t  currentBank;
+};
+
+struct VirtualInfo {
+    uint32_t    numPhysicalPages;
+    uint32_t    numFreePhysicalPages;
+    uint32_t    numVirtualPages;
+    uint32_t    numFreeVirtualPages;
+    std::string swapFileName;
+};
+
+struct MemoryInfo {
+    std::string memoryTypeName;
+    MemoryMode  memoryMode;
+    union {
+        LinearInfo  linfo;
+        BankedInfo  binfo;
+        VirtualInfo vinfo;
+        uint32_t    swapInsPerSec;
+        uint32_t    swapOutsPerSec;
+    } Info;
+};
 
 struct MemoryErrorMessage {
     std::string msg;
@@ -58,6 +96,7 @@ public :
     virtual bool FreeNPages(uint32_t pPages, uint32_t *pPageList) = 0;
     virtual bool SwapoutPage(uint32_t page) = 0;
     virtual bool SwapInPage(uint32_t page)  = 0;
+    virtual MemoryInfo GetInfo() = 0;
 };
 
 extern MemoryErrorMessage   MemoryErrorTable[];
