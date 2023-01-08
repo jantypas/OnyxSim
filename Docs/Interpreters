@@ -2,7 +2,7 @@ Lisp-style language
 ---------------------
 (Stop) (Exit) (Noop)
 (Var) (let)
-(cat cons tail, head)
+(cat) (cons) (tail) (head)
 (Test)
 (+) (-) (*) (/) (%) (&) (|) (~) (^) (<<) (>>)
 (sin) (cos) (tan) (asin) (acos) (atan) (ln) (etox) (**) (root)

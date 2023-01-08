@@ -755,6 +755,7 @@ Programs included:
     onyxsysmon      - Onyx system monitor
     onyxnetrtr      - Onyx network router
     onyxnet         - Onyx network node
+    onyxlisp        - A lisp-like language
 -- Someday perhaps --
     onyxcc          - Onyx C compiler
     onyxbas         - Onyx basic interpreter
@@ -836,3 +837,8 @@ Onyx Object Format
             (01)value(00)
         ... bytes
 .endoffile(ffff'ffff)
+
+Runtime file biinding
+    monitor takes the --bindfile option
+    --bindfile programfilename nativefilename
+
