@@ -260,6 +260,10 @@ bool Virtual::ReadAddress(uint64_t addr, uint8_t *value) {
         }
     }
     uint32_t physPage = virtualPageTable[page].physicalPage;
+    if (SwapInPage(page)) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_CANT_SWAP_IN_PAGE];
+        return false;
+    }
     *value = physicalStorage[(physPage*MEM_PAGE_SIZE)+(addr/MEM_PAGE_SIZE)];
     return true;
 }

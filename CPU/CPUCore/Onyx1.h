@@ -4,6 +4,7 @@
 #include <stdint-gcc.h>
 #ifndef ONYXSIM_ONYX1_H
 #define ONYXSIM_ONYX1_H
+#include "../../CPU/Microcode/CPUMicrocode.h"
 #include "../../Memory/MemInterface.h"
 #include "../../Processes/Process.h"
 #include "../../IO/IOInterface.h"
