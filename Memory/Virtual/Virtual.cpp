@@ -374,6 +374,23 @@ bool Virtual::GetBank(uint8_t *bank) {
 }
 
 bool Virtual::AllocateNPages(uint32_t pPages, uint32_t *pPagelist) {
+    // Get the next virtual page off the fre list
+    if (virtualFreePagesList.empty()) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NO_VIRTUAL_PAGES];
+        return false;
+    }
+    uint32_t newVirtPage = *virtualFreePagesList.end();
+    markVirtualPageAsUsed(&newVirtPage);
+
+    // Allocate a physical page to this virtual page
+    if (physicalFreePagesList.size() < MIN_SWAPPABLE_PAGES) {
+        if (!SwapOutPageCandidates()) {
+            LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NO_PHYSICAL_PAGES];
+            return false;
+        };
+    }
+    uint32_t newPage = *physicalFreePagesList.end();
+    virtualPageTable[newVirtPage].physicalPage = newPage;
     return true;
 }
 
@@ -443,5 +460,18 @@ bool Virtual::SwapOutPage(uint32_t page) {
 }
 
 bool Virtual::FreeNPages(uint32_t pPages, uint32_t *pPageList) {
+    if (pPages >= numVirtualPages) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
+        return fasle;
+    }
+    uint32_t state = virtualPageTable[pPages].pageState;
+    if (IS_FLAG_CLEAR(state, PAGE_STATE_IN_USE) ||
+        IS_FLAG_SET(state, PAGE_STATE_IS_ON_DISK) ||
+        IS_FLAG_SET(state, PAGE_STATE_IS_LOCKED)) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_PAGE_IS_LOCKED];
+        return false;
+    }
+    markPhysicalPageAsFree(virtualPageTable[pPages].physicalPage);
+    markVirtualPageAsFree(pPages);
     return true;
 }
