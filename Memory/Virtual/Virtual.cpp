@@ -7,16 +7,17 @@
 #include <memory.h>
 #include <algorithm>
 #include <iterator>
+#include <memory.h>
 
 /**
  * We need these macros to make our life easier
  * Some inline defines to manage flags rather than compiled functions and
  * a couple of templates for things we're going to do over and over again.
  */
-#define CLR_FLAG(x, y) x &= ~y;
-#define SET_FLAG(x, y) x &= y;
-#define IS_FLAG_CLEAR(x, y) (x & y) != y
-#define IS_FLAG_SET(x, y) (x & y) == y
+#define CLR_FLAG(x, y)          x &= ~y;
+#define SET_FLAG(x, y)          x &= y;
+#define IS_FLAG_CLEAR(x, y)     (x & y) != y
+#define IS_FLAG_SET(x, y)       (x & y) == y
 
 /**
  * Same here -- this template allows sus to remove all of a given value
@@ -181,7 +182,7 @@ bool Virtual::SwapOutPageList(std::vector<uint32_t> &list) {
     return true;
 }
 
-bool Virtual::SwapInPageList() {
+bool Virtual::SwapOutPageCandidates() {
     std::vector<uint32_t> list;
     if (findFreePagesFromTheLRU(list)) {
         if (SwapOutPageList(list)) {
@@ -251,7 +252,7 @@ bool Virtual::ReadAddress(uint64_t addr, uint8_t *value) {
         return false;
     }
     if (IS_FLAG_SET(virtualPageTable[page].pageState, PAGE_STATE_IS_ON_DISK)) {
-        if (!SwapInPageList()) {
+        if (!SwapOutPageCandidates()) {
             LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_CANT_SWAP_IN_PAGE];
             return false;
         } else {
@@ -283,12 +284,19 @@ bool Virtual::WriteAddress(uint64_t addr, uint8_t value) {
         return false;
     }
     if (IS_FLAG_SET(virtualPageTable[page].pageState, PAGE_STATE_IS_ON_DISK)) {
-        if (!SwapInPage(page)) {
+        if (!SwapOutPageCandidates()) {
+            LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_CANT_SWAP_IN_PAGE];
+            return false;
+        } else {
             LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_CANT_SWAP_IN_PAGE];
             return false;
         }
     }
     uint32_t physPage = virtualPageTable[page].physicalPage;
+    if (SwapInPage(page)) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_CANT_SWAP_IN_PAGE];
+        return false;
+    }
     physicalStorage[(physPage*MEM_PAGE_SIZE)+(addr/MEM_PAGE_SIZE)] = value;
     return true;
 }
@@ -307,13 +315,20 @@ bool Virtual::LoadPage(uint32_t page, uint8_t *buffer) {
         return false;
     }
     if (IS_FLAG_SET(virtualPageTable[page].pageState, PAGE_STATE_IS_ON_DISK)) {
-        if (!SwapInPage(page)) {
+        if (!SwapOutPageCandidates()) {
+            LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_CANT_SWAP_IN_PAGE];
+            return false;
+        } else {
             LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_CANT_SWAP_IN_PAGE];
             return false;
         }
     }
     uint32_t physPage = virtualPageTable[page].physicalPage;
-    memcpy(&physicalStorage[physPage*MEM_PAGE_SIZE], buffer, MEM_PAGE_SIZE);
+    if (SwapInPage(page)) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_CANT_SWAP_IN_PAGE];
+        return false;
+    }
+    memcpy(&physicalStorage[(physPage*MEM_PAGE_SIZE)], buffer, MEM_PAGE_SIZE);
     return true;
 }
 
@@ -331,13 +346,20 @@ bool Virtual::SavePage(uint32_t page, uint8_t *buffer) {
         return false;
     }
     if (IS_FLAG_SET(virtualPageTable[page].pageState, PAGE_STATE_IS_ON_DISK)) {
-        if (!SwapInPage(page)) {
+        if (!SwapOutPageCandidates()) {
+            LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_CANT_SWAP_IN_PAGE];
+            return false;
+        } else {
             LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_CANT_SWAP_IN_PAGE];
             return false;
         }
     }
     uint32_t physPage = virtualPageTable[page].physicalPage;
-    memcpy(buffer, &physicalStorage[physPage*MEM_PAGE_SIZE], MEM_PAGE_SIZE);
+    if (SwapInPage(page)) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_CANT_SWAP_IN_PAGE];
+        return false;
+    }
+    memcpy(buffer, &physicalStorage[(physPage*MEM_PAGE_SIZE)], MEM_PAGE_SIZE);
     return true;
 }
 
@@ -355,23 +377,10 @@ bool Virtual::AllocateNPages(uint32_t pPages, uint32_t *pPagelist) {
     return true;
 }
 
-bool Virtual::SwapOutUsedPages() {
-    if (lruCache.empty()) {
-        // This should neve rhappen
-        return false;
-    }
-    if (lruCache.size() == 1) {
-        uint32_t page = *lruCache.end();
-        lruCache.pop_back();
-
-    }
-    if (lruCache.size() > 0) {
-
-    }
-}
-
 bool Virtual::SwapInPage(uint32_t page) {
     // Make sure the page is within range
+    uint8_t buffer[MEM_PAGE_SIZE];
+
     if (page >= numVirtualPages) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
         return false;
@@ -388,13 +397,49 @@ bool Virtual::SwapInPage(uint32_t page) {
     }
     // Try to get a free page
     std::vector<uint32_t> list;
-    if (findFreePagesFromTheLRU(list)) {
-        SwapOutPageList(list);
+    if (physicalFreePagesList.size() < MIN_SWAPPABLE_PAGES) {
+        /* We don't have enough free pages, try swapping some out  */
+        if (!findFreePagesFromTheLRU(list)) {
+            if (!SwapOutPageCandidates(list)) {
+                LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_CANT_SWAP_OUT_PAGE];
+                return false;
+            }
+        } else {
+            LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_CANT_SWAP_OUT_PAGE];
+            return false;
+        }
     }
+    uint32_t newPhysicalPage = *physicalFreePagesList.end();
+    markPhysicalPageAsUsed(newPhysicalPage);
+    virtualPageTable[page].physicalPage = newPhysicalPage;
+    CLR_FLAG(virtualPageTable[page].pageState, PAGE_STATE_IS_ON_DISK);
+    swapper.ReadPageFromPage(page, buffer);
+    memcpy(&physicalFreePagesList[page*MEM_PAGE_SIZE], buffer, MEM_PAGE_SIZE);
+    return true;
 }
 
 bool Virtual::SwapOutPage(uint32_t page) {
-    return false;
+    uint16_t state;
+
+    // Make sure the page is within range
+    if (page >= numVirtualPages) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
+        return false;
+    }
+    // Make sure the page is in use -- can't swap in a free page or a page on disk or locked one
+    state = virtualPageTable[page].pageState;
+    if (IS_FLAG_SET(state, PAGE_STATE_IS_LOCKED) ||
+        IS_FLAG_SET(state, PAGE_STATE_IS_ON_DISK) ||
+        IS_FLAG_CLEAR(state, PAGE_STATE_IN_USE)) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_CANT_SWAP_OUT_PAGE];
+        return false;
+    }
+    // Swap out the page to disk
+    swapper.WritePageToSwap(page, &physicalStorage[page*MEM_PAGE_SIZE]);
+    SET_FLAG(virtualPageTable[page].pageState, PAGE_STATE_IS_ON_DISK);
+    // Free the physical page - we no longer need it
+    markPhysicalPageAsUsed(virtualPageTable[page].physicalPage);
+    return true;
 }
 
 bool Virtual::FreeNPages(uint32_t pPages, uint32_t *pPageList) {

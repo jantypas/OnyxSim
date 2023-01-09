@@ -45,7 +45,7 @@ private :
     bool markVirtualPageAsUsed(uint32_t page, uint32_t physPage);
     bool findFreePagesFromTheLRU(std::vector<uint32_t> &pages);
     bool SwapOutPageList(std::vector<uint32_t> &list);
-    bool SwapInPageList();
+    bool SwapOutPageCandidates();
 public:
     bool InitLinear(uint32_t pNumPages) override;
     bool InitBanked(uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) override;
