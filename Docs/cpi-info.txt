@@ -194,8 +194,15 @@ Condition Codes
 0A80  3   0   1   SLEEP Dx                    Sleep a propcess for Dx time units
 0A80  3   0   0   TICK                        Sleep one time cycle
 0A90  3   0   1   NICE Dx                     Set process priotity to Dx
-0AB0  3   0   1   TRYLOCK Dx, Dy              Lock on a key
-0AC0  3   0   1   UNLOCK Dx                   Unlock a key
+0AB0  3   0   2   LOCK Dx, Dy, Dz             Try to obtain a lock Dx, type Dy. result in Dz
+0AC0  3   0   1   UNLOCK Dx, Dy               Try to unlock a lock in Dx, result in Dy
+                                                    Dy = 0  Mutual Exclusion
+                                                    Dy = 1  Barrier lock
+                                                    Dy = 2  Read lock
+                                                    Dy = 3  Write lock
+0AD0  3   0   2   ATSTSET Aw, Dx, Dy, Dz            Atomic test-and-test
+                                                        Test Ax for value Dx.  If true, set Ax to Dy
+                                                        Result in Dx
 
 0C00  3   -   -   *GURU                       Call Guru monitor supervisor function
 0C10  3   -   2   *INPORT Dx, Dy, Dz          Get a word from Port Dz and store in Dy.  Result in Dz
