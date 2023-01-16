@@ -9,6 +9,7 @@ Onyx1 Boot-up messages
     "Whatever is inside, it's not my fault. I had nothing to do with this!"
     "Yeah, it's inside -- but that's nothing to be proud of."
     "It's inside, but doctors have medication for it now..."
+    "What's inside?  You look.... I'm too scared."
 
        First 16           Second 16 (optional.  If XT is set)
 XI JM Opcode  WS #Reg       instr    #reg pairs  regXA     regXB
@@ -88,7 +89,7 @@ Condition Codes
 0000  0   0   0   STOP                        Stop the processor
 0010  0   0   0   EXIT                        Exit simulator-
 0020  0   0   0   NOOP                        No operation
-
+-- Memory move/store instructions
 0030  0   -   1   MOVE Rx, Ry                 Move Ry -> Rx
 0040  0   -   2   MOVEI Rx, Size, #value      Move litteral value
 0050  0   -   2   COPYM Ax, Ay, Dx            Capy memory Ay -> Ax for Dx units
@@ -98,7 +99,7 @@ Condition Codes
 0090  0   0   2   CMPBLK Dx, Ax, Ay, Dy       Compare memory block(Ax) and (Ay), for Dy words, store in Dx
 00A0  1   0   2   MSHIFT Dx, Rx, Dy           Bits Dx..Ry shifted right to Dx
 00B0  3   0   1   INFO Dx, Dy                 Get value from Dx and return it in Dy (value = special page)
-
+--- Math instructions
 0100  0   -   2   IADD Rx, Ry, Rz             Rx = Ry + Rz
 0110  0   -   2   ISUB Rx, Ry, Rz             Rx = Ry - Rz
 0120  0   -   2   IMULT Rx, Ry,Rz             Rx = Ry * Rz
@@ -131,7 +132,7 @@ Condition Codes
 02D0  1   -   2   STRNCMP Dx, Ax, Ay          Compare strings Ax and Ay -> Dx
 02E0  1   -   2   STRFIND Dx, Ax, Ay          Find first occurance of stirng Ay in Ax -> Position to Dx
 02F0  1   -   2   STRCAT Ax, Ay, Az, Dx       Ax = Ay + Az up to Dx units
-
+-- Test/Jump/Branching instructions
 0400  0   -   2   TEST Dx, Dy, Rx, Ry         Perform test Dy on Rx and Ry, store to Dx
 0410  0   -   2   TBITSET  Dx, Rx, Dy         Dx = Is bit Dy set in Rx
 0420  0   -   2   TBITCLR  Dx, Rx, Dy         Dx = Is bit Dy clear in Rx
@@ -153,7 +154,7 @@ Condition Codes
 05F0  0   0   -   SYSCALL                     Perform system call
 0600  0   0   0   TRAPRET                     Return from trap
 0610  3   0   2   COPROC Dx, Ax, Ay           Call a copressor Dx, passing Call and Data stack Ax, Ay, result in Dx
-
+--- Messaging I/O
 0700  0   -   1   MSGSEND Dx, Ax, Dy          Send an IPC message on channel Dy, from buffer Ax, result in Dx
 0710  0   -   2   MSGRECV Dx, Ax, Dy          Get an IPC message on channel Dy and put it into Ax, result in Dx
 0720  0   -   1   MSGAVAIL Dx, Dy             Is an IPC message available on channel Dy  Result in Dx
@@ -161,7 +162,7 @@ Condition Codes
 0740  0   -   2   IOREQ Dx, Dy, Dz, Ax        Send an IO Message to Dy with command Dz, data Ax, result in Dx
 0750  0   -   2   BUFFERALLOC Dx, Dy, Ax      Allocate Dy I/O buffers to Ax, Result in Dx
 0760  0   -   1   BUFFERFREE  Dx, Ax          Free Ax I/O buffers
-
+-- Utility functions
 0800  3   -   1   ENCRYPT Ax, Ay              Encrypt a block in Ax to Ay
 0810  3   -   1   DECRYPT Ax, Ay              Decrypt a block in Ax to Ay
 0820  3   -   2   ENCRSETUP Dx, Dy, Ax        Set up encryption mode Dy data from Ax, result in Dx
@@ -182,7 +183,7 @@ Condition Codes
 0910  3   -   0   SEINSERT Ax, Ay             Secure enclave insert key Ax, value Ay
 0920  3   -   2   SEMATCH Dx, Ax, Ay          Given a key Ax, and a value Ay, are they correct -> Dx
 0930  3   -   1   SEREMOVE Dx, Ax             Remove key Ax from secure enclave -> Dx
-
+-- Process thread instructions
 0A00  3   0   0   YIELD                       Yield the CPU
 0A10  3   0   1   GETPID Dx                   Return PID in Dx
 0A20  3   0   1   FORK Dx                     Fork a process - return new PID in Dx
@@ -200,7 +201,7 @@ Condition Codes
 0AA0  3   0   2   ATSTSET Aw, Dx, Dy, Dz            Atomic test-and-test
                                                         Test Ax for value Dx.  If true, set Ax to Dy
                                                         Result in Dx
-
+--- Lower-level OS instructions
 0C00  3   -   -   *GURU                       Call Guru monitor supervisor function
 0C10  3   -   2   *INPORT Dx, Dy, Dz          Get a word from Port Dz and store in Dy.  Result in Dz
 0C20  3   -   2   *OUTPORT Dx, Dy, Dz         Write a word in Dz to Port Dy.  Result in Dx
@@ -213,8 +214,9 @@ Condition Codes
 0C90  3   -   1   *MDSP Ax                    Move Ax to data stack pointer
 0CA0  3   -   1   *MCSP Ax                    Move Ax to code stack pointer
 0CB0  3   -   1   *MSP  Ax, Ay                Move Code stack point, Data stack pointer to Ax, Ay
-
-3FF0  3   0   0   Halt, Catch fire, go boom.  Halt, Catch fire, that's no fire.  Go for full destruction!
+--- Every other processor has something like this -- we need one too
+3FF0  3   0   0   HCFB                        Halt, Catch fire, go boom!  No idea why this is needed but everyone else has one
+                                              We'll probably just play a sad trambone or something
 
 Pragmas
     .manifest
@@ -276,7 +278,6 @@ Special registers
     0x1F    Y index
     0x1E    X index
 
-
     0x40   Process message interrupt mask
     0x41   Process Message service table address
     0x42   Process Trap service table address
@@ -298,6 +299,8 @@ Special registers
     0x44    Messages needing service
     0x45    Process Interrupt service table address
     0x46    Process Interrupt service table mask
+    0x47    Process return address from CALL/JUMP
+    0x48    Process return address from SERVICE routine
 
     0x7A   System message interrupt mask
     0x7B   System message interrupt service table address
@@ -772,7 +775,7 @@ Programs included:
 Onyx Object Format
     Data Types
         End-of-attributes       0x00
-        (64-bit Int              0x01
+        (64-bit Int             0x01
         32-bit Int              0x02
         16-bit Int              0x03
          8-bit Int              0x04
