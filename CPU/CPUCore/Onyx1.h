@@ -11,8 +11,16 @@
 #include "../../BIOS/BIOSInterface.h"
 #include "../../Monitor/MonitorInterface.h"
 
+enum CPUState {
+};
+
+struct CPUEvent {
+    CPUState    state;
+};
+
 class Onyx1 {
 public :
+    CPUEvent            events;
     uint64_t            *dataRegisters;
     uint64_t            *addressRegisters;
     uint64_t            *controlRegisters;
@@ -21,8 +29,10 @@ public :
     uint64_t             featureSetA;
     uint64_t             featureSetB;
     uint64_t             PC;            // Program counter
-    uint64_t             SP;            // Stack pointer
-    uint64_t             SSP;           // Shadow stack pointer
+    uint64_t             DSP;           // Data Stack pointer
+    uint64_t             CSP;           // Code stack pointer
+    uint64_t             SSP;           // Shadow stack of code stack pointer
+    uint16_t             taskPtr;       // Reference to current task
     Process             *processID;     // Current process;
     uint8_t              privLevel;     // Processor privilege level
     MemInterface        *memory;

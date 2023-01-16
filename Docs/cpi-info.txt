@@ -187,20 +187,17 @@ Condition Codes
 0A10  3   0   1   GETPID Dx                   Return PID in Dx
 0A20  3   0   1   FORK Dx                     Fork a process - return new PID in Dx
 0A30  3   0   0   JOIN                        Join proccessses
-0A40  3   0   2   HALLOC Dx, Dy, Ax           Attempt to get Dy words of memory on the heap and put in address Ax -> Dx
-0A50  3   0   1   HFREE Dx, Ax                Free memory at Ax -> Dx
-0A60  3   0   1   SUPER Dx                    Become super user to privilege Dx -- returns state in Dx
-0A70  3   0   0   MORTAL                      Be a normal user
-0A80  3   0   1   SLEEP Dx                    Sleep a propcess for Dx time units
-0A80  3   0   0   TICK                        Sleep one time cycle
-0A90  3   0   1   NICE Dx                     Set process priotity to Dx
-0AB0  3   0   2   LOCK Dx, Dy, Dz             Try to obtain a lock Dx, type Dy. result in Dz
-0AC0  3   0   1   UNLOCK Dx, Dy               Try to unlock a lock in Dx, result in Dy
+0A40  3   0   1   ELEVATE Dx                  Become super user to privilege Dx -- returns state in Dx
+0A50  3   0   1   SLEEP Dx                    Sleep a propcess for Dx time units
+0A60  3   0   0   TICK                        Sleep one time cycle
+0A70  3   0   1   NICE Dx                     Set process priotity to Dx
+0A80  3   0   2   LOCK Dx, Dy, Dz             Try to obtain a lock Dx, type Dy. result in Dz
+0A90  3   0   1   UNLOCK Dx, Dy               Try to unlock a lock in Dx, result in Dy
                                                     Dy = 0  Mutual Exclusion
                                                     Dy = 1  Barrier lock
                                                     Dy = 2  Read lock
                                                     Dy = 3  Write lock
-0AD0  3   0   2   ATSTSET Aw, Dx, Dy, Dz            Atomic test-and-test
+0AA0  3   0   2   ATSTSET Aw, Dx, Dy, Dz            Atomic test-and-test
                                                         Test Ax for value Dx.  If true, set Ax to Dy
                                                         Result in Dx
 
@@ -212,7 +209,10 @@ Condition Codes
 0C50  0   0   0   *SYSRET                     Return from system call
 0C60  0   0   -   *TRAP                       Perform system trap
 0C70  3   -   -   *COPROCRET                  Return from coprocessor
-0C80  3   -   0   *TASKSW                     Task switch to value in process/segment register
+0C80  3   -   0   *TASKSW Dx                  Task switch to value process in Dx
+0C90  3   -   1   *MDSP Ax                    Move Ax to data stack pointer
+0CA0  3   -   1   *MCSP Ax                    Move Ax to code stack pointer
+0CB0  3   -   1   *MSP  Ax, Ay                Move Code stack point, Data stack pointer to Ax, Ay
 
 3FF0  3   0   0   Halt, Catch fire, go boom.  Halt, Catch fire, that's no fire.  Go for full destruction!
 
