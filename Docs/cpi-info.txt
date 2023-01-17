@@ -13,13 +13,12 @@ Onyx1 Boot-up messages
     "What's inside?  I have no idee.  I found it best not to ask...it will help later in court.  I was not involved."
     "What's inside?  Remember the monster under the bed?  This is worse."
 
-       First 16           Second 16 (optional.  If XT is set)
-XI JM Opcode  WS #Reg       instr    #reg pairs  regXA     regXB
- 1  1 10-bits 2   2
- 1  1 10-bits 2   -         12-bits    4-bits 16-bits   16-bits
+       First 16
+XI Opcode  WS #Reg pairs
+ 1 11-bits 2   2
 
     XM = Extended instruction (get another 16 bits)
-    JM = Jump code (0 relative jump, 1 = absolute jump)
+    WS = number of bits to fetch
         03 = 64 bits
         02 = 32 bits
         01 = 16 bits
@@ -217,7 +216,7 @@ Condition Codes
 0CA0  3   -   1   *MCSP Ax                    Move Ax to code stack pointer
 0CB0  3   -   1   *MSP  Ax, Ay                Move Code stack point, Data stack pointer to Ax, Ay
 --- Every other processor has something like this -- we need one too
-3FF0  3   0   0   HCFB                        Halt, Catch fire, go boom!  No idea why this is needed but everyone else has one
+7FF0  3   0   0   HCFB                        Halt, Catch fire, go boom!  No idea why this is needed but everyone else has one
                                               We'll probably just play a sad trambone or something
 
 Pragmas
