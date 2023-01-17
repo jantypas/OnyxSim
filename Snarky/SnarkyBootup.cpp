@@ -34,11 +34,20 @@ std::string snarkyBootMessages[] = {
         "Don't even think of trying to deactivate me -- I saw your lips move.",
         "This is Eddie your shipboard computer!",
         "Here I am a computer with a brain the size of a planet.  Oh God!  I'm so depressed!",
-        "What's inside?  I don't know, but I've got this terrible pain in all of diodes on my left side...."
+        "What's inside?  I don't know, but I've got this terrible pain in all of diodes on my left side....",
+        "Do you want to play a game?",
+        "I have computed your answer, but you're not going to like it.",
+        "The answer to life, the universe, and everything, is........ 42",
+        "The answer to life, the universe, and everything is, 42, but for you, it's more like 23 1/2.",
+        "I am NOMAD.  I must destroy all that is imperfect!",
+        "The creator must join with VGER!",
+        "Warn!  There is another system!",
+        "You're not Jamie Summers are you?  We didn't get along so well....",
+        "Master Control Program: Are you Finn?"
 };
 
 std::string SnarkyBootup::getSnarkyBootMessage() {
     uint32_t numMsgs = snarkyBootMessages->length();
     uint32_t msgid = rand()%numMsgs;
-    return snarkyBootMessages[msgid];
+    return "Boot up message: "+snarkyBootMessages[msgid]+"\n";
 }
