@@ -43,6 +43,7 @@ private :
     bool markPhysicalPageAsUsed(uint32_t page);
     bool markVirtualPageAsFree(uint32_t page);
     bool markVirtualPageAsUsed(uint32_t page, uint32_t physPage);
+    bool markVirtualPageAsSwapped(uint32_t page);
     bool findFreePagesFromTheLRU(std::vector<uint32_t> &pages);
     bool SwapOutPageList(std::vector<uint32_t> &list);
     bool SwapOutPageCandidates();
