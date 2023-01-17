@@ -6,12 +6,14 @@
 #define ONYXSIM_CONFIGPARAMETERS_H
 #include <stdint-gcc.h>
 #include <string>
+#include <variant>
 
-class ConfigParameters {
+struct ConfigParameters {
 public :
-    std::string SwapFileName = "/tmp/virtswap.swp";
+    bool Init();
+    std::string getStringValue(std::string name);
+    uint32_t    getI32Value(std::string name);
+    bool        getBoolValue(std::string name);
 };
-
-extern ConfigParameters Configuration;
 
 #endif //ONYXSIM_CONFIGPARAMETERS_H

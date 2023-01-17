@@ -47,9 +47,9 @@ private :
     bool SwapOutPageList(std::vector<uint32_t> &list);
     bool SwapOutPageCandidates();
 public:
-    bool InitLinear(uint32_t pNumPages) override;
-    bool InitBanked(uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) override;
-    bool InitVirtual(uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) override;
+    bool InitLinear(ConfigParameters *conf, uint32_t pNumPages) override;
+    bool InitBanked(ConfigParameters *conf, uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) override;
+    bool InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) override;
     bool Exit() override;
     bool ReadAddress(uint64_t addr, uint8_t *value) override;
     bool WriteAddress(uint64_t addr, uint8_t value) override;

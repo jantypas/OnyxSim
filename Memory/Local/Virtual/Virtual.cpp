@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iterator>
 #include <memory.h>
+#include "../../../Configuration/ConfigParameters.h"
 
 /**
  * We need these macros to make our life easier
@@ -206,17 +207,17 @@ bool Virtual::SwapOutPageCandidates() {
  * @param pNumPages
  * @return
  */
-bool Virtual::InitLinear(uint32_t pNumPages) {
+bool Virtual::InitLinear(ConfigParameters *conf, uint32_t pNumPages) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Virtual::InitBanked(uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) {
+bool Virtual::InitBanked(ConfigParameters *conf, uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Virtual::InitVirtual(uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) {
+bool Virtual::InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) {
     uint32_t ix;
 
     numVirtualPages         = pNumVirtualPages;
@@ -224,7 +225,7 @@ bool Virtual::InitVirtual(uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages,
     physicalStorage         = new uint8_t[numPhysicalPages * MEM_PAGE_SIZE];
     std::fill(physicalFreePagesList.begin(), physicalFreePagesList.end(), ix);
     std::fill(virtualFreePagesList.begin(), virtualFreePagesList.end(),ix);
-    swapper.Init(Configuration.SwapFileName);
+    swapper.Init(conf->getStringValue("swapFileName"));
     return true;
 }
 
@@ -379,8 +380,6 @@ bool Virtual::AllocateNPages(uint32_t pPages, uint32_t *pPagelist) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NO_VIRTUAL_PAGES];
         return false;
     }
-    uint32_t newVirtPage = *virtualFreePagesList.end();
-    markVirtualPageAsUsed(&newVirtPage);
 
     // Allocate a physical page to this virtual page
     if (physicalFreePagesList.size() < MIN_SWAPPABLE_PAGES) {
@@ -390,7 +389,6 @@ bool Virtual::AllocateNPages(uint32_t pPages, uint32_t *pPagelist) {
         };
     }
     uint32_t newPage = *physicalFreePagesList.end();
-    virtualPageTable[newVirtPage].physicalPage = newPage;
     return true;
 }
 

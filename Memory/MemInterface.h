@@ -3,6 +3,8 @@
 //
 #include <stdint-gcc.h>
 #include <string>
+#include "../Configuration/ConfigParameters.h"
+
 #ifndef ONYXSIM_MEMINTERFACE_H
 #define ONYXSIM_MEMINTERFACE_H
 
@@ -82,9 +84,9 @@ struct MemoryErrorMessage {
 
 class MemInterface {
 public :
-    virtual bool InitLinear(uint32_t pNumPages) = 0;
-    virtual bool InitBanked(uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) = 0;
-    virtual bool InitVirtual(uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) = 0;
+    virtual bool InitLinear(ConfigParameters *conf, uint32_t pNumPages) = 0;
+    virtual bool InitBanked(ConfigParameters *conf, uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) = 0;
+    virtual bool InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) = 0;
     virtual bool Exit() = 0;
     virtual bool ReadAddress(uint64_t addr, uint8_t *value) = 0;
     virtual bool WriteAddress(uint64_t addr, uint8_t value) = 0;

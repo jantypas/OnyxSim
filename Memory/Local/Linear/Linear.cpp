@@ -5,19 +5,19 @@
 #include "Linear.h"
 #include <memory.h>
 
-bool Linear::InitLinear(uint32_t pNumPages) {
+bool Linear::InitLinear(ConfigParameters *conf, uint32_t pNumPages) {
     numPages = pNumPages;
     storage = new uint8_t [pNumPages*MEM_PAGE_SIZE];
     isActive = true;
     return true;
 };
 
-bool Linear::InitBanked(uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) {
+bool Linear::InitBanked(ConfigParameters *conf, uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Linear::InitVirtual(uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) {
+bool Linear::InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }

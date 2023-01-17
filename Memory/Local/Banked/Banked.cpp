@@ -5,17 +5,17 @@
 #include "Banked.h"
 #include <memory.h>
 
-bool Banked::InitLinear(uint32_t pNumPages) {
+bool Banked::InitLinear(ConfigParameters *conf, uint32_t pNumPages) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Banked::InitVirtual(uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) {
+bool Banked::InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Banked::InitBanked(uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) {
+bool Banked::InitBanked(ConfigParameters *conf, uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) {
     uint8_t ix;
     *mainStorage = new uint8_t[pNumMainBanks];
     for (ix = 0; ix < pNumMainBanks; ix++) {
