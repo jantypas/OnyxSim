@@ -14,7 +14,8 @@ Onyx1 Boot-up messages
     "What's inside?  Remember the monster under the bed?  This is worse."
     "I may be a computer, but that only means I can compute the wrong answer really, really fast = the power of Devops!"
     "Forget what's inside.  Should you be outside once in a while?"
-    "What's inside?  A little man who really good at playing chess..."
+    "What's inside?  A little man who's really good at playing chess..."
+
 
        First 16
 XI Opcode  WS #Reg pairs
