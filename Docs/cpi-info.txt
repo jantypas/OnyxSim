@@ -15,6 +15,8 @@ Onyx1 Boot-up messages
     "I may be a computer, but that only means I can compute the wrong answer really, really fast = the power of Devops!"
     "Forget what's inside.  Should you be outside once in a while?"
     "What's inside?  A little man who's really good at playing chess..."
+    "What's inside?  I don't know.  I don't care.  That's YOUR problem."
+    "They said it couldn't be done.  They said it shouldn't be done.  But I did it away!"
 
 
        First 16

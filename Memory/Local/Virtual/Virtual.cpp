@@ -388,8 +388,30 @@ bool Virtual::AllocateNPages(uint32_t pPages, uint32_t *pPagelist) {
             return false;
         };
     }
-    uint32_t newPage = *physicalFreePagesList.end();
-    return true;
+    /*
+     * See if we have enough virtual ad physical pages (combined) to do the load.  If so,
+     * great, just load them in.
+     * If we DON'T have enough virtual pages, that's an error.
+     * If we have enough virtual pages, but not enough physical pages, we have to do a hack.
+     * In this case, we create the required number of virtual pages, BUT, we do not allocate physical pages.
+     * In this case, we lie and say all of these pages are swapped out/
+     */
+    if (virtualFreePagesList.size() <= pPages) {
+        LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NO_VIRTUAL_PAGES];
+        return false;
+    }
+    if ((virtualFreePagesList.size() > pPages) &&
+            (physicalFreePagesList.size() >= pPages)) {
+        for (uint32_t ix = 0; ix < pPages; ix++) {
+
+        }
+    }
+    if ((virtualFreePagesList.size() >= pPages) &&
+            (physicalFreePagesList.size() <= pPages)) {
+
+    }
+    LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_UNKNOWN_MEMORY_ERROR];
+    return false;
 }
 
 bool Virtual::SwapInPage(uint32_t page) {

@@ -16,7 +16,8 @@ MemoryErrorMessage  MemoryErrorTable[] = {
         {"Page is still on disk",           MEMORY_ERROR_PAGE_IS_ON_DISK,       false},
         {"Trying to access a page in use",  MEMORY_ERROR_USED_PAGE_ACCESS,      true},
         {"No more physical pages",          MEMORY_ERROR_NO_PHYSICAL_PAGES,     true},
-        {"No more virtual pages",           MEMORY_ERROR_NO_VIRTUAL_PAGES,      true}
+        {"No more virtual pages",           MEMORY_ERROR_NO_VIRTUAL_PAGES,      true},
+        {"Unknown fatal memory error",      MEMORY_ERROR_UNKNOWN_MEMORY_ERROR,  true}
 };
 
 MemoryErrorMessage *LastMemoryError;
