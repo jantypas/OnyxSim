@@ -124,7 +124,7 @@ bool Banked::GetBank(uint8_t *bank) {
     return true;
 }
 
-bool Banked::AllocateNPages(uint32_t pPages, uint32_t *pPagelist) {
+bool Banked::AllocateNPages(uint32_t pPages, std::vector<uint32_t> &pPagelist) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }

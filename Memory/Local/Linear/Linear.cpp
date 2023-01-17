@@ -94,7 +94,7 @@ bool Linear::SavePage(uint32_t page, uint8_t *buffer) {
     return true;
 }
 
-bool Linear::AllocateNPages(uint32_t pPages, uint32_t *pPagelist) {
+bool Linear::AllocateNPages(uint32_t pPages, std::vector<uint32_t> &pPagelist) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }

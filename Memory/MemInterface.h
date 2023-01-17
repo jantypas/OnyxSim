@@ -3,6 +3,7 @@
 //
 #include <stdint-gcc.h>
 #include <string>
+#include <vector>
 #include "../Configuration/ConfigParameters.h"
 
 #ifndef ONYXSIM_MEMINTERFACE_H
@@ -95,7 +96,7 @@ public :
     virtual bool SavePage(uint32_t page, uint8_t *buffer) = 0;
     virtual bool SetBank(uint8_t bank) = 0;
     virtual bool GetBank(uint8_t *bank) = 0;
-    virtual bool AllocateNPages(uint32_t pPages, uint32_t *pPagelist) = 0;
+    virtual bool AllocateNPages(uint32_t pPages, std::vector<uint32_t> &pPagelist) = 0;
     virtual bool FreeNPages(uint32_t pPages, uint32_t *pPageList) = 0;
     virtual bool SwapOutPage(uint32_t page) = 0;
     virtual bool SwapInPage(uint32_t page)  = 0;

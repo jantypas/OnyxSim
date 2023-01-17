@@ -374,7 +374,7 @@ bool Virtual::GetBank(uint8_t *bank) {
     return false;
 }
 
-bool Virtual::AllocateNPages(uint32_t pPages, uint32_t *pPagelist) {
+bool Virtual::AllocateNPages(uint32_t pPages, std::vector<uint32_t>&pPagelist) {
     // Get the next virtual page off the fre list
     if (virtualFreePagesList.empty()) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NO_VIRTUAL_PAGES];
@@ -403,8 +403,15 @@ bool Virtual::AllocateNPages(uint32_t pPages, uint32_t *pPagelist) {
     if ((virtualFreePagesList.size() > pPages) &&
             (physicalFreePagesList.size() >= pPages)) {
         for (uint32_t ix = 0; ix < pPages; ix++) {
-
+            uint32_t newPhys = *physicalFreePagesList.end();
+            physicalFreePagesList.pop_back();
+            uint32_t newVirt = *virtualFreePagesList.end();
+            virtualFreePagesList.pop_back();
+            markPhysicalPageAsUsed(newPhys);
+            markVirtualPageAsUsed(newVirt, newPhys);
+            pPagelist.push_back(newVirt);
         }
+        return true;
     }
     if ((virtualFreePagesList.size() >= pPages) &&
             (physicalFreePagesList.size() <= pPages)) {

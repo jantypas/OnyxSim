@@ -57,7 +57,7 @@ public:
     bool SavePage(uint32_t page, uint8_t *buffer) override;
     bool GetBank(uint8_t *bank) override;
     bool SetBank(uint8_t bank) override;
-    bool AllocateNPages(uint32_t pPages, uint32_t *pPagelist) override;\
+    bool AllocateNPages(uint32_t pPages, std::vector<uint32_t> &pPagelist) override;\
     bool FreeNPages(uint32_t pPages, uint32_t *pPageList) override;
     bool SwapInPage(uint32_t page) override;
     bool SwapOutPage(uint32_t page) override;
