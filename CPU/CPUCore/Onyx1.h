@@ -28,17 +28,20 @@ public :
     uint64_t             cpuModel;
     uint64_t             featureSetA;
     uint64_t             featureSetB;
-    uint64_t             PC;            // Program counter
-    uint64_t             DSP;           // Data Stack pointer
-    uint64_t             CSP;           // Code stack pointer
-    uint64_t             SSP;           // Shadow stack of code stack pointer
-    uint16_t             taskPtr;       // Reference to current task
-    Process             *processID;     // Current process;
-    uint8_t              privLevel;     // Processor privilege level
+    uint64_t             PC;                // Program counter
+    uint64_t             DSP;               // Data Stack pointer
+    uint64_t             CSP;               // Code stack pointer
+    uint64_t             SSP;               // Shadow stack of code stack pointer
+    uint16_t             taskPtr;           // Reference to current task
+    uint64_t             instrMaxCount;     // Instructions per countext
+    uint64_t             instrCountdown;    // Instructions left before context switch
+    Process             *processID;         // Current process;
+    uint8_t              privLevel;         // Processor privilege level
     MemInterface        *memory;
     IOInterface         *io;
     BIOSInterface       *bios;
     MonitorInterface    *monitor;
+    CPUMicrocode        *microcode;
 };
 
 
