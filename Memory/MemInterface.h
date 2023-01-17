@@ -63,18 +63,21 @@ struct VirtualInfo {
     uint32_t    numFreePhysicalPages;
     uint32_t    numVirtualPages;
     uint32_t    numFreeVirtualPages;
-    std::string swapFileName;
+};
+
+struct SwapInfo {
+    uint32_t    swapIns;
+    uint32_t    swapOuts;
 };
 
 struct MemoryInfo {
     std::string memoryTypeName;
     MemoryMode  memoryMode;
-    union {
+    union Data {
         LinearInfo  linfo;
         BankedInfo  binfo;
         VirtualInfo vinfo;
-        uint32_t    swapInsPerSec;
-        uint32_t    swapOutsPerSec;
+        SwapInfo    swapinfo;
     } Info;
 };
 

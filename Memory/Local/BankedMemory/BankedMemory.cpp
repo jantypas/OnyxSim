@@ -2,20 +2,20 @@
 // Created by jantypas on 12/31/22.
 //
 
-#include "Banked.h"
+#include "BankedMemory.h"
 #include <memory.h>
 
-bool Banked::InitLinear(ConfigParameters *conf, uint32_t pNumPages) {
+bool BankedMemory::InitLinear(ConfigParameters *conf, uint32_t pNumPages) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Banked::InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) {
+bool BankedMemory::InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Banked::InitBanked(ConfigParameters *conf, uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) {
+bool BankedMemory::InitBanked(ConfigParameters *conf, uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) {
     uint8_t ix;
     *mainStorage = new uint8_t[pNumMainBanks];
     for (ix = 0; ix < pNumMainBanks; ix++) {
@@ -35,7 +35,7 @@ bool Banked::InitBanked(ConfigParameters *conf, uint32_t pNumMainBanks, uint32_t
     return true;
 }
 
-bool Banked::Exit() {
+bool BankedMemory::Exit() {
     uint8_t ix;
     if (!isActive) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_INITIALIZED];
@@ -57,7 +57,7 @@ bool Banked::Exit() {
     return true;
 }
 
-bool Banked::ReadAddress(uint64_t addr, uint8_t *value) {
+bool BankedMemory::ReadAddress(uint64_t addr, uint8_t *value) {
     if (!isActive) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_INITIALIZED];
         return false;
@@ -70,7 +70,7 @@ bool Banked::ReadAddress(uint64_t addr, uint8_t *value) {
     return true;
 }
 
-bool Banked::WriteAddress(uint64_t addr, uint8_t value) {
+bool BankedMemory::WriteAddress(uint64_t addr, uint8_t value) {
     if (!isActive) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_INITIALIZED];
         return false;
@@ -83,7 +83,7 @@ bool Banked::WriteAddress(uint64_t addr, uint8_t value) {
     return true;
 }
 
-bool Banked::LoadPage(uint32_t page, uint8_t *buffer) {
+bool BankedMemory::LoadPage(uint32_t page, uint8_t *buffer) {
     if (!isActive) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_INITIALIZED];
         return false;
@@ -96,7 +96,7 @@ bool Banked::LoadPage(uint32_t page, uint8_t *buffer) {
     return true;
 }
 
-bool Banked::SavePage(uint32_t page, uint8_t *buffer) {
+bool BankedMemory::SavePage(uint32_t page, uint8_t *buffer) {
     if (!isActive) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_INITIALIZED];
         return false;
@@ -109,7 +109,7 @@ bool Banked::SavePage(uint32_t page, uint8_t *buffer) {
     return true;
 }
 
-bool Banked::SetBank(uint8_t bank) {
+bool BankedMemory::SetBank(uint8_t bank) {
     if (bank >= numAlternateBanks) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
         return false;
@@ -119,22 +119,37 @@ bool Banked::SetBank(uint8_t bank) {
     return true;
 }
 
-bool Banked::GetBank(uint8_t *bank) {
+bool BankedMemory::GetBank(uint8_t *bank) {
     *bank - activeBank;
     return true;
 }
 
-bool Banked::AllocateNPages(uint32_t pPages, std::vector<uint32_t> &pPagelist) {
+bool BankedMemory::AllocateNPages(uint32_t pPages, std::vector<uint32_t> &pPagelist) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Banked::SwapOutPage(uint32_t page) {
+bool BankedMemory::SwapOutPage(uint32_t page) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Banked::SwapInPage(uint32_t page) {
+bool BankedMemory::SwapInPage(uint32_t page) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
+}
+
+bool BankedMemory::FreeNPages(uint32_t pPages, uint32_t *pPageList) {
+    LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
+    return false;
+}
+
+MemoryInfo BankedMemory::GetInfo() {
+    MemoryInfo info;
+    info.memoryTypeName = "banked";
+    info.memoryMode = MEMORY_BANKS;
+    info.Info.binfo.numMainBanks = numMainBanks;
+    info.Info.binfo.numAuxBanks = numAlternateBanks;
+    info.Info.binfo.currentBank = activeBank;
+    return info;
 }

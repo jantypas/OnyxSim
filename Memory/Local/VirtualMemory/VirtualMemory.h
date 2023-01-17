@@ -2,8 +2,8 @@
 // Created by jantypas on 12/31/22.
 //
 
-#ifndef ONYXSIM_VIRTUAL_H
-#define ONYXSIM_VIRTUAL_H
+#ifndef ONYXSIM_VIRTUALMEMORY_H
+#define ONYXSIM_VIRTUALMEMORY_H
 #include "../../MemInterface.h"
 #include <map>
 #include <vector>
@@ -22,7 +22,7 @@ public :
     uint16_t pageState;
 };
 
-class Virtual : MemInterface {
+class VirtualMemory : MemInterface {
 private :
     std::map<uint32_t, VirtualMemoryPageInfo>   virtualPageTable;
     std::map<uint32_t, PhysicalMemoryPageInfo>  physicalPageTable;
@@ -62,7 +62,8 @@ public:
     bool FreeNPages(uint32_t pPages, uint32_t *pPageList) override;
     bool SwapInPage(uint32_t page) override;
     bool SwapOutPage(uint32_t page) override;
+    MemoryInfo GetInfo() override;
 };
 
 
-#endif //ONYXSIM_VIRTUAL_H
+#endif //ONYXSIM_VIRTUALMEMORY_H

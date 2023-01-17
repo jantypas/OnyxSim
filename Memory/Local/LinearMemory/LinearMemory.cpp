@@ -2,37 +2,37 @@
 // Created by jantypas on 12/31/22.
 //
 
-#include "Linear.h"
+#include "LinearMemory.h"
 #include <memory.h>
 
-bool Linear::InitLinear(ConfigParameters *conf, uint32_t pNumPages) {
+bool LinearMemory::InitLinear(ConfigParameters *conf, uint32_t pNumPages) {
     numPages = pNumPages;
     storage = new uint8_t [pNumPages*MEM_PAGE_SIZE];
     isActive = true;
     return true;
 };
 
-bool Linear::InitBanked(ConfigParameters *conf, uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) {
+bool LinearMemory::InitBanked(ConfigParameters *conf, uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Linear::InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) {
+bool LinearMemory::InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Linear::GetBank(uint8_t *bank) {
+bool LinearMemory::GetBank(uint8_t *bank) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Linear::SetBank(uint8_t bank) {
+bool LinearMemory::SetBank(uint8_t bank) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Linear::Exit() {
+bool LinearMemory::Exit() {
     if (!isActive) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_INITIALIZED];
         return false;
@@ -42,7 +42,7 @@ bool Linear::Exit() {
     }
 }
 
-bool Linear::ReadAddress(uint64_t addr, uint8_t *value) {
+bool LinearMemory::ReadAddress(uint64_t addr, uint8_t *value) {
     if (!isActive) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
         return false;
@@ -55,7 +55,7 @@ bool Linear::ReadAddress(uint64_t addr, uint8_t *value) {
     return true;
 }
 
-bool Linear::WriteAddress(uint64_t addr, uint8_t value) {
+bool LinearMemory::WriteAddress(uint64_t addr, uint8_t value) {
     if (!isActive) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
         return false;
@@ -68,7 +68,7 @@ bool Linear::WriteAddress(uint64_t addr, uint8_t value) {
     return true;
 }
 
-bool Linear::LoadPage(uint32_t page, uint8_t *buffer) {
+bool LinearMemory::LoadPage(uint32_t page, uint8_t *buffer) {
     if (!isActive) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
         return false;
@@ -81,7 +81,7 @@ bool Linear::LoadPage(uint32_t page, uint8_t *buffer) {
     return true;
 }
 
-bool Linear::SavePage(uint32_t page, uint8_t *buffer) {
+bool LinearMemory::SavePage(uint32_t page, uint8_t *buffer) {
     if (!isActive) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
         return false;
@@ -94,17 +94,31 @@ bool Linear::SavePage(uint32_t page, uint8_t *buffer) {
     return true;
 }
 
-bool Linear::AllocateNPages(uint32_t pPages, std::vector<uint32_t> &pPagelist) {
+bool LinearMemory::AllocateNPages(uint32_t pPages, std::vector<uint32_t> &pPagelist) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Linear::SwapInPage(uint32_t page) {
+bool LinearMemory::SwapInPage(uint32_t page) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Linear::SwapOutPage(uint32_t page) {
+bool LinearMemory::SwapOutPage(uint32_t page) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
+}
+
+bool LinearMemory::FreeNPages(uint32_t pPages, uint32_t *pPageList) {
+    LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
+    return false;
+}
+
+MemoryInfo LinearMemory::GetInfo() {
+    MemoryInfo info;
+
+    info.memoryMode = MEMORY_LINEAR;
+    info.memoryTypeName = "linear";
+    info.Info.linfo.numPages = numPages;
+    return info;
 }

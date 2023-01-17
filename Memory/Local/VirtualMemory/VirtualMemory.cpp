@@ -2,7 +2,7 @@
 // Created by jantypas on 12/31/22.
 //
 
-#include "Virtual.h"
+#include "VirtualMemory.h"
 #include <vector>
 #include <memory.h>
 #include <algorithm>
@@ -48,7 +48,7 @@ void insertAtHeadofVector(std::vector <T> &v, const T &target) {
  * @return success/failure boolean
  *
  */
-bool Virtual::findFreePagesFromTheLRU(std::vector<uint32_t> &pages) {
+bool VirtualMemory::findFreePagesFromTheLRU(std::vector<uint32_t> &pages) {
     // No candidates?
     if (lruCache.empty()) { return false; }
     /**
@@ -82,7 +82,7 @@ bool Virtual::findFreePagesFromTheLRU(std::vector<uint32_t> &pages) {
  * @param page  - The page to free
  * @return Success/failure
  */
-bool Virtual::markPhysicalPageAsFree(uint32_t page) {
+bool VirtualMemory::markPhysicalPageAsFree(uint32_t page) {
     // Make sure our page is within range
     if (page >= numPhysicalPages) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
@@ -106,7 +106,7 @@ bool Virtual::markPhysicalPageAsFree(uint32_t page) {
  * @param page  - The page to use
  * @return Success/failure
  */
-bool Virtual::markPhysicalPageAsUsed(uint32_t page) {
+bool VirtualMemory::markPhysicalPageAsUsed(uint32_t page) {
     // Make sure our page is in range
     if (page >= numPhysicalPages) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
@@ -129,7 +129,7 @@ bool Virtual::markPhysicalPageAsUsed(uint32_t page) {
  * @param page - page to free
  * @return Success/failure
  */
-bool Virtual::markVirtualPageAsFree(uint32_t page) {
+bool VirtualMemory::markVirtualPageAsFree(uint32_t page) {
     // Make sure page is in range
     if (page >= numVirtualPages) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
@@ -156,7 +156,7 @@ bool Virtual::markVirtualPageAsFree(uint32_t page) {
  * @param page
  * @return
  */
-bool Virtual::markVirtualPageAsUsed(uint32_t page, uint32_t physPage) {
+bool VirtualMemory::markVirtualPageAsUsed(uint32_t page, uint32_t physPage) {
     // Make sure page is within range
     if (page >= numVirtualPages) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
@@ -174,7 +174,7 @@ bool Virtual::markVirtualPageAsUsed(uint32_t page, uint32_t physPage) {
     return true;
 }
 
-bool Virtual::markVirtualPageAsSwapped(uint32_t page) {
+bool VirtualMemory::markVirtualPageAsSwapped(uint32_t page) {
     // Make sure page is within range
     if (page >= numVirtualPages) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
@@ -193,7 +193,7 @@ bool Virtual::markVirtualPageAsSwapped(uint32_t page) {
     return true;
 }
 
-bool Virtual::SwapOutPageList(std::vector<uint32_t> &list) {
+bool VirtualMemory::SwapOutPageList(std::vector<uint32_t> &list) {
     std::vector<uint32_t>::iterator ix;
 
     for (ix = list.begin(); ix != list.end(); ix++) {
@@ -202,7 +202,7 @@ bool Virtual::SwapOutPageList(std::vector<uint32_t> &list) {
     return true;
 }
 
-bool Virtual::SwapOutPageCandidates() {
+bool VirtualMemory::SwapOutPageCandidates() {
     std::vector<uint32_t> list;
     if (findFreePagesFromTheLRU(list)) {
         if (SwapOutPageList(list)) {
@@ -226,17 +226,17 @@ bool Virtual::SwapOutPageCandidates() {
  * @param pNumPages
  * @return
  */
-bool Virtual::InitLinear(ConfigParameters *conf, uint32_t pNumPages) {
+bool VirtualMemory::InitLinear(ConfigParameters *conf, uint32_t pNumPages) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Virtual::InitBanked(ConfigParameters *conf, uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) {
+bool VirtualMemory::InitBanked(ConfigParameters *conf, uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Virtual::InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) {
+bool VirtualMemory::InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) {
     uint32_t ix;
 
     numVirtualPages         = pNumVirtualPages;
@@ -248,7 +248,7 @@ bool Virtual::InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uin
     return true;
 }
 
-bool Virtual::Exit() {
+bool VirtualMemory::Exit() {
     if (!isActive) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_INITIALIZED];
         return false;
@@ -257,7 +257,7 @@ bool Virtual::Exit() {
     return true;
 }
 
-bool Virtual::ReadAddress(uint64_t addr, uint8_t *value) {
+bool VirtualMemory::ReadAddress(uint64_t addr, uint8_t *value) {
     if (!isActive) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_INITIALIZED];
         return false;
@@ -289,7 +289,7 @@ bool Virtual::ReadAddress(uint64_t addr, uint8_t *value) {
     return true;
 }
 
-bool Virtual::WriteAddress(uint64_t addr, uint8_t value) {
+bool VirtualMemory::WriteAddress(uint64_t addr, uint8_t value) {
     if (!isActive) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_INITIALIZED];
         return false;
@@ -321,7 +321,7 @@ bool Virtual::WriteAddress(uint64_t addr, uint8_t value) {
     return true;
 }
 
-bool Virtual::LoadPage(uint32_t page, uint8_t *buffer) {
+bool VirtualMemory::LoadPage(uint32_t page, uint8_t *buffer) {
     if (!isActive) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_INITIALIZED];
         return false;
@@ -352,7 +352,7 @@ bool Virtual::LoadPage(uint32_t page, uint8_t *buffer) {
     return true;
 }
 
-bool Virtual::SavePage(uint32_t page, uint8_t *buffer) {
+bool VirtualMemory::SavePage(uint32_t page, uint8_t *buffer) {
     if (!isActive) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_INITIALIZED];
         return false;
@@ -383,17 +383,17 @@ bool Virtual::SavePage(uint32_t page, uint8_t *buffer) {
     return true;
 }
 
-bool Virtual::SetBank(uint8_t bank) {
+bool VirtualMemory::SetBank(uint8_t bank) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Virtual::GetBank(uint8_t *bank) {
+bool VirtualMemory::GetBank(uint8_t *bank) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 
-bool Virtual::AllocateNPages(uint32_t pPages, std::vector<uint32_t>&pPagelist) {
+bool VirtualMemory::AllocateNPages(uint32_t pPages, std::vector<uint32_t>&pPagelist) {
     // Get the next virtual page off the fre list
     if (virtualFreePagesList.empty()) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NO_VIRTUAL_PAGES];
@@ -446,7 +446,7 @@ bool Virtual::AllocateNPages(uint32_t pPages, std::vector<uint32_t>&pPagelist) {
     return false;
 }
 
-bool Virtual::SwapInPage(uint32_t page) {
+bool VirtualMemory::SwapInPage(uint32_t page) {
     // Make sure the page is within range
     uint8_t buffer[MEM_PAGE_SIZE];
 
@@ -487,7 +487,7 @@ bool Virtual::SwapInPage(uint32_t page) {
     return true;
 }
 
-bool Virtual::SwapOutPage(uint32_t page) {
+bool VirtualMemory::SwapOutPage(uint32_t page) {
     uint16_t state;
 
     // Make sure the page is within range
@@ -511,7 +511,7 @@ bool Virtual::SwapOutPage(uint32_t page) {
     return true;
 }
 
-bool Virtual::FreeNPages(uint32_t pPages, uint32_t *pPageList) {
+bool VirtualMemory::FreeNPages(uint32_t pPages, uint32_t *pPageList) {
     if (pPages >= numVirtualPages) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
         return false;
@@ -526,4 +526,9 @@ bool Virtual::FreeNPages(uint32_t pPages, uint32_t *pPageList) {
     markPhysicalPageAsFree(virtualPageTable[pPages].physicalPage);
     markVirtualPageAsFree(pPages);
     return true;
+}
+
+MemoryInfo VirtualMemory::GetInfo() {
+    MemoryInfo info;
+    return info;
 }
