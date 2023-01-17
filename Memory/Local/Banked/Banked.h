@@ -28,7 +28,7 @@ public :
     bool SetBank(uint8_t bank) override;
     bool AllocateNPages(uint32_t pPages, uint32_t *pPagelist) override;
     bool SwapInPage(uint32_t page) override;
-    bool SwapoutPage(uint32_t page) override;
+    bool SwapOutPage(uint32_t page) override;
 };
 
 

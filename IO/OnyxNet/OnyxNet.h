@@ -42,9 +42,9 @@ struct OnyxPacketHeader { // 64 bytes
     uint32_t          specialBits;  // +44 bytes
     uint32_t          crc;          // +48 bytes
     uint16_t          ttl;          // +50 bytes
-    uint16_t          length        // +52 bytes
+    uint16_t          length;       // +52 bytes
     uint64_t          timestamp;    // +60 bytes
-    uint8_t           unused[12]    // +68 Future space
+    uint8_t           unused[12];   // +68 Future space
 };
 
 struct OnyxPacket {

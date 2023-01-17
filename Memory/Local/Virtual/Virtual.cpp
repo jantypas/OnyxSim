@@ -56,7 +56,7 @@ bool Virtual::findFreePagesFromTheLRU(std::vector<uint32_t> &pages) {
      */
      uint32_t pg = 0;
      uint32_t minimalPages;
-     if (lruCache > MIN_SWAPPABLE_PAGES) {
+     if (lruCache.size() > MIN_SWAPPABLE_PAGES) {
          minimalPages = MIN_SWAPPABLE_PAGES;
      } else {
         minimalPages = 1;
@@ -417,7 +417,7 @@ bool Virtual::SwapInPage(uint32_t page) {
     if (physicalFreePagesList.size() < MIN_SWAPPABLE_PAGES) {
         /* We don't have enough free pages, try swapping some out  */
         if (!findFreePagesFromTheLRU(list)) {
-            if (!SwapOutPageCandidates(list)) {
+            if (!SwapOutPageCandidates()) {
                 LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_CANT_SWAP_OUT_PAGE];
                 return false;
             }
@@ -462,7 +462,7 @@ bool Virtual::SwapOutPage(uint32_t page) {
 bool Virtual::FreeNPages(uint32_t pPages, uint32_t *pPageList) {
     if (pPages >= numVirtualPages) {
         LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
-        return fasle;
+        return false;
     }
     uint32_t state = virtualPageTable[pPages].pageState;
     if (IS_FLAG_CLEAR(state, PAGE_STATE_IN_USE) ||

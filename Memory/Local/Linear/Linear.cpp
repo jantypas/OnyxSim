@@ -104,7 +104,7 @@ bool Linear::SwapInPage(uint32_t page) {
     return false;
 }
 
-bool Linear::SwapoutPage(uint32_t page) {
+bool Linear::SwapOutPage(uint32_t page) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }

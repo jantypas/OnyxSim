@@ -129,7 +129,7 @@ bool Banked::AllocateNPages(uint32_t pPages, uint32_t *pPagelist) {
     return false;
 }
 
-bool Banked::SwapoutPage(uint32_t page) {
+bool Banked::SwapOutPage(uint32_t page) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }

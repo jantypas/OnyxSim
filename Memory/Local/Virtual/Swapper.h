@@ -18,15 +18,16 @@ public :
     bool Init(std::string pName) {
         name = std::move(pName);
         swapFileDesc = fopen(name.c_str(), "rw");
-    }
+        return true;
+    };
     ~Swapper() {
         fclose(swapFileDesc);
-    }
+    };
     bool ReadPageFromPage(uint32_t page, uint8_t *buffer) {
         fseek(swapFileDesc, MEM_PAGE_SIZE*page, SEEK_SET);
         fread(buffer, MEM_PAGE_SIZE*page, 1, swapFileDesc);
         return true;
-    }
+    };
     bool WritePageToSwap(uint32_t page, uint8_t *buffer) {
         fseek(swapFileDesc, MEM_PAGE_SIZE*page, SEEK_SET);
         fwrite(buffer, MEM_PAGE_SIZE*page, 1, swapFileDesc);
