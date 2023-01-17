@@ -10,6 +10,8 @@ Onyx1 Boot-up messages
     "Yeah, it's inside -- but that's nothing to be proud of."
     "It's inside, but doctors have medication for it now..."
     "What's inside?  You look.... I'm too scared."
+    "What's inside?  I have no idee.  I found it best not to ask...it will help later in court.  I was not involved."
+    "What's inside?  Remember the monster under the bed?  This is worse."
 
        First 16           Second 16 (optional.  If XT is set)
 XI JM Opcode  WS #Reg       instr    #reg pairs  regXA     regXB
@@ -302,6 +304,7 @@ Special registers
     0x47    Process return address from CALL/JUMP
     0x48    Process return address from SERVICE routine
 
+    0x79   MMU Control Block address
     0x7A   System message interrupt mask
     0x7B   System message interrupt service table address
     0x7C   System Message service table address

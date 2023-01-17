@@ -8,7 +8,7 @@
 #include <cstdio>
 #include <string>
 #include <utility>
-#include "../MemInterface.h"
+#include "../../MemInterface.h"
 
 class Swapper {
 private :

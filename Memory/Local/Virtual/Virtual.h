@@ -4,10 +4,10 @@
 
 #ifndef ONYXSIM_VIRTUAL_H
 #define ONYXSIM_VIRTUAL_H
-#include "../MemInterface.h"
+#include "../../MemInterface.h"
 #include <map>
 #include <vector>
-#include "../../Configuration/ConfigParameters.h"
+#include "../../../Configuration/ConfigParameters.h"
 #include "Swapper.h"
 
 class VirtualMemoryPageInfo {

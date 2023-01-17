@@ -4,7 +4,7 @@
 
 #ifndef ONYXSIM_BANKED_H
 #define ONYXSIM_BANKED_H
-#include "../MemInterface.h"
+#include "../../MemInterface.h"
 
 class Banked : MemInterface {
 private :

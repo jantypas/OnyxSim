@@ -4,7 +4,7 @@
 
 #ifndef ONYXSIM_LINEAR_H
 #define ONYXSIM_LINEAR_H
-#include "../MemInterface.h"
+#include "../../MemInterface.h"
 
 class Linear : MemInterface {
 private :
