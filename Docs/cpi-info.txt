@@ -18,10 +18,9 @@ Onyx1 Boot-up messages
 
 
        First 16
-XI Opcode  WS #Reg pairs
- 1 11-bits 2   2
+Opcode  WS #Reg pairs
+12-bits 2   2
 
-    XM = Extended instruction (get another 16 bits)
     WS = number of bits to fetch
         03 = 64 bits
         02 = 32 bits
@@ -92,8 +91,8 @@ Condition Codes
 -- System instructions * = Privileged
  Op  Mod Mode #
 0000  0   0   0   STOP                        Stop the processor
-0010  0   0   0   EXIT                        Exit simulator-
-0020  0   0   0   NOOP                        No operation
+0010  0   0   0   NOOP                        No operation
+
 -- Memory move/store instructions
 0030  0   -   1   MOVE Rx, Ry                 Move Ry -> Rx
 0040  0   -   2   MOVEI Rx, Size, #value      Move litteral value
@@ -104,6 +103,7 @@ Condition Codes
 0090  0   0   2   CMPBLK Dx, Ax, Ay, Dy       Compare memory block(Ax) and (Ay), for Dy words, store in Dx
 00A0  1   0   2   MSHIFT Dx, Rx, Dy           Bits Dx..Ry shifted right to Dx
 00B0  3   0   1   INFO Dx, Dy                 Get value from Dx and return it in Dy (value = special page)
+
 --- Math instructions
 0100  0   -   2   IADD Rx, Ry, Rz             Rx = Ry + Rz
 0110  0   -   2   ISUB Rx, Ry, Rz             Rx = Ry - Rz
@@ -132,11 +132,17 @@ Condition Codes
 0280  1   -   2   FROOT Fx, Fy, Fz            Fx = Fy-th Root of Fz
 0290  1   -   1   FTOR Dx, Rx                 Convert Fx -> Dx
 02A0  1   -   1   DTOF Fx, Dx                 Convert Dx -> Fx
-02B0  1   -   2   STRNCPY Dx, Ax, Ay          Copy string Ay to Ax up to Dx units
-02C0  1   -   2   STRLEN  Dx, Ax              Dx = Length of string Ax
-02D0  1   -   2   STRNCMP Dx, Ax, Ay          Compare strings Ax and Ay -> Dx
-02E0  1   -   2   STRFIND Dx, Ax, Ay          Find first occurance of stirng Ay in Ax -> Position to Dx
-02F0  1   -   2   STRCAT Ax, Ay, Az, Dx       Ax = Ay + Az up to Dx units
+02B0  1   -   1   SNPR Dx                     Set numeric precision (8, 16, 32, 64 bits)
+
+02C0  1   -   2   STRNCPY Dx, Ax, Ay          Copy string Ay to Ax up to Dx units
+02D0  1   -   2   STRLEN  Dx, Ax              Dx = Length of string Ax
+02E0  1   -   2   STRNCMP Dx, Ax, Ay          Compare strings Ax and Ay -> Dx
+02F0  1   -   2   STRFIND Dx, Ax, Ay          Find first occurance of stirng Ay in Ax -> Position to Dx
+0300  1   -   2   STRCAT Ax, Ay, Az, Dx       Ax = Ay + Az up to Dx units
+0310  1   -   1   SSPRE Dx                    Set string type
+                                                    0 = ASCII 8-bit null terminated
+                                                    1 = ASCII 8-bit length prefix
+                                                    2 = UTF-8
 -- Test/Jump/Branching instructions
 0400  0   -   2   TEST Dx, Dy, Rx, Ry         Perform test Dy on Rx and Ry, store to Dx
 0410  0   -   2   TBITSET  Dx, Rx, Dy         Dx = Is bit Dy set in Rx
@@ -159,6 +165,7 @@ Condition Codes
 05F0  0   0   -   SYSCALL                     Perform system call
 0600  0   0   0   TRAPRET                     Return from trap
 0610  3   0   2   COPROC Dx, Ax, Ay           Call a copressor Dx, passing Call and Data stack Ax, Ay, result in Dx
+
 --- Messaging I/O
 0700  0   -   1   MSGSEND Dx, Ax, Dy          Send an IPC message on channel Dy, from buffer Ax, result in Dx
 0710  0   -   2   MSGRECV Dx, Ax, Dy          Get an IPC message on channel Dy and put it into Ax, result in Dx
@@ -167,6 +174,7 @@ Condition Codes
 0740  0   -   2   IOREQ Dx, Dy, Dz, Ax        Send an IO Message to Dy with command Dz, data Ax, result in Dx
 0750  0   -   2   BUFFERALLOC Dx, Dy, Ax      Allocate Dy I/O buffers to Ax, Result in Dx
 0760  0   -   1   BUFFERFREE  Dx, Ax          Free Ax I/O buffers
+
 -- Utility functions
 0800  3   -   1   ENCRYPT Ax, Ay              Encrypt a block in Ax to Ay
 0810  3   -   1   DECRYPT Ax, Ay              Decrypt a block in Ax to Ay
@@ -188,6 +196,7 @@ Condition Codes
 0910  3   -   0   SEINSERT Ax, Ay             Secure enclave insert key Ax, value Ay
 0920  3   -   2   SEMATCH Dx, Ax, Ay          Given a key Ax, and a value Ay, are they correct -> Dx
 0930  3   -   1   SEREMOVE Dx, Ax             Remove key Ax from secure enclave -> Dx
+
 -- Process thread instructions
 0A00  3   0   0   YIELD                       Yield the CPU
 0A10  3   0   1   GETPID Dx                   Return PID in Dx
@@ -206,6 +215,7 @@ Condition Codes
 0AA0  3   0   2   ATSTSET Aw, Dx, Dy, Dz            Atomic test-and-test
                                                         Test Ax for value Dx.  If true, set Ax to Dy
                                                         Result in Dx
+
 --- Lower-level OS instructions
 0C00  3   -   -   *GURU                       Call Guru monitor supervisor function
 0C10  3   -   2   *INPORT Dx, Dy, Dz          Get a word from Port Dz and store in Dy.  Result in Dz
@@ -219,8 +229,9 @@ Condition Codes
 0C90  3   -   1   *MDSP Ax                    Move Ax to data stack pointer
 0CA0  3   -   1   *MCSP Ax                    Move Ax to code stack pointer
 0CB0  3   -   1   *MSP  Ax, Ay                Move Code stack point, Data stack pointer to Ax, Ay
+
 --- Every other processor has something like this -- we need one too
-7FF0  3   0   0   HCFB                        Halt, Catch fire, go boom!  No idea why this is needed but everyone else has one
+FFF0  3   0   0   HCFB                        Halt, Catch fire, go boom!  No idea why this is needed but everyone else has one
                                               We'll probably just play a sad trambone or something
 
 Pragmas
