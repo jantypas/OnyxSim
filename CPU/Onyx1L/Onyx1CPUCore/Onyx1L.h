@@ -4,12 +4,12 @@
 #include <stdint-gcc.h>
 #ifndef ONYXSIM_ONYX1_H
 #define ONYXSIM_ONYX1_H
-#include "../../CPU/Microcode/CPUMicrocode.h"
-#include "../../Memory/MemInterface.h"
-#include "../../Processes/Process.h"
-#include "../../IO/IOInterface.h"
-#include "../../BIOS/BIOSInterface.h"
-#include "../../Monitor/MonitorInterface.h"
+#include "../../Onyx1L//Onyx1LMicrocode/Onyx1LMicrocode.h"
+#include "../../../Memory/MemInterface.h"
+#include "../../../Processes/Process.h"
+#include "../../../IO/IOInterface.h"
+#include "../../../BIOS/BIOSInterface.h"
+#include "../../../Monitor/MonitorInterface.h"
 
 enum CPUState {
 };
@@ -18,7 +18,7 @@ struct CPUEvent {
     CPUState    state;
 };
 
-class Onyx1 {
+class Onyx1L {
 public :
     CPUEvent            events;
     uint64_t            *dataRegisters;
@@ -32,16 +32,13 @@ public :
     uint64_t             DSP;               // Data Stack pointer
     uint64_t             CSP;               // Code stack pointer
     uint64_t             SSP;               // Shadow stack of code stack pointer
-    uint16_t             taskPtr;           // Reference to current task
-    uint64_t             instrMaxCount;     // Instructions per countext
-    uint64_t             instrCountdown;    // Instructions left before context switch
     Process             *processID;         // Current process;
     uint8_t              privLevel;         // Processor privilege level
     MemInterface        *memory;
     IOInterface         *io;
     BIOSInterface       *bios;
     MonitorInterface    *monitor;
-    CPUMicrocode        *microcode;
+    Onyx1LMicrocode     *microcode;
 };
 
 

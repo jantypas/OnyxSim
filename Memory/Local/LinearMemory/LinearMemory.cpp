@@ -19,25 +19,9 @@ bool LinearMemory::InitLinear(ConfigParameters *conf, uint32_t pNumPages) {
     return true;
 };
 
-bool LinearMemory::InitBanked(ConfigParameters *conf, uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) {
-    LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
-    logger.Message(LOG_ERR, "LinearMemory::InitBanked: Not implemented -- returns failure(false)");
-    return false;
-}
-
 bool LinearMemory::InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     logger.Message(LOG_ERR, "LinearMemory::InitVirtual: Not implemented -- returns failure(false)");
-    return false;
-}
-
-bool LinearMemory::GetBank(uint8_t *bank) {
-    LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
-    return false;
-}
-
-bool LinearMemory::SetBank(uint8_t bank) {
-    LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
     return false;
 }
 

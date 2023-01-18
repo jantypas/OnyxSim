@@ -231,11 +231,6 @@ bool VirtualMemory::InitLinear(ConfigParameters *conf, uint32_t pNumPages) {
     return false;
 }
 
-bool VirtualMemory::InitBanked(ConfigParameters *conf, uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) {
-    LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
-    return false;
-}
-
 bool VirtualMemory::InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) {
     uint32_t ix;
 
@@ -381,16 +376,6 @@ bool VirtualMemory::SavePage(uint32_t page, uint8_t *buffer) {
     }
     memcpy(buffer, &physicalStorage[(physPage*MEM_PAGE_SIZE)], MEM_PAGE_SIZE);
     return true;
-}
-
-bool VirtualMemory::SetBank(uint8_t bank) {
-    LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
-    return false;
-}
-
-bool VirtualMemory::GetBank(uint8_t *bank) {
-    LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
-    return false;
 }
 
 bool VirtualMemory::AllocateNPages(uint32_t pPages, std::vector<uint32_t>&pPagelist) {

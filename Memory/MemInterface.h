@@ -50,14 +50,6 @@ struct LinearInfo {
     uint32_t numPages;
 };
 
-struct BankedInfo {
-    uint32_t pageSize;
-    uint32_t numMainBanks;
-    uint32_t numAuxBanks;
-    uint8_t  switchableBank;
-    uint8_t  currentBank;
-};
-
 struct VirtualInfo {
     uint32_t    numPhysicalPages;
     uint32_t    numFreePhysicalPages;
@@ -75,7 +67,6 @@ struct MemoryInfo {
     MemoryMode  memoryMode;
     union Data {
         LinearInfo  linfo;
-        BankedInfo  binfo;
         VirtualInfo vinfo;
         SwapInfo    swapinfo;
     } Info;
@@ -90,15 +81,12 @@ struct MemoryErrorMessage {
 class MemInterface {
 public :
     virtual bool InitLinear(ConfigParameters *conf, uint32_t pNumPages) = 0;
-    virtual bool InitBanked(ConfigParameters *conf, uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) = 0;
     virtual bool InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) = 0;
     virtual bool Exit() = 0;
     virtual bool ReadAddress(uint64_t addr, uint8_t *value) = 0;
     virtual bool WriteAddress(uint64_t addr, uint8_t value) = 0;
     virtual bool LoadPage(uint32_t page, uint8_t *buffer) = 0;
     virtual bool SavePage(uint32_t page, uint8_t *buffer) = 0;
-    virtual bool SetBank(uint8_t bank) = 0;
-    virtual bool GetBank(uint8_t *bank) = 0;
     virtual bool AllocateNPages(uint32_t pPages, std::vector<uint32_t> &pPagelist) = 0;
     virtual bool FreeNPages(uint32_t pPages, uint32_t *pPageList) = 0;
     virtual bool SwapOutPage(uint32_t page) = 0;

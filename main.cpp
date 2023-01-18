@@ -2,7 +2,6 @@
 
 #include "Memory//MemInterface.h"
 #include "Memory/Local/LinearMemory/LinearMemory.h"
-#include "Memory/Local/BankedMemory/BankedMemory.h"
 #include "Memory/Local/VirtualMemory/VirtualMemory.h"
 
 int main() {
