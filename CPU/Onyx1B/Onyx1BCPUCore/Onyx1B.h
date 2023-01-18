@@ -5,11 +5,11 @@
 #ifndef ONYXSIM_ONYX1_H
 #define ONYXSIM_ONYX1_H
 #include "../../Onyx1L//Onyx1LMicrocode/Onyx1LMicrocode.h"
-#include "../../../Memory/MemInterface.h"
 #include "../../../Processes/Process.h"
 #include "../../../IO/IOInterface.h"
 #include "../../../BIOS/BIOSInterface.h"
 #include "../../../Monitor/MonitorInterface.h"
+#include "../../../Memory/Local/LinearMemory/LinearMemory.h"
 
 enum CPUState {
 };
@@ -35,7 +35,7 @@ public :
     uint64_t             SSP;               // Shadow stack of code stack pointer
     Process             *processID;         // Current process;
     uint8_t              privLevel;         // Processor privilege level
-    MemInterface        *memory;
+    LinearMemory        *memory;
     IOInterface         *io;
     BIOSInterface       *bios;
     MonitorInterface    *monitor;

@@ -4,11 +4,50 @@
 
 #ifndef ONYXSIM_VIRTUALMEMORY_H
 #define ONYXSIM_VIRTUALMEMORY_H
-#include "../../MemInterface.h"
 #include <map>
 #include <vector>
 #include "../../../Configuration/ConfigParameters.h"
 #include "Swapper.h"
+#include "../../MemoryConstants.h"
+
+#define MIN_SWAPPABLE_PAGES         16
+
+#define MEMORY_ERROR_NONE                   0
+#define MEMORY_ERROR_ADDRESS_ERROR          1
+#define MEMORY_ERROR_FREE_PAGE_ACCESS       2
+#define MEMORY_ERROR_USED_PAGE_ACCECSS      3
+#define MEMORY_ERROR_NOT_INITIALIZED        4
+#define MEMORY_ERROR_CANT_SWAP_IN_PAGE      5
+#define MEMORY_ERROR_CANT_SWAP_OUT_PAGE     6
+#define MEMORY_ERROR_PAGE_IS_LOCKED         7
+#define MEMORY_ERROR_NO_VIRTUAL_PAGES       8
+#define MEMORY_ERROR_NO_PHYSICAL_PAGES      9
+#define MEMORY_ERROR_UNKNOWN_MEMORY_ERROR   10
+
+#define PAGE_STATE_IS_LOCKED    0x0001
+#define PAGE_STATE_IS_ON_DISK   0x0002
+#define PAGE_STATE_IN_USE       0x0004
+
+class VirtualMemoryError {
+public:
+    uint32_t    code;
+    bool        isFatal;
+    std::string msg;
+    VirtualMemoryError(uint32_t pCode, bool pFatal, std::string pMsg) {
+        code    = pCode;
+        isFatal = pFatal;
+        msg     = pMsg;
+    }
+    VirtualMemoryError(const VirtualMemoryError &t) {
+        code    = t.code;
+        isFatal = t.isFatal;
+        msg     = t.msg;
+    }
+};
+
+struct VirtualMemoryInfo {
+
+};
 
 class VirtualMemoryPageInfo {
 public :
@@ -22,7 +61,7 @@ public :
     uint16_t pageState;
 };
 
-class VirtualMemory : MemInterface {
+class VirtualMemory {
 private :
     std::map<uint32_t, VirtualMemoryPageInfo>   virtualPageTable;
     std::map<uint32_t, PhysicalMemoryPageInfo>  physicalPageTable;
@@ -38,6 +77,8 @@ private :
     uint32_t                                    minPhysicalPages;
     bool                                        isActive;
     Swapper                                     swapper;
+    VirtualMemoryError                         *LastMemoryError;
+    VirtualMemoryInfo                           info;
 
     bool markPhysicalPageAsFree(uint32_t page);
     bool markPhysicalPageAsUsed(uint32_t page);
@@ -48,18 +89,18 @@ private :
     bool SwapOutPageList(std::vector<uint32_t> &list);
     bool SwapOutPageCandidates();
 public:
-    bool InitLinear(ConfigParameters *conf, uint32_t pNumPages) override;
-    bool InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) override;
-    bool Exit() override;
-    bool ReadAddress(uint64_t addr, uint8_t *value) override;
-    bool WriteAddress(uint64_t addr, uint8_t value) override;
-    bool LoadPage(uint32_t page, uint8_t *buffer) override;
-    bool SavePage(uint32_t page, uint8_t *buffer) override;
-    bool AllocateNPages(uint32_t pPages, std::vector<uint32_t> &pPagelist) override;\
-    bool FreeNPages(uint32_t pPages, uint32_t *pPageList) override;
-    bool SwapInPage(uint32_t page) override;
-    bool SwapOutPage(uint32_t page) override;
-    MemoryInfo GetInfo() override;
+    bool Init(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName);
+    bool Exit();
+    bool ReadAddress(uint64_t addr, uint8_t *value);
+    bool WriteAddress(uint64_t addr, uint8_t value);
+    bool LoadPage(uint32_t page, uint8_t *buffer);
+    bool SavePage(uint32_t page, uint8_t *buffer);
+    bool AllocateNPages(uint32_t pPages, std::vector<uint32_t> &pPagelist);
+    bool FreeNPages(uint32_t pPages, uint32_t *pPageList);
+    bool SwapInPage(uint32_t page);
+    bool SwapOutPage(uint32_t page);
+    VirtualMemoryInfo *GetInfo();
+    VirtualMemoryError  *GetError();
 };
 
 

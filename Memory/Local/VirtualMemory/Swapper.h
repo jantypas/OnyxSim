@@ -8,30 +8,39 @@
 #include <cstdio>
 #include <string>
 #include <utility>
-#include "../../MemInterface.h"
+#include "../../MemoryConstants.h"
+
+struct SwapperInfo {
+    std::string     swapFileName;
+    uint32_t        swapIns;
+    uint32_t        swapOuts;
+};
 
 class Swapper {
 private :
     FILE            *swapFileDesc;
-    std::string     name;
+    SwapperInfo     info;
 public :
     bool Init(std::string pName) {
-        name = std::move(pName);
-        swapFileDesc = fopen(name.c_str(), "rw");
+        info.swapFileName = std::move(pName);
+        swapFileDesc = fopen(info.swapFileName.c_str(), "rw");
         return true;
     };
     ~Swapper() {
         fclose(swapFileDesc);
     };
     bool ReadPageFromPage(uint32_t page, uint8_t *buffer) {
-        fseek(swapFileDesc, MEM_PAGE_SIZE*page, SEEK_SET);
-        fread(buffer, MEM_PAGE_SIZE*page, 1, swapFileDesc);
+        fseek(swapFileDesc, LOCAL_MEM_PAGE_SIZE*page, SEEK_SET);
+        fread(buffer, LOCAL_MEM_PAGE_SIZE*page, 1, swapFileDesc);
         return true;
     };
     bool WritePageToSwap(uint32_t page, uint8_t *buffer) {
-        fseek(swapFileDesc, MEM_PAGE_SIZE*page, SEEK_SET);
-        fwrite(buffer, MEM_PAGE_SIZE*page, 1, swapFileDesc);
+        fseek(swapFileDesc, LOCAL_MEM_PAGE_SIZE*page, SEEK_SET);
+        fwrite(buffer, LOCAL_MEM_PAGE_SIZE*page, 1, swapFileDesc);
         return true;
+    }
+    SwapperInfo *GetInfo() {
+        return &info;
     }
 };
 
