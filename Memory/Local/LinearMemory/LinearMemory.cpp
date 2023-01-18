@@ -4,11 +4,18 @@
 
 #include "LinearMemory.h"
 #include <memory.h>
+#include "../../../Logger/Syslog.h"
+#include <cstdio>
+#include <syslog.h>
+#include <string>
 
 bool LinearMemory::InitLinear(ConfigParameters *conf, uint32_t pNumPages) {
+    logger.Message(LOG_DEBUG, "LinearMemory::InitLinear started");
     numPages = pNumPages;
     storage = new uint8_t [pNumPages*MEM_PAGE_SIZE];
+    logger.Message(LOG_DEBUG, "LinearMemory::InitLinear: Allocating %d pages" + std::to_string(pNumPages));
     isActive = true;
+    logger.Message(LOG_DEBUG, "LinearMemory::InitLinear: Code returns success(true)");
     return true;
 };
 

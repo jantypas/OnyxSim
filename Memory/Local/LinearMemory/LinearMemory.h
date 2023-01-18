@@ -5,9 +5,11 @@
 #ifndef ONYXSIM_LINEARMEMORY_H
 #define ONYXSIM_LINEARMEMORY_H
 #include "../../MemInterface.h"
+#include "../../../Logger/Syslog.h"
 
 class LinearMemory : MemInterface {
 private :
+    Syslog      logger;
     uint8_t     *storage;
     uint32_t    numPages;
     bool        isActive;
