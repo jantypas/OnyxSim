@@ -10,5 +10,5 @@ Syslog::~Syslog() {
 }
 
 void Syslog::Message(int priority, std::string msg) {
-    syslog(priority, msg.c_str());
+    syslog(priority, "%s", msg.c_str());
 }

@@ -93,7 +93,9 @@ Condition Codes
 -- System instructions * = Privileged
  Op  Mod Mode #
 0000  0   0   0   STOP                        Stop the processor
-0010  0   0   0   NOOP                        No operation
+0001  0   0   0   NOOP                        No operation
+0002  0   0   1   MGASS Dx                    Move high address segment selector from Dx (only used in Onyx 1B)
+0003  0   0   1   MLASS Dx                    Move low address segment selector (only used in Onyx1B)
 
 -- Memory move/store instructions
 0030  0   -   1   MOVE Rx, Ry                 Move Ry -> Rx
@@ -308,12 +310,8 @@ Special registers
         0x----:----:---2:----   - Inside trap
         0x----:----:---4:----   - Inside trap service routine
         0x----:----:---8:----   - Inside I/O serivce routine
-        0x----:---1:----:----   - MMU in "linear" mode
-        0x----:---2:----:----   - MMU in banked mode
-        0x----:---4:----:----   - MMU in protected mode
-        0x----:---8:----:----   - MMU in virtual mode
-        0x----:--1-:----:----   - In privileged mode
-        0x8---:----:----:----   - CPU was just reset
+        0x----:----:--1-:----   - In privileged mode
+        0x8---:----:--2-:----   - CPU was just reset
     0x44    Messages needing service
     0x45    Process Interrupt service table address
     0x46    Process Interrupt service table mask
@@ -328,14 +326,9 @@ Special registers
     0x7E   System Control
         0x----:----:----:---1   - Disable shadow stack protection
         0x----:----:----:---2   - Enable single-step
-        0x----:----:----:-MM-   - Enable memory mode
-                                  0 = Linear
-                                  1 = Banked
-                                  2 = Protected
-                                  3 = Virtual
         0x8---:----:----:----   - Reset CPU to startup state
-    0x7F    System Process/Task selector
-        0x----:----:PPPP:--SS   - Select a given process/segment
+    0x7F    System bank/process/task selector
+        0x----:----:----:----   - Not used in Onyx1L, Onyx1B
 
 Traps =>
     IllegalMemoryReferenceTrap(-1)
