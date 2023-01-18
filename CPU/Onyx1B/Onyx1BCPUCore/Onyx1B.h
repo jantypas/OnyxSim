@@ -21,7 +21,6 @@ struct CPUEvent {
 class Onyx1L {
 public :
     CPUEvent            events;
-    uint16_t            ccs, dsp, cssp, dssp, esp, xsp; // Segment pointers
     uint64_t            *dataRegisters;
     uint64_t            *addressRegisters;
     uint64_t            *controlRegisters;
