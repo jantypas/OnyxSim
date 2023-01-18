@@ -11,6 +11,7 @@
 #include "../../../Monitor/MonitorInterface.h"
 #include "../../../Memory/Local/LinearMemory/LinearMemory.h"
 
+
 enum CPUState {
 };
 
@@ -21,6 +22,9 @@ struct CPUEvent {
 class Onyx1L {
 public :
     CPUEvent            events;
+    uint32_t            highBankAddress;
+    uint32_t            highBnakSize;
+    uint32_t            numBanks;
     uint64_t            *dataRegisters;
     uint64_t            *addressRegisters;
     uint64_t            *controlRegisters;

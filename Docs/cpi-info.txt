@@ -94,8 +94,11 @@ Condition Codes
  Op  Mod Mode #
 0000  0   0   0   STOP                        Stop the processor
 0001  0   0   0   NOOP                        No operation
-0002  0   0   1   MGASS Dx                    Move high address segment selector from Dx (only used in Onyx 1B)
-0003  0   0   1   MLASS Dx                    Move low address segment selector (only used in Onyx1B)
+0002  0   0   1   SBANK Dx, Ax, Ay            Set up banked memory
+                                                Dx = # of banks
+                                                Ax = Bank page start
+                                                Ay = Bank offset
+
 
 -- Memory move/store instructions
 0030  0   -   1   MOVE Rx, Ry                 Move Ry -> Rx
