@@ -10,10 +10,10 @@
 #include <string>
 
 bool LinearMemory::InitLinear(ConfigParameters *conf, uint32_t pNumPages) {
-    logger.Message(LOG_DEBUG, "LinearMemory::InitLinear started");
+    logger.Message(LOG_DEBUG, "LinearMemory::InitLinear: started");
     numPages = pNumPages;
     storage = new uint8_t [pNumPages*MEM_PAGE_SIZE];
-    logger.Message(LOG_DEBUG, "LinearMemory::InitLinear: Allocating %d pages" + std::to_string(pNumPages));
+    logger.Message(LOG_DEBUG, "LinearMemory::InitLinear: Allocating " + std::to_string(pNumPages)+ " pages");
     isActive = true;
     logger.Message(LOG_DEBUG, "LinearMemory::InitLinear: Code returns success(true)");
     return true;
@@ -21,11 +21,13 @@ bool LinearMemory::InitLinear(ConfigParameters *conf, uint32_t pNumPages) {
 
 bool LinearMemory::InitBanked(ConfigParameters *conf, uint32_t pNumMainBanks, uint32_t pBankSize, uint32_t pNumAlternateBanks) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
+    logger.Message(LOG_ERR, "LinearMemory::InitBanked: Not implemented -- returns failure(false)");
     return false;
 }
 
 bool LinearMemory::InitVirtual(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName) {
     LastMemoryError = &MemoryErrorTable[MEMORY_ERROR_NOT_IMPLEMENTED];
+    logger.Message(LOG_ERR, "LinearMemory::InitVirtual: Not implemented -- returns failure(false)");
     return false;
 }
 
