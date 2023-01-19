@@ -7,5 +7,7 @@ int main() {
     ConfigParameters *config = new ConfigParameters();
     auto memoryInterface = new LinearMemory();
     auto result = memoryInterface->Init(config, 1024);
+    result = memoryInterface->WriteAddress(5120, 12);
     result = memoryInterface->ReadAddress(5120, &value);
+    memoryInterface->Exit();
 }

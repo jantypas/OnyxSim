@@ -9,6 +9,7 @@
 #include <iterator>
 #include <memory.h>
 #include "../../../Configuration/ConfigParameters.h"
+#include "../../../Logger/Logger.h"
 
 /**
  * We need these macros to make our life easier
@@ -59,12 +60,16 @@ VirtualMemoryError  VirtualErrorTable[] {
  * findFreePagesFromTheLRU -- Look into the LRU Cache to see if we have any
  *                            candidates for swapping
  * @param pages - Return a list of possible pages
- * @return success/failure boolean
+ * @ret
  *
  */
 bool VirtualMemory::findFreePagesFromTheLRU(std::vector<uint32_t> &pages) {
+    logger->Message(LOG_DEBUG, "findFreePages: Started");
     // No candidates?
-    if (lruCache.empty()) { return false; }
+    if (lruCache.empty()) {
+        logger->Message(LOG_DEBUG, "findFreePages: lruCache is empty");
+        return false;
+    }
     /**
      * Get tne number of desired pages.
      * Make sure these pages are not locked or on disk
@@ -72,9 +77,11 @@ bool VirtualMemory::findFreePagesFromTheLRU(std::vector<uint32_t> &pages) {
      uint32_t pg = 0;
      uint32_t minimalPages;
      if (lruCache.size() > MIN_SWAPPABLE_PAGES) {
+         logger->Message(LOG_DEBUG, "findFreePages: lruCache pages > minimum swappable pages");
          minimalPages = MIN_SWAPPABLE_PAGES;
      } else {
-        minimalPages = 1;
+         logger->Message(LOG_DEBUG, "findFreePages: lruCache pages = 1");
+         minimalPages = 1;
      }
      auto  ix = lruCache.end();
      while ((pg < minimalPages) && (!lruCache.empty())) {
@@ -88,7 +95,8 @@ bool VirtualMemory::findFreePagesFromTheLRU(std::vector<uint32_t> &pages) {
              minimalPages ++;
          }
      }
-    return true;
+     logger->Message(LOG_DEBUG, "findFreePages: Found "+std::to_string(minimalPages)+" pages");
+     return true;
 }
 
 /**
@@ -97,21 +105,26 @@ bool VirtualMemory::findFreePagesFromTheLRU(std::vector<uint32_t> &pages) {
  * @return Success/failure
  */
 bool VirtualMemory::markPhysicalPageAsFree(uint32_t page) {
+    logger->Message(LOG_DEBUG, "markPhysicalPagesAsFree started");
     // Make sure our page is within range
     if (page >= numPhysicalPages) {
+        logger->Message(LOG_ERR, "markPhysicalPagesAsFree: Memory address error");
         LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
         return false;
     }
     // Make sure page isn't already free
     if (IS_FLAG_CLEAR(physicalPageTable[page].pageState, PAGE_STATE_IN_USE)) {
+        logger->Message(LOG_DEBUG, "markPhysicalPagesAsFree: Accessing a free page");
         LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_FREE_PAGE_ACCESS];
         return false;
     }
     // Clear the page
+    logger->Message(LOG_DEBUG, "markPhysicalPagesAsFree: Page "+std::to_string(page)+ "set to used");
     CLR_FLAG(virtualPageTable[page].pageState, PAGE_STATE_IN_USE);
     physicalFreePagesList.push_back(page);
     removeAllFromVector(physicalUsedPagesList, page);
     removeAllFromVector(lruCache, page);
+    logger->Message(LOG_DEBUG, "markPhysicalPagesAsFree: Success");
     return true;
 }
 

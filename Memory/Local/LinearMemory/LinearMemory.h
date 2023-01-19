@@ -4,9 +4,10 @@
 
 #ifndef ONYXSIM_LINEARMEMORY_H
 #define ONYXSIM_LINEARMEMORY_H
-#include "../../../Logger/Syslog.h"
+#include "../../../Logger/Logger.h"
 #include "../../../Configuration/ConfigParameters.h"
 #include "../../MemoryConstants.h"
+#include "../../../Logger/Logger.h"
 
 #define MEMORY_ERROR_NONE               0
 #define MEMORY_ERROR_ADDRESS_ERROR      1
@@ -36,7 +37,7 @@ struct LinearMemInfo {
 
 class LinearMemory {
 private :
-    Syslog              logger;
+    Logger             *logger;
     uint8_t            *storage;
     uint32_t            numPages;
     bool                isActive;
@@ -51,6 +52,9 @@ public :
     bool SavePage(uint32_t page, uint8_t *buffer);
     LinearMemInfo *GetInfo();
     LinearMemoryError *GetLastError();
+    LinearMemory() {
+        logger = new Logger("LinearMemory");
+    }
 };
 
 
