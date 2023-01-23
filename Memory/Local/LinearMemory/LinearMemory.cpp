@@ -13,7 +13,7 @@
 
 LinearMemoryError   LinearMemoryErrorTable[] = {
         {   MEMORY_ERROR_NONE,              false,  "No error"                      },
-        {   MEMORY_ERROR_ADDRESS_ERROR,     false,  "Memory adddress violation"     },
+        {   MEMORY_ERROR_ADDRESS_ERROR,     false,  "Memory address violation"     },
         {   MEMORY_ERROR_NOT_INITIALIZED,   false,  "Memory system not initialized" }
 };
 

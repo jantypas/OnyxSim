@@ -4,7 +4,6 @@
 #include <stdint-gcc.h>
 #ifndef ONYXSIM_ONYX1_H
 #define ONYXSIM_ONYX1_H
-#include "../../Onyx1L//Onyx1LMicrocode/Onyx1LMicrocode.h"
 #include "../../../Processes/Process.h"
 #include "../../../IO/IOInterface.h"
 #include "../../../BIOS/BIOSInterface.h"
@@ -42,7 +41,6 @@ public :
     IOInterface         *io;
     BIOSInterface       *bios;
     MonitorInterface    *monitor;
-    Onyx1LMicrocode     *microcode;
 };
 
 

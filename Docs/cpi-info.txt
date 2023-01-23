@@ -20,8 +20,8 @@ Onyx1 Boot-up messages
 
 
        First 16
-Opcode  WS #Reg pairs
-12-bits 2   2
+Opcode  WS #Reg
+11-bits 2   3
 
     WS = number of bits to fetch
         03 = 64 bits
@@ -94,7 +94,7 @@ Condition Codes
  Op  Mod Mode #
 0000  0   0   0   STOP                        Stop the processor
 0001  0   0   0   NOOP                        No operation
-0002  0   0   1   SBANK Dx, Ax, Ay            Set up banked memory
+0002  0   0   2   SBANK Dx, Ax, Ay            Set up banked memory
                                                 Dx = # of banks
                                                 Ax = Bank page start
                                                 Ay = Bank offset
@@ -238,7 +238,7 @@ Condition Codes
 0CB0  3   -   1   *MSP  Ax, Ay                Move Code stack point, Data stack pointer to Ax, Ay
 
 --- Every other processor has something like this -- we need one too
-FFF0  3   0   0   HCFB                        Halt, Catch fire, go boom!  No idea why this is needed but everyone else has one
+7FF0  3   0   0   HCFB                        Halt, Catch fire, go boom!  No idea why this is needed but everyone else has one
                                               We'll probably just play a sad trambone or something
 
 Pragmas
