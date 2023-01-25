@@ -28,7 +28,7 @@ Opcode  WS #Reg
         02 = 32 bits
         01 = 16 bits
         00 = 8 bits
-    # - Register pairs
+    # - Registers
 
 Up to 6 registers (3 pairs) can be used
 If XT is set, opcode is now 22-bits, and two extra registers are provided
