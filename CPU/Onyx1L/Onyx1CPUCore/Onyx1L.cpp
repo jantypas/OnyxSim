@@ -3,6 +3,7 @@
 //
 
 #include "Onyx1L.h"
+#include <endian.h>
 
 bool Onyx1L::Onyx1LEventService() {
     return true;
@@ -31,7 +32,7 @@ bool Onyx1L::Onyx1LFetch() {
                 decoded.Register[ix].mode = value2;
             }
         } else {
-
+            uint16_t h = htobe32()
         }
     } else {
 

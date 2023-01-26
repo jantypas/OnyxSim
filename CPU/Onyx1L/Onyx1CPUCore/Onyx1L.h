@@ -90,7 +90,7 @@ public :
     IOInterface                             *io;
     BIOSInterface                           *bios;
     MonitorInterface                        *monitor;
-
+    uint16_t    readSwappedUint16()
     void Tick() override {
 
     }
