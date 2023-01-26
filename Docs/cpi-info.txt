@@ -20,23 +20,15 @@ Onyx1 Boot-up messages
 
 
        First 16
-Opcode  WS #Reg
-11-bits 2   3
+Opcode   Unused #Reg
+12-bits   1      3
 
-    WS = number of bits to fetch
-        03 = 64 bits
-        02 = 32 bits
-        01 = 16 bits
-        00 = 8 bits
-    # - Registers
-
-Up to 6 registers (3 pairs) can be used
-If XT is set, opcode is now 22-bits, and two extra registers are provided
+Up to 7 registers can be used
 
 Registers =
     RRMM R-
         RR = Register number (00-FF)
-        MM = Mode (4 bits, 4 unused)
+        MM = Mode (S----MMM where S = store, MMM = Mode)
             00 = Rx
             01 = Rx,X
             02 = Rx,Y
@@ -91,154 +83,166 @@ Condition Codes
     L = Less-Than
 
 -- System instructions * = Privileged
- Op  Mod Mode #
-0000  0   0   0   STOP                        Stop the processor
-0001  0   0   0   NOOP                        No operation
-0002  0   0   2   SBANK Dx, Ax, Ay            Set up banked memory
-                                                Dx = # of banks
-                                                Ax = Bank page start
-                                                Ay = Bank offset
+ Op  Mod #
+000  0  0   STOP                        Stop the processor
+001  0  0   NOOP                        No operation
+002  0  3   SBANK Dx, Ax, Ay            (Onyx1B only) Set up banked memory
+                                         Dx = # of banks
+                                         Ax = Bank page start
+                                         Ay = Bank offset
 
 
--- Memory move/store instructions
-0030  0   -   1   MOVE Rx, Ry                 Move Ry -> Rx
-0040  0   -   2   MOVEI Rx, Size, #value      Move litteral value
-0050  0   -   2   COPYM Ax, Ay, Dx            Capy memory Ay -> Ax for Dx units
-0060  0   0   2   COPYP Rx, Ry, Dx            Copy Dx pages from Ry to Rx
-0070  0   0   2   CMP Dx, Rx, Ry              Compare Rx to Rx -> Dx
-0080  0   0   2   CMPP Dx, Dy, Dz             Compare page Dy to Dz result > Dx
-0090  0   0   2   CMPBLK Dx, Ax, Ay, Dy       Compare memory block(Ax) and (Ay), for Dy words, store in Dx
-00A0  1   0   2   MSHIFT Dx, Rx, Dy           Bits Dx..Ry shifted right to Dx
-00B0  3   0   1   INFO Dx, Dy                 Get value from Dx and return it in Dy (value = special page)
+-- Memory Move/Store instructions
+010  0   2   MOVE8 Rx, Ry          Move Ry -> Rx (8 bits)
+011  0   2   MOVE16 Rx, Ry         Move Ry -> Rx (16 bits)
+012  0   2   MOVE32 Rx, Ry         Move Ry -> Rx (32 bits)
+013  0   2   MOVE64 Rx. Ry         Move Ry -> Rx (64 bits)
+014  0   1   MOVEI8 Rx, #value     Move literal value (8 bits)
+015  0   1   MOVEI16 Rx, #value    Move Literal value (16 bits)
+016  0   1   MOVEI32 Rx, #value    Move literal value (32-bits)
+017  0   1   MOVEI64 Rx, #value    Move literal value (64-bits)
+018  0   3   COPYM Ax, Ay, Dx      Capy memory Ay -> Ax for Dx units (implies 8 bits)
+019  0   3   COPYP Rx, Ry, Dx      Copy Dx pages from Ry to Rx
+01A  0   2   CMP8 Rx, Ry           Compare Rx to Rx -> Dx (8-bits)
+01B  0   2   CMP16 Rx, Ry          Compare Ry to Rx -> Dx (16-bit)
+01C  0   2   CMP32 Rx, Ry          Compare Ry to Rx -> Dx (32-bit)
+01D  0   2   CMP64 Rx, Ry          Compare Ry to Rx -> Dx (32-bit)
+01E  0   2   CMPP Dy, Dz           Compare page Dy to Dz result > Dx
+01F  0   3   CMPBLK Ax, Ay, Dy     Compare memory block(Ax) and (Ay), for Dy words, store in Dx
+020  3   2   INFO Dx, Dy           Get value from Dx and return it in Dy (value = special page)
 
 --- Math instructions
-0100  0   -   2   IADD Rx, Ry, Rz             Rx = Ry + Rz
-0110  0   -   2   ISUB Rx, Ry, Rz             Rx = Ry - Rz
-0120  0   -   2   IMULT Rx, Ry,Rz             Rx = Ry * Rz
-0130  0   -   2   IDIV Rx, Ry, Rz             Rx = Ry / Rz
-0140  0   -   2   IMOD Rx, Dy, Dz             Rx = Ry % Rz
-0150  0   -   2   IAND Rx, Ry, Rz             Rx = Ry & Rz
-0160  0   -   2   IOR Rx, Ry, Rz              Rx = Ry | Rz
-0170  0   -   2   IXOR Rx, Ry, Rz             Rx = Ry XOR Rz
-0180  0   -   2   ISHIFTL Rx, Ry, Rz          Rx = Ry << Rz
-0190  0   -   2   ISHIFTR Rz, Ry, Rz          Rx = Ry >> Rz
-01A0  0   -   1   INOT Rx, Ry                 Rx = ~Ry
-01B0  1   -   2   FADD Fx, Fy, Fz             Fx = Fy + Fz
-01C0  1   -   2   FSUB Fx, Fy, Fz             Fx = Fy - Fz
-01D0  1   -   2   FMULT Fx, Fy, Fz            Fx = Fy * Fz
-01E0  1   -   2   FDIV Fx, Fy, Fz             Fx = Fy / Fz
-01F0  1   -   1   FSIN Fx, Fy                 Fx = Sin(Fy)
-0200  1   -   1   FCOS Fx, Fy                 Fx = Cos(Fy)
-0210  1   -   1   FTAN Fx, Fy                 Fx = Tan(Fy)
-0220  1   -   1   FASIN Fx, Fy                Fx = Sin-1(Fy)
-0230  1   -   1   FACOS Fx, Fy                Fx = Cos-1(Fy)
-0240  1   -   1   FATAN Fx, Fy                Fx = Tan-1(Fy)
-0250  1   -   1   FLN Fx, Fy                  Fx = Ln(Fy)
-0260  1   -   1   FETOX Fx, Fy                Fx = e^(Fy)
-0270  1   -   2   FPOWER Fx, Fy, Fz           Fx = Fy raised to power Fx
-0280  1   -   2   FROOT Fx, Fy, Fz            Fx = Fy-th Root of Fz
-0290  1   -   1   FTOR Dx, Rx                 Convert Fx -> Dx
-02A0  1   -   1   DTOF Fx, Dx                 Convert Dx -> Fx
-02B0  1   -   1   SNPR Dx                     Set numeric precision (8, 16, 32, 64 bits)
+030  0   2  IADD64 Dx, Dy                  Dx = Dx + Dy
+031  0   2  ISUB64 Dx, Dy                  Dx = Dx - Dy
+032  0   2  IMULT64 Dx, Dy                 Dx = Dx * Dy
+033  0   2  IDIV64 Dx, Dy                  Dx = Dx / Dy
+034  0   2  IMOD64 Dx, Dy                  Dx = Dx % Dy
+035  0   2  IAND64 Dx, Dy                  Dx = Dx & Dy
+036  0   2  IOR64 Dx, Dy                   Dx = Dx | D
+037  0   2  IXOR64 Dx, Dy                  Dx = Dx XOR Dy
+038  0   2  ISHIFTL64 Dx, Dy               Dx = Dx << Dy
+039  0   2  ISHIFTR64 Dx, Dy               Dx = Dx >> Dy
+03A  0   1  INOT64 Dx                      Dx = ^Dx
+03B  1   2  FADD64 Dx, Dy                  Dx = Dx + Dy
+03C  1   2  FSUB64 Dx, Dy                  Dx = Dx - Dy
+03D  1   2  FMULT64 Dx, Dy                 Dx = Dx * Dy
+03E  1   2  FDIV64 Dx, Dy                  Dx = Dx / Dy
+03F  1   1  FSIN64 Dx                      Dx = Sin(Dx)
+040  1   1  FCOS64 Dx                      Dx = Cos(Dx)
+041  1   1  FTAN64 Dx                      Dx = Tan(Dx)
+042  1   1  FASIN64 Dx                     Dx = Sin-1(Dx)
+043  1   1  FACOS64 Dx                     Dx = Cos-1(Dx)
+044  1   1  FATAN64 Dx                     Dx = Tan-1(Dx)
+045  1   1  FLN64 Dx                       Dx = Ln(Dx)
+046  1   1  FETOX64 Dx                     Dx = e^(Dx)
+047  1   2  FPOWER64 Dx, Dy                Dx = Dx raised to power Dy
+048  1   2  FROOT64 Dx, Dy                 Dx = Dx-th Root of Dy
+049  1   1  FTOR64 Dx                      Convert floating point Dx to Int64
+04A  1   1  DTOF64 Dx                      Convert Int64(Dx) to Float64(Dx)
 
-02C0  1   -   2   STRNCPY Dx, Ax, Ay          Copy string Ay to Ax up to Dx units
-02D0  1   -   2   STRLEN  Dx, Ax              Dx = Length of string Ax
-02E0  1   -   2   STRNCMP Dx, Ax, Ay          Compare strings Ax and Ay -> Dx
-02F0  1   -   2   STRFIND Dx, Ax, Ay          Find first occurance of stirng Ay in Ax -> Position to Dx
-0300  1   -   2   STRCAT Ax, Ay, Az, Dx       Ax = Ay + Az up to Dx units
-0310  1   -   1   SSPRE Dx                    Set string type
+050  1  3   STRNCPY Dx, Ax, Ay          Copy string Ay to Ax up to Dx units
+051  1  2   STRLEN  Dx, Ax              Dx = Length of string Ax
+052  1  3   STRNCMP Dx, Ax, Ay          Compare strings Ax and Ay -> Dx
+053  1  3   STRFIND Dx, Ax, Ay          Find first occurance of stirng Ay in Ax -> Position to Dx
+054  1  4   STRCAT Ax, Ay, Az, Dx       Ax = Ay + Az up to Dx units
+055  1  1   SSPRE Dx                    Set string type
                                                     0 = ASCII 8-bit null terminated
                                                     1 = ASCII 8-bit length prefix
                                                     2 = UTF-8
 -- Test/Jump/Branching instructions
-0400  0   -   2   TEST Dx, Dy, Rx, Ry         Perform test Dy on Rx and Ry, store to Dx
-0410  0   -   2   TBITSET  Dx, Rx, Dy         Dx = Is bit Dy set in Rx
-0420  0   -   2   TBITCLR  Dx, Rx, Dy         Dx = Is bit Dy clear in Rx
-0500  0   -   1   PUSH Rx                     Push value Rx to stack (A5E-- = Rx)a
-0510  0   -   2   PUSHI Size, #Value          Push immediate value onto stack
-0520  0   -   1   POP Rx                      Pop Rx from to of stack (Rx =  A5E++)
-0530  0   -   1   JUMP Ax                     Jump to address Ax )
-0540  0   -   1   JUMPI #value                Jump to 64-bit value
-0550  0   -   1   CALL Ax                     Call subroutine at Ax
-0560  0   -   2   CALLI #value                Call litteral address
-0570  0   0   0   CALLRET                     Return from call
-0580  0   -   2   BRCOND #Cond, Ax            Branch on condition set
-0590  0   -   2   BRCONDI #Cond, #Value       Branch to immediate value on condition
-05A0  0   -   1   TZBR Rx Ax                  If Rx == 0, Branch to Ax
-05B0  0   -   1   TZBR Rx, #Value             If Rx == 0, Branch to immediate
-05C0  0   -   1   TNZBR Rx Ax                 If Rx != 0, Branch to Ax
-05D0  0   -   1   TNZBR Rx, #Value            If Rx != 0, Branch to immediate
-05E0  0   0   0   SERVICERET                  Return from service routine
-05F0  0   0   -   SYSCALL                     Perform system call
-0600  0   0   0   TRAPRET                     Return from trap
-0610  3   0   2   COPROC Dx, Ax, Ay           Call a copressor Dx, passing Call and Data stack Ax, Ay, result in Dx
+060  0  3   TEST Dx, Rx, Ry         Perform test Dy on Rx and Ry -> Dx
+061  0  2   TBITSET  Dx, Rx         Dx = Is bit Dy set in Rx -> Dx
+062  0  2   TBITCLR  Dx, Rx         Dx = Is bit Dy clear in Rx -? Dx
+063  0  1   PUSH8 Rx                Push 8-bit value Rx to stack
+064  0  1   PUSH16 Rx               Push 16-bit value Rx to stack
+065  0  1   PUSH32 Rx               Push 32-bit value Rx to stack
+066  0  1   PUSH64 Rx               Push 64-bit value Rx to stack
+067  0  1   POP8 Rx                 Pop 8-bit Rx from to of stack
+068  0  1   POP16 Rx                POp 16-bit value from stack
+069  0  1   POP32 Rx                Pop 32-bit value from stack
+06A  0  1   POP64 Rx                Pop 64-bit value from stack
+06B  0  1   JUMP Ax                 Jump to address Ax )
+06C  0  1   JUMPI #value            Jump to 64-bit value
+06D  0  1   CALL Ax                 Call subroutine at Ax
+06E  0  1   CALLI #value            Call litteral address
+06F  0  0   CALLRET                 Return from call
+070  0  1   BRCOND #Cond, Ax        Branch on condition set
+071  0  1   BRCONDI #Cond, #Value   Branch to immediate value on condition
+072  0  2   TZBR Rx Ax              If Rx == 0, Branch to Ax
+073  0  2   TZBR Rx, #Value         If Rx == 0, Branch to immediate
+074  0  2   TNZBR Rx Ax                 If Rx != 0, Branch to Ax
+075  0  2   TNZBR Rx, #Value            If Rx != 0, Branch to immediate
+076  0  0   SERVICERET                  Return from service routine
+077  0  0   SYSCALL                     Perform system call
+078  0  0   TRAPRET                     Return from trap
+079  3  3   COPROC Dx, Ax, Ay           Call a copressor Dx, passing Call and Data stack Ax, Ay, result in Dx
 
 --- Messaging I/O
-0700  0   -   1   MSGSEND Dx, Ax, Dy          Send an IPC message on channel Dy, from buffer Ax, result in Dx
-0710  0   -   2   MSGRECV Dx, Ax, Dy          Get an IPC message on channel Dy and put it into Ax, result in Dx
-0720  0   -   1   MSGAVAIL Dx, Dy             Is an IPC message available on channel Dy  Result in Dx
-0730  0   -   2   MSGWAIT Dx, Dy, Dz          Wait on message channel Dy (blocking for Dz ms) -> Dx
-0740  0   -   2   IOREQ Dx, Dy, Dz, Ax        Send an IO Message to Dy with command Dz, data Ax, result in Dx
-0750  0   -   2   BUFFERALLOC Dx, Dy, Ax      Allocate Dy I/O buffers to Ax, Result in Dx
-0760  0   -   1   BUFFERFREE  Dx, Ax          Free Ax I/O buffers
+080  0  3   MSGSEND Dx, Ax, Dy          Send an IPC message on channel Dy, from buffer Ax, result in Dx
+081  0  3   MSGRECV Dx, Ax, Dy          Get an IPC message on channel Dy and put it into Ax, result in Dx
+082  0  3   MSGAVAIL Dx, Dy             Is an IPC message available on channel Dy  Result in Dx
+083  0  3   MSGWAIT Dx, Dy, Dz          Wait on message channel Dy (blocking for Dz ms) -> Dx
+084  0  3   IOREQ Dx, Dy, Dz, Ax        Send an IO Message to Dy with command Dz, data Ax, result in Dx
+085  0  3   BUFFERALLOC Dx, Dy, Ax      Allocate Dy I/O buffers to Ax, Result in Dx
+086  0  3   BUFFERFREE  Dx, Ax          Free Ax I/O buffers
 
 -- Utility functions
-0800  3   -   1   ENCRYPT Ax, Ay              Encrypt a block in Ax to Ay
-0810  3   -   1   DECRYPT Ax, Ay              Decrypt a block in Ax to Ay
-0820  3   -   2   ENCRSETUP Dx, Dy, Ax        Set up encryption mode Dy data from Ax, result in Dx
-0830  3   -   2   HASH Dx, Dy, Ax, Ay         Compute Dy hash of Ax to Ay.  Result in Dx
-0840  2   -   2   ENQUEUE Dx, Dy, Ax          Enqueue 64 bytes into queue Dy. Result in Dx
-0850  2   -   2   DEQUEUE Dx, Dy, Ax          Dequeue 64 bytes from queue Dy.  Result in Dx
-0860  2   -   2   QUEUEPUSH Dx, Dy, Ax        Push (stack) 64 bytes onto queue Dy, Result in Dx
-0870  2   -   2   QUEUEPOP Dx, Dy, Ax         Pop (stack) 64 bytes from queue Dy.  Result in Dx
-0880  2   -   1   QUEUECLR Dx                 Clear queue Dy
-0890  2   -   1   QUEUEEMPTY Dx, Dy           Is  Queue Dy empty -> Dx
-08A0  2   -   2   DICTINS Dx, Dy, Ax, Ay      Insert 64-bytes (Ax) into dictionary Dy with value 64-bytes (Ay)
-08B0  2   -   2   DICTREM Dx, Dy, Ax          Remove Ax from dctionary Dy -> Result in Dx
-08C0  2   -   2   DICTFIND Dx, Dy, Ax, Ay     Find Ax in dictionary Dy.  Result in Dx, Dy
-08D0  2   -   1   DICTCLR Dx                  Clear dictionary Dx
-08E0  3   -   3   SORT Dx, Dy, Ax, Ay, Az     Sort Dx records, Ax to Ay via method Az. Length of record Dy
-08F0  3   -   2   SOUNDEX Dx, Dy, Ax, Ay      Compute soundex code for Ax to Ay using mode Dy.  Result in Dx
-0900  3   -   0   SERESET                     Secure enclave reset59
-0910  3   -   0   SEINSERT Ax, Ay             Secure enclave insert key Ax, value Ay
-0920  3   -   2   SEMATCH Dx, Ax, Ay          Given a key Ax, and a value Ay, are they correct -> Dx
-0930  3   -   1   SEREMOVE Dx, Ax             Remove key Ax from secure enclave -> Dx
+090  3  2   ENCRYPT Ax, Ay              Encrypt a block in Ax to Ay
+091  3  2   DECRYPT Ax, Ay              Decrypt a block in Ax to Ay
+092  3  3   ENCRSETUP Dx, Dy, Ax        Set up encryption mode Dy data from Ax, result in Dx
+093  3  4   HASH Dx, Dy, Ax, Ay         Compute Dy hash of Ax to Ay.  Result in Dx
+094  2  4   ENQUEUE Dx, Dy, Ax          Enqueue 64 bytes into queue Dy. Result in Dx
+095  2  3   DEQUEUE Dx, Dy, Ax          Dequeue 64 bytes from queue Dy.  Result in Dx
+096  2  3   QUEUEPUSH Dx, Dy, Ax        Push (stack) 64 bytes onto queue Dy, Result in Dx
+097  2  3   QUEUEPOP Dx, Dy, Ax         Pop (stack) 64 bytes from queue Dy.  Result in Dx
+098  2  1   QUEUECLR Dx                 Clear queue Dy
+099  2  2   QUEUEEMPTY Dx, Dy           Is  Queue Dy empty -> Dx
+09A  2  4   DICTINS Dx, Dy, Ax, Ay      Insert 64-bytes (Ax) into dictionary Dy with value 64-bytes (Ay)
+09B  2  4   DICTREM Dx, Dy, Ax          Remove Ax from dctionary Dy -> Result in Dx
+09C  2  4   DICTFIND Dx, Dy, Ax, Ay     Find Ax in dictionary Dy.  Result in Dx, Dy
+09D  2  1   DICTCLR Dx                  Clear dictionary Dx
+09E  3  5   SORT Dx, Dy, Ax, Ay, Az     Sort Dx records, Ax to Ay via method Az. Length of record Dy
+09F  3  4   SOUNDEX Dx, Dy, Ax, Ay      Compute soundex code for Ax to Ay using mode Dy.  Result in Dx
+0A0  3  0   SERESET                     Secure enclave reset59
+0A1  3  0   SEINSERT Ax, Ay             Secure enclave insert key Ax, value Ay
+0A2  3  3   SEMATCH Dx, Ax, Ay          Given a key Ax, and a value Ay, are they correct -> Dx
+0A3  3  2   SEREMOVE Dx, Ax             Remove key Ax from secure enclave -> Dx
 
 -- Process thread instructions
-0A00  3   0   0   YIELD                       Yield the CPU
-0A10  3   0   1   GETPID Dx                   Return PID in Dx
-0A20  3   0   1   FORK Dx                     Fork a process - return new PID in Dx
-0A30  3   0   0   JOIN                        Join proccessses
-0A40  3   0   1   ELEVATE Dx                  Become super user to privilege Dx -- returns state in Dx
-0A50  3   0   1   SLEEP Dx                    Sleep a propcess for Dx time units
-0A60  3   0   0   TICK                        Sleep one time cycle
-0A70  3   0   1   NICE Dx                     Set process priotity to Dx
-0A80  3   0   2   LOCK Dx, Dy, Dz             Try to obtain a lock Dx, type Dy. result in Dz
-0A90  3   0   1   UNLOCK Dx, Dy               Try to unlock a lock in Dx, result in Dy
+0B0  3  0   YIELD                       Yield the CPU
+0B1  3  1   GETPID Dx                   Return PID in Dx
+0B2  3  1   FORK Dx                     Fork a process - return new PID in Dx
+0B3  3  0   JOIN                        Join proccessses
+0B4  3  1   ELEVATE Dx                  Become super user to privilege Dx -- returns state in Dx
+0B5  3  1   SLEEP Dx                    Sleep a propcess for Dx time units
+0B6  3  0   TICK                        Sleep one time cycle
+0B7  3  1   NICE Dx                     Set process priotity to Dx
+0B8  3  3   LOCK Dx, Dy, Dz             Try to obtain a lock Dx, type Dy. result in Dz
+0B9  3  1   UNLOCK Dx, Dy               Try to unlock a lock in Dx, result in Dy
                                                     Dy = 0  Mutual Exclusion
                                                     Dy = 1  Barrier lock
                                                     Dy = 2  Read lock
                                                     Dy = 3  Write lock
-0AA0  3   0   2   ATSTSET Aw, Dx, Dy, Dz            Atomic test-and-test
+0BA  3  4   ATSTSET Aw, Dx, Dy, Dz            Atomic test-and-test
                                                         Test Ax for value Dx.  If true, set Ax to Dy
                                                         Result in Dx
 
 --- Lower-level OS instructions
-0C00  3   -   -   *GURU                       Call Guru monitor supervisor function
-0C10  3   -   2   *INPORT Dx, Dy, Dz          Get a word from Port Dz and store in Dy.  Result in Dz
-0C20  3   -   2   *OUTPORT Dx, Dy, Dz         Write a word in Dz to Port Dy.  Result in Dx
-0C30  3   0   0   *RESETCPU                   Reset processor
-0C40  3   0   0   *DEBUG                      Debug break
-0C50  0   0   0   *SYSRET                     Return from system call
-0C60  0   0   -   *TRAP                       Perform system trap
-0C70  3   -   -   *COPROCRET                  Return from coprocessor
-0C80  3   -   0   *TASKSW Dx                  Task switch to value process in Dx
-0C90  3   -   1   *MDSP Ax                    Move Ax to data stack pointer
-0CA0  3   -   1   *MCSP Ax                    Move Ax to code stack pointer
-0CB0  3   -   1   *MSP  Ax, Ay                Move Code stack point, Data stack pointer to Ax, Ay
+0C0  3  -   *GURU                       Call Guru monitor supervisor function
+0C1  3  3   *INPORT Dx, Dy, Dz          Get a word from Port Dz and store in Dy.  Result in Dz
+0C2  3  3  *OUTPORT Dx, Dy, Dz         Write a word in Dz to Port Dy.  Result in Dx
+0C3  3  0   *RESETCPU                   Reset processor
+0C4  3  0   *DEBUG                      Debug break
+0C5  0  0   *SYSRET                     Return from system call
+0C6  0  -   *TRAP                       Perform system trap
+0C7  3  -   *COPROCRET                  Return from coprocessor
+0C8  3  0   *TASKSW Dx                  Task switch to value process in Dx
+0C9  3  1   *MDSP Ax                    Move Ax to data stack pointer
+0CA  3  1   *MCSP Ax                    Move Ax to code stack pointer
+0CB  3  1   *MSP  Ax, Ay                Move Code stack point, Data stack pointer to Ax, Ay
 
 --- Every other processor has something like this -- we need one too
-7FF0  3   0   0   HCFB                        Halt, Catch fire, go boom!  No idea why this is needed but everyone else has one
+FFF0 3  0   HCFB                        Halt, Catch fire, go boom!  No idea why this is needed but everyone else has one
                                               We'll probably just play a sad trambone or something
 
 Pragmas
