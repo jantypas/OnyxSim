@@ -53,7 +53,6 @@ struct Onyx1DecodedInstruction {
 public :
     uint64_t    tempRegisters[8];
     uint16_t    opCode;
-    uint8_t     worDSize;
     uint8_t     numRegisters;
     struct {
             bool    STORE;
@@ -78,6 +77,15 @@ class CPUContextObjects {
 };
 
 class Onyx1L : OnyxCPU {
+private :
+    bool Read8(uint64_t addr, uint8_t *value);
+    bool Read16(uint64_t addr, uint16_t *value);
+    bool Read32(uint64_t addr, uint32_t *value);
+    bool Read64(uint64_t addr, uint64_t *value);
+    bool Write8(uint64_t addr, uint8_t value);
+    bool Write16(uint64_t addr, uint16_t value);
+    bool Write32(uint64_t addr, uint32_t value);
+    bool Write64(uint64_t addr, uint64_t value);
 public :
     Onyx1DecodedInstruction decodedInstruction;
     std::map<uint64_t, CPUContextObjects *> runningMap;
@@ -90,11 +98,11 @@ public :
     IOInterface                             *io;
     BIOSInterface                           *bios;
     MonitorInterface                        *monitor;
-    uint16_t    readSwappedUint16()
     void Tick() override {
 
     }
     Onyx1L();
+
     bool Onyx1LEventService();
     bool Onyx1LFetch();
     bool Onyx1LDecode();
