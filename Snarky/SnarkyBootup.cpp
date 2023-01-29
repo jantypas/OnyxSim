@@ -151,6 +151,15 @@ And sign in on the log,
 They've come to see our pony,
 And they've come to see our dog
 )"""",
+R""""(
+This is a test of the Emergency Broadcast System.
+Had this been an actual emergency, we would have all fled in terror.
+You would have been left uninformed
+)"""",
+"Connection closed by foreign host",
+"System shutdown in 300 seconds....",
+"Captain!  I cannot change the laws of physics!",
+"I'm a doctor not a systems engineer!"
 };
 
 std::string SnarkyBootup::getSnarkyBootMessage() {
