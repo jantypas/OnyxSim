@@ -185,11 +185,13 @@ Did you see how he started system backups AND virus scanning right before the co
 //          "Pharaoh, I know this is a hack, but we'll fix it in the next release...."
         )"""",
         R""""(
-//
+// AJK::
 // Kansas City Cassette Emulator
 // OK -- it's ancient, and we're not even using real cassettes, but the code works
-// and it's easier to emulate the 70s computer than to figure out what that code did.
+// and it's easier to emulate the 70s computer than to figure out what that code does.
 // The original programmer isn't available anymore -- I think he's dead.
+// RJK: Well I guess that precludes us brining him back on a contract?
+// AJK: Don't know -- he could be working for the government now -- it's hard to tell.
 //
         )"""",
         "Diogenes was in search of an honest man -- I'm in search of an insane woman -- Rich Rozen",
