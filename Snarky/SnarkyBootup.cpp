@@ -129,11 +129,12 @@ out the next guy.
 R""""(
 I hereby dedicate this code to my wife.
 Who will have to support me, the kids and the dog
-when this crappy product goes public
+when this crappy product goes public.
         )"""",
         R""""(
 If this code works, I wrote it.
-If it doesn't work,. some other guy wrote it.
+If it doesn't work,. some other guy wrote it -
+I was just stuck trying to fix a flaming mess.
         )"""",
         R""""(
 I don't know what this code does, but it works.
