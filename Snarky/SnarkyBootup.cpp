@@ -160,7 +160,37 @@ You would have been left uninformed
 "Connection closed by foreign host",
 "System shutdown in 300 seconds....",
 "Captain!  I cannot change the laws of physics!",
-"I'm a doctor not a systems engineer!"
+"I'm a doctor not a systems engineer!",
+"RFI = Request from Idiots",
+"RFP = Request Fantasy Product",
+"RFP = Request Fantasy Pricing",
+R""""(
+(As sung in Cats!)
+Midnight!
+Still waiting for the compiler....
+Have to fix all the errors....
+In this guy's crappy code!
+        )"""",
+        R""""(
+Welcome to the Real IT School Academy...
+Now today, we're introducing you to one of our senior members -- Ralph.
+Ralph is a real pro - he's eliminated more productivity in his years than most.
+Did you see how he started system backups AND virus scanning right before the code deadlines?
+        )"""",
+        "Deposit 35 cents for teh next ten minutes",
+        "This feature -- CPU..... does not work.  Please make a note of it",
+        R""""(
+// RJB: This code is bad, but it works, and it's only temporary until it's fixed
+// AKD: Temporary like hell
+        )"""",
+        R""""(
+//
+// Kansas City Cassette Emulator
+// OK -- it's ancient, and we're not even using real cassettes, but the code works
+// and it's easier to emulate the 70s computer than to figure out what that code did.
+// The original programmer isn't available anymore -- I think he's dead.
+//
+        )"""",
 };
 
 std::string SnarkyBootup::getSnarkyBootMessage() {
