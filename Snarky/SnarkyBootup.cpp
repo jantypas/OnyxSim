@@ -181,7 +181,8 @@ Did you see how he started system backups AND virus scanning right before the co
         "This feature -- CPU..... does not work.  Please make a note of it",
         R""""(
 // RJB: This code is bad, but it works, and it's only temporary until it's fixed
-// AKD: Temporary like hell
+// AKD: Temporary like hell == the pyramids probably have a note that says
+//          "Pharaoh, I know this is a hack, but we'll fix it in the next release...."
         )"""",
         R""""(
 //
@@ -191,6 +192,14 @@ Did you see how he started system backups AND virus scanning right before the co
 // The original programmer isn't available anymore -- I think he's dead.
 //
         )"""",
+        "Diogenes was in search of an honest man -- I'm in search of an insane woman -- Rich Rozen",
+        R""""(
+Oh...
+A host is a host, From coast to coast,
+And no one will talk to a host that's close,
+Unless that host, that isn't close,
+is busy, hang or dead'
+)""""
 };
 
 std::string SnarkyBootup::getSnarkyBootMessage() {
