@@ -120,9 +120,9 @@ When I last ran this code, only God and I understood it.
 Now only God does.
 )"""",
 R""""(
-Dear manager.  Once you finish attempting to optimzie this code, and realize
+Dear manager.  Once you finish attempting to optimize this code, and realize
 what a horrible waste of time this was, please increment the counter below to help
-out the next one.
+out the next guy.
 
 #define WASTERED_TIME 5
 )"""",
@@ -138,6 +138,18 @@ If it doesn't work,. some other guy wrote it.
         R""""(
 I don't know what this code does, but it works.
 So I'm too afraid to change it.
+)"""",
+"Dangerous big red button!  Do not push!",
+R""""(
+Deep in engineering,
+Where mortals seldom go,
+A customer and manager,
+come looking for a show.
+
+They pass amused among us,
+And sign in on the log,
+They've come to see our pony,
+And they've come to see our dog
 )"""",
 };
 
