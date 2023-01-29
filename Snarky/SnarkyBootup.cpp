@@ -190,6 +190,8 @@ Did you see how he started system backups AND virus scanning right before the co
 // OK -- it's ancient, and we're not even using real cassettes, but the code works
 // and it's easier to emulate the 70s computer than to figure out what that code does.
 // The original programmer isn't available anymore -- I think he's dead.
+// RJK: Dead?  Or does he just feel that way?  I feel like that all the time.
+// AJK: No, I think he's really dead.
 // RJK: Well I guess that precludes us brining him back on a contract?
 // AJK: Don't know -- he could be working for the government now -- it's hard to tell.
 //
