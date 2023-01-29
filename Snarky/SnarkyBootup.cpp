@@ -203,7 +203,8 @@ A host is a host, From coast to coast,
 And no one will talk to a host that's close,
 Unless that host, that isn't close,
 is busy, hang or dead'
-)""""
+)"""",
+"If these messages are too tame for you -- try fortune -o"
 };
 
 std::string SnarkyBootup::getSnarkyBootMessage() {
