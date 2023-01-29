@@ -1,23 +1,3 @@
-Onyx1 Boot-up messages
-    "What's inside?  You really don't want to know."
-    "Nearly 100 (somewhat) correct opcodes!"
-    "It's inside -- don't let it out!  You have no idea what it takes to catch it."
-    "Now with more blue smoke power!"
-    "The computer your mother wouldn't let you buy when you were a kid."
-    "What's inside? If you're smart you'll step on it before it gets to the children!"
-    "It's inside -- what did you expect for free?  It might even work!"
-    "Whatever is inside, it's not my fault. I had nothing to do with this!"
-    "Yeah, it's inside -- but that's nothing to be proud of."
-    "It's inside, but doctors have medication for it now..."
-    "What's inside?  You look.... I'm too scared."
-    "What's inside?  I have no idee.  I found it best not to ask...it will help later in court.  I was not involved."
-    "What's inside?  Remember the monster under the bed?  This is worse."
-    "I may be a computer, but that only means I can compute the wrong answer really, really fast = the power of Devops!"
-    "Forget what's inside.  Should you be outside once in a while?"
-    "What's inside?  A little man who's really good at playing chess..."
-    "What's inside?  I don't know.  I don't care.  That's YOUR problem."
-    "They said it couldn't be done.  They said it shouldn't be done.  But I did it away!"
-
 
        First 16
 Opcode   Unused #Reg
@@ -86,7 +66,7 @@ Condition Codes
  Op  Mod
 0000  0    STOP                        Stop the processor
 0010  0    NOOP                        No operation
-0020  0    SBANK Dx, Ax, Ay            (Onyx1B only) Set up banked memory
+0020  1    *SBANK Dx, Ax, Ay           (Onyx1B only) Set up banked memory
                                          Dx = # of banks
                                          Ax = Bank page start
                                          Ay = Bank offset
@@ -96,20 +76,19 @@ Condition Codes
 0102 0  MOVE8 Rx, Ry          Move Ry -> Rx (8 bits)
 0112 0  MOVE16 Rx, Ry         Move Ry -> Rx (16 bits)
 0122 0  MOVE32 Rx, Ry         Move Ry -> Rx (32 bits)
-0130 0  MOVE64 Rx. Ry         Move Ry -> Rx (64 bits)
-0142 0  MOVEI8 Rx, #value     Move literal value (8 bits)
+0132 0  MOVE64 Rx. Ry         Move Ry -> Rx (64 bits)
+0141 0  MOVEI8 Rx, #value     Move literal value (8 bits)
 0151 0  MOVEI16 Rx, #value    Move Literal value (16 bits)
 0161 0  MOVEI32 Rx, #value    Move literal value (32-bits)
 0171 0  MOVEI64 Rx, #value    Move literal value (64-bits)
 0183 0  COPYM Ax, Ay, Dx      Capy memory Ay -> Ax for Dx units (implies 8 bits)
-0193 0  COPYP Rx, Ry, Dx      Copy Dx pages from Ry to Rx
+0193 1  COPYP Rx, Ry, Dx      Copy Dx pages from Ry to Rx
 01A2 0  CMP8 Rx, Ry           Compare Rx to Rx -> Dx (8-bits)
 01B2 0  CMP16 Rx, Ry          Compare Ry to Rx -> Dx (16-bit)
 01C2 0  CMP32 Rx, Ry          Compare Ry to Rx -> Dx (32-bit)
 01D2 0  CMP64 Rx, Ry          Compare Ry to Rx -> Dx (32-bit)
-01E2 0  CMPP Dy, Dz           Compare page Dy to Dz result > Dx
-01F3 0  CMPBLK Ax, Ay, Dy     Compare memory block(Ax) and (Ay), for Dy words, store in Dx
-0202 3  INFO Dx, Dy           Get value from Dx and return it in Dy (value = special page)
+01E2 1  CMPP Dy, Dz           Compare page Dy to Dz result > Dx
+01F3 0  INFO Dx, Dy           Get value from Dx and return it in Dy (value = special page)
 
 --- Math instructions
 0302 0 IADD64 Dx, Dy            Dx = Dx + Dy
@@ -145,7 +124,7 @@ Condition Codes
 0523 1 STRNCMP Dx, Ax, Ay       Compare strings Ax and Ay -> Dx
 0533 1 STRFIND Dx, Ax, Ay       Find first occurance of stirng Ay in Ax -> Position to Dx
 0544 1 STRCAT Ax, Ay, Az, Dx    Ax = Ay + Az up to Dx units
-0551 1 SSPRE Dx                 Set string type
+0551 2 SSPRE Dx                 Set string type
                                     0 = ASCII 8-bit null terminated
                                     1 = ASCII 8-bit length prefix
                                     2 = UTF-8
@@ -161,21 +140,22 @@ Condition Codes
 0681 0 POP16 Rx                POp 16-bit value from stack
 0691 0 POP32 Rx                Pop 32-bit value from stack
 06A1 0 POP64 Rx                Pop 64-bit value from stack
-06B1 0 JUMP Ax                 Jump to address Ax )
-06C1 0 JUMPI #value            Jump to 64-bit value
-06D1 0 CALL Ax                 Call subroutine at Ax
-06E1 0 CALLI #value            Call litteral address
+06B1 0 JUMP64 Ax               Jump to address Ax )
+06C1 0 JUMPI64 #value          Jump to 64-bit value
+06D1 0 CALL64 Ax               Call subroutine at Ax
+06E1 0 CALLI64 #value          Call litteral address
 06F0 0 CALLRET                 Return from call
-0701 0 BRCOND #Cond, Ax        Branch on condition set
-0711 0 BRCONDI #Cond, #Value   Branch to immediate value on condition
-0722 0 TZBR Rx Ax              If Rx == 0, Branch to Ax
-0732 0 TZBR Rx, #Value         If Rx == 0, Branch to immediate
-0742 0 TNZBR Rx Ax                 If Rx != 0, Branch to Ax
-0752 0 TNZBR Rx, #Value            If Rx != 0, Branch to immediate
-0760 0 SERVICERET                  Return from service routine
-0770 0 SYSCALL                     Perform system call
-0780 0 TRAPRET                     Return from trap
-0793 3 COPROC Dx, Ax, Ay           Call a copressor Dx, passing Call and Data stack Ax, Ay, result in Dx
+0701 0 BRTCOND #Cond, Ax       Branch on condition set
+0711 0 BRFCONF #COnd, Ax       Branch on condition not set
+0721 0 BRTCONDI #Cond, #Value  Branch to immediate value on condition
+0731 0 BRFCONDI #Cond, #value  Branch to immediate value on conditoin false
+0742 0 TZBR Rx Ax              If Rx == 0, Branch to Ax
+0752 0 TZBRI Rx, #Value        If Rx == 0, Branch to immediate
+0762 0 TNZBR Rx Ax             If Rx != 0, Branch to Ax
+0772 0 TNZBRI Rx, #Value       If Rx != 0, Branch to immediate
+0780 0 SERVICERET              Return from service routine
+0790 0 SYSCALL                 Perform system call
+07A0 0 TRAPRET                 Return from trap
 
 --- Messaging I/O
 0803 0 MSGSEND Dx, Ax, Dy          Send an IPC message on channel Dy, from buffer Ax, result in Dx
@@ -191,14 +171,14 @@ Condition Codes
 0912 3 DECRYPT Ax, Ay              Decrypt a block in Ax to Ay
 0923 3 ENCRSETUP Dx, Dy, Ax        Set up encryption mode Dy data from Ax, result in Dx
 0934 3 HASH Dx, Dy, Ax, Ay         Compute Dy hash of Ax to Ay.  Result in Dx
-0944 2 ENQUEUE Dx, Dy, Ax          Enqueue 64 bytes into queue Dy. Result in Dx
-0953 2 DEQUEUE Dx, Dy, Ax          Dequeue 64 bytes from queue Dy.  Result in Dx
-0962 2 QUEUEPUSH Dx, Dy, Ax        Push (stack) 64 bytes onto queue Dy, Result in Dx
-0973 2 QUEUEPOP Dx, Dy, Ax         Pop (stack) 64 bytes from queue Dy.  Result in Dx
+0944 2 QUEUEFRONTPUSH Dx, Dy, Ax   Push on to stack
+0953 2 QUEUEBACKPUSH Dx, Dy, Ax    Pop from stack
+0962 2 QUEUEFRONTPOP Dx, Dy, Ax    Push (stack) 64 bytes onto queue Dy, Result in Dx
+0973 2 QUEUEBACKPOP Dx, Dy, Ax     Pop (stack) 64 bytes from queue Dy.  Result in Dx
 0981 2 QUEUECLR Dx                 Clear queue Dy
 0992 2 QUEUEEMPTY Dx, Dy           Is  Queue Dy empty -> Dx
-09A4 2 DICTINS Dx, Dy, Ax, Ay      Insert 64-bytes (Ax) into dictionary Dy with value 64-bytes (Ay)
-09B4 2 DICTREM Dx, Dy, Ax          Remove Ax from dctionary Dy -> Result in Dx
+09A4 2 DICTINSERT Dx, Dy, Ax, Ay   Insert 64-bytes (Ax) into dictionary Dy with value 64-bytes (Ay)
+09B4 2 DICTREMOVE Dx, Dy, Ax       Remove Ax from dctionary Dy -> Result in Dx
 09C4 2 DICTFIND Dx, Dy, Ax, Ay     Find Ax in dictionary Dy.  Result in Dx, Dy
 09D1 2 DICTCLR Dx                  Clear dictionary Dx
 09E5 3 SORT Dx, Dy, Ax, Ay, Az     Sort Dx records, Ax to Ay via method Az. Length of record Dy
@@ -235,11 +215,8 @@ Condition Codes
 0C40 3 *DEBUG                      Debug break
 0C50 0 *SYSRET                     Return from system call
 0C6= 0 *TRAP                       Perform system trap
-0C7- 3 *COPROCRET                  Return from coprocessor
-0C80 3 *TASKSW Dx                  Task switch to value process in Dx
-0C91 3 *MDSP Ax                    Move Ax to data stack pointer
-0CA1 3 *MCSP Ax                    Move Ax to code stack pointer
-0CB1 3 *MSP  Ax, Ay                Move Code stack point, Data stack pointer to Ax, Ay
+0C70 3 *TASKSW Dx                  Task switch to value process in Dx
+
 
 --- Every other processor has something like this -- we need one too
 FFF0 3 HCFB                        Halt, Catch fire, go boom!  No idea why this is needed but everyone else has one

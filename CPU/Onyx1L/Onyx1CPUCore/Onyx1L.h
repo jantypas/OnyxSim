@@ -55,7 +55,7 @@ public :
     uint16_t    opCode;
     uint8_t     numRegisters;
     struct {
-            bool    STORE;
+            bool    store;
             uint8_t name;
             uint8_t mode;
     } Register[8];
