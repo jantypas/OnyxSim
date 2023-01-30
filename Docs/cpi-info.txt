@@ -66,11 +66,6 @@ Condition Codes
  Op  Mod
 0000  0    STOP                        Stop the processor
 0010  0    NOOP                        No operation
-0020  1    *SBANK Dx, Ax, Ay           (Onyx1B only) Set up banked memory
-                                         Dx = # of banks
-                                         Ax = Bank page start
-                                         Ay = Bank offset
-
 
 -- Memory Move/Store instructions
 0102 0  MOVE8 Rx, Ry          Move Ry -> Rx (8 bits)
