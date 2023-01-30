@@ -23,6 +23,7 @@
 #define MEMORY_ERROR_NO_VIRTUAL_PAGES       8
 #define MEMORY_ERROR_NO_PHYSICAL_PAGES      9
 #define MEMORY_ERROR_UNKNOWN_MEMORY_ERROR   10
+#define MEMORY_ERROR_NO_STORAGE             11
 
 #define PAGE_STATE_IS_LOCKED    0x0001
 #define PAGE_STATE_IS_ON_DISK   0x0002
@@ -80,7 +81,6 @@ private :
     uint32_t                                    minPhysicalPages;
     bool                                        isActive;
     Swapper                                     swapper;
-    VirtualMemoryError                         *LastMemoryError;
     VirtualMemoryInfo                           info;
 
     bool markPhysicalPageAsFree(uint32_t page);
@@ -91,9 +91,11 @@ private :
     bool findFreePagesFromTheLRU(std::vector<uint32_t> &pages);
     bool SwapOutPageList(std::vector<uint32_t> &list);
     bool SwapOutPageCandidates();
+    void ReportError(std::string func, uint32_t errornumber);
 public:
     VirtualMemory() {
     }
+    VirtualMemoryError                         *LastMemoryError;
     bool Init(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName);
     bool Exit();
     bool ReadAddress(uint64_t addr, uint8_t *value);
@@ -104,7 +106,7 @@ public:
     bool FreeNPages(uint32_t pPages, uint32_t *pPageList);
     bool SwapInPage(uint32_t page);
     bool SwapOutPage(uint32_t page);
-    VirtualMemoryInfo *GetInfo();
+    VirtualMemoryInfo   *GetInfo();
     VirtualMemoryError  *GetError();
 };
 

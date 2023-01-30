@@ -47,7 +47,8 @@ VirtualMemoryError  VirtualErrorTable[] {
         {   MEMORY_ERROR_PAGE_IS_LOCKED,        true,   "Page is locked in memory"          },
         {   MEMORY_ERROR_NO_VIRTUAL_PAGES,      true,   "No more virtual pages available"   },
         {   MEMORY_ERROR_NO_VIRTUAL_PAGES,      true,   "No more physical pages available"  },
-        {   MEMORY_ERROR_UNKNOWN_MEMORY_ERROR,  true,   "Unknown fatal memory error"    }
+        {   MEMORY_ERROR_UNKNOWN_MEMORY_ERROR,  true,   "Unknown fatal memory error"       },
+        {   MEMORY_ERROR_NO_STORAGE,            true,   "No backing storage available"      }
 };
 
 /**********************************************************************************************
@@ -89,6 +90,7 @@ bool VirtualMemory::findFreePagesFromTheLRU(std::vector<uint32_t> &pages) {
          uint16_t state;
          state = virtualPageTable[possiblePage].pageState;
          if (IS_FLAG_CLEAR(state, PAGE_STATE_IS_LOCKED) && IS_FLAG_CLEAR(state, PAGE_STATE_IS_ON_DISK)) {
+             BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:findFreePages:Moving page "+std::to_string(*ix);
              lruCache.erase(ix);
              ix --;
              pages.push_back(possiblePage);
@@ -254,10 +256,18 @@ bool VirtualMemory::Init(ConfigParameters *conf, uint32_t pNumVirtualPages, uint
 
     numVirtualPages         = pNumVirtualPages;
     numPhysicalPages        = pNumPhysicalPages;
-    physicalStorage         = new uint8_t[numPhysicalPages * LOCAL_MEM_PAGE_SIZE];
+
+    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:Init: Started";
+    physicalStorage         = new uint8_t[numPhysicalPages * LOCAL_MEM_PAGE_SIZE];\
+    if (physicalStorage == nullptr) {
+        ReportError("Init", MEMORY_ERROR_NO_STORAGE);
+    } else {
+        BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:Init: Allocated "+std::to_string(numPhysicalPages)+" Physical Pages";
+    }
     std::fill(physicalFreePagesList.begin(), physicalFreePagesList.end(), ix);
     std::fill(virtualFreePagesList.begin(), virtualFreePagesList.end(),ix);
     swapper.Init(conf->getStringValue("swapFileName"));
+    ReportError("Init", MEMORY_ERROR_NONE);
     return true;
 }
 
@@ -537,4 +547,12 @@ VirtualMemoryInfo *VirtualMemory::GetInfo() {
 
 VirtualMemoryError *VirtualMemory::GetError() {
     return LastMemoryError;
+}
+
+void VirtualMemory::ReportError(std::string func, uint32_t errornumber) {
+    if (errornumber == MEMORY_ERROR_NONE) {
+        BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:"+func+":"+LastMemoryError[errornumber].msg;
+    } else {
+        BOOST_LOG_TRIVIAL(error) << "VirtualMemory:"+func+":"+LastMemoryError[errornumber].msg;
+    }
 }

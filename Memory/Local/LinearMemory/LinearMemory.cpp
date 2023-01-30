@@ -14,13 +14,18 @@
 LinearMemoryError   LinearMemoryErrorTable[] = {
         {   MEMORY_ERROR_NONE,              false,  "No error"                      },
         {   MEMORY_ERROR_ADDRESS_ERROR,     false,  "Memory address violation"     },
-        {   MEMORY_ERROR_NOT_INITIALIZED,   false,  "Memory system not initialized" }
+        {   MEMORY_ERROR_NOT_INITIALIZED,   false,  "Memory system not initialized" },
+        {   MEMORY_ERROR_NO_STORAGE,        true,   "No backing storage avaialble"}
 };
 
 bool LinearMemory::Init(ConfigParameters *conf, uint32_t pNumPages) {
     BOOST_LOG_TRIVIAL(debug) << "LinearMemory:Init: started";
     numPages = pNumPages;
     storage = new uint8_t [pNumPages*LOCAL_MEM_PAGE_SIZE];
+    if (storage == nullptr) {
+        ReportError("Init", MEMORY_ERROR_NO_STORAGE);
+        return false;
+    }
     BOOST_LOG_TRIVIAL(debug) << "LinearMemory:Init: Allocating " + std::to_string(pNumPages)+ " pages";
     isActive = true;
     ReportError("Init", MEMORY_ERROR_NONE);

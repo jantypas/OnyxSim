@@ -10,6 +10,7 @@
 #define MEMORY_ERROR_NONE               0
 #define MEMORY_ERROR_ADDRESS_ERROR      1
 #define MEMORY_ERROR_NOT_INITIALIZED    2
+#define MEMORY_ERROR_NO_STORAGE         3
 
 class LinearMemoryError {
 public:
