@@ -4,12 +4,12 @@
 
 #include "LinearMemory.h"
 #include <memory.h>
-#include "../../../Logger/Logger.h"
 #include <cstdio>
 #include <syslog.h>
 #include <string>
 #include "../../../Configuration/ConfigParameters.h"
 #include "../../MemoryConstants.h"
+#include <boost/log/trivial.hpp>
 
 LinearMemoryError   LinearMemoryErrorTable[] = {
         {   MEMORY_ERROR_NONE,              false,  "No error"                      },
@@ -18,6 +18,7 @@ LinearMemoryError   LinearMemoryErrorTable[] = {
 };
 
 bool LinearMemory::Init(ConfigParameters *conf, uint32_t pNumPages) {
+    BOOST_LOG_TRIVIAL(trace) << "Test";
     logger->Message(LOG_DEBUG, "Init: started");
     numPages = pNumPages;
     storage = new uint8_t [pNumPages*LOCAL_MEM_PAGE_SIZE];
@@ -116,4 +117,9 @@ LinearMemInfo *LinearMemory::GetInfo() {
 LinearMemoryError *LinearMemory::GetLastError() {
     logger->Message(LOG_DEBUG,"GetError: Success");
     return LastMemoryError;
+}
+
+void LinearMemory::ReportError(std::string func, uint32_t errornumber) {
+    LastMemoryError = &LinearMemoryErrorTable[errornumber];
+    BOOST_LOG_TRIVIAL(error) << func + ":Fatal:"+LastMemoryError->isFatal+":"+LastMemoryError.msg;
 }

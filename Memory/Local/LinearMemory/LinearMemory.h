@@ -37,12 +37,12 @@ struct LinearMemInfo {
 
 class LinearMemory {
 private :
-    Logger             *logger;
     uint8_t            *storage;
     uint32_t            numPages;
     bool                isActive;
     LinearMemoryError  *LastMemoryError;
     LinearMemInfo       info;
+    void ReportError(std::string func, uint32_t errornumber;
 public :
     bool Init(ConfigParameters *conf, uint32_t pNumPages);
     bool Exit();

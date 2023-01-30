@@ -26,7 +26,6 @@ public :
         if (baseFrequency != 0) {
             std::this_thread::sleep_for(std::chrono::nanoseconds (baseFrequency));
         };
-        cpu.Tick();
     }
     void Run(OnyxCPU *cpu) {
         while (!running) {
