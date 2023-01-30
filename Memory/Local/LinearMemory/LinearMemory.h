@@ -4,10 +4,8 @@
 
 #ifndef ONYXSIM_LINEARMEMORY_H
 #define ONYXSIM_LINEARMEMORY_H
-#include "../../../Logger/Logger.h"
 #include "../../../Configuration/ConfigParameters.h"
 #include "../../MemoryConstants.h"
-#include "../../../Logger/Logger.h"
 
 #define MEMORY_ERROR_NONE               0
 #define MEMORY_ERROR_ADDRESS_ERROR      1
@@ -42,7 +40,7 @@ private :
     bool                isActive;
     LinearMemoryError  *LastMemoryError;
     LinearMemInfo       info;
-    void ReportError(std::string func, uint32_t errornumber;
+    void ReportError(std::string func, uint32_t errornumber);
 public :
     bool Init(ConfigParameters *conf, uint32_t pNumPages);
     bool Exit();
@@ -53,7 +51,6 @@ public :
     LinearMemInfo *GetInfo();
     LinearMemoryError *GetLastError();
     LinearMemory() {
-        logger = new Logger("LinearMemory");
     }
 };
 

@@ -9,7 +9,6 @@
 #include "../../../Configuration/ConfigParameters.h"
 #include "Swapper.h"
 #include "../../MemoryConstants.h"
-#include "../../../Logger/Logger.h"
 
 #define MIN_SWAPPABLE_PAGES         16
 
@@ -67,7 +66,6 @@ public :
 
 class VirtualMemory {
 private :
-    Logger                                     *logger;
     std::map<uint32_t, VirtualMemoryPageInfo>   virtualPageTable;
     std::map<uint32_t, PhysicalMemoryPageInfo>  physicalPageTable;
     std::vector<uint32_t>                       physicalFreePagesList;
@@ -95,7 +93,6 @@ private :
     bool SwapOutPageCandidates();
 public:
     VirtualMemory() {
-        logger = new Logger("VirtualMemory");
     }
     bool Init(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName);
     bool Exit();
