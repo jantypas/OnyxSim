@@ -267,16 +267,20 @@ bool VirtualMemory::Init(ConfigParameters *conf, uint32_t pNumVirtualPages, uint
     std::fill(physicalFreePagesList.begin(), physicalFreePagesList.end(), ix);
     std::fill(virtualFreePagesList.begin(), virtualFreePagesList.end(),ix);
     swapper.Init(conf->getStringValue("swapFileName"));
+    isActive = true;
     ReportError("Init", MEMORY_ERROR_NONE);
     return true;
 }
 
 bool VirtualMemory::Exit() {
+    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:Exit: Started";
     if (!isActive) {
-        LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_NOT_INITIALIZED];
+        ReportError("Exit", MEMORY_ERROR_NOT_INITIALIZED);
         return false;
     }
     delete physicalStorage;
+    ReportError("Exit", MEMORY_ERROR_NONE);
+    isActive = false;
     return true;
 }
 
@@ -549,10 +553,10 @@ VirtualMemoryError *VirtualMemory::GetError() {
     return LastMemoryError;
 }
 
-void VirtualMemory::ReportError(std::string func, uint32_t errornumber) {
+void VirtualMemory::ReportError(std::string func, uint32_t errornumber) const {
     if (errornumber == MEMORY_ERROR_NONE) {
-        BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:"+func+":"+LastMemoryError[errornumber].msg;
+        BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:"+func+":"+VirtualErrorTable[errornumber].msg;
     } else {
-        BOOST_LOG_TRIVIAL(error) << "VirtualMemory:"+func+":"+LastMemoryError[errornumber].msg;
+        BOOST_LOG_TRIVIAL(error) << "VirtualMemory:"+func+": "+VirtualErrorTable[errornumber].msg;
     }
 }

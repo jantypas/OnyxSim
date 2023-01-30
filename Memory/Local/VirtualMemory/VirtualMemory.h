@@ -91,7 +91,7 @@ private :
     bool findFreePagesFromTheLRU(std::vector<uint32_t> &pages);
     bool SwapOutPageList(std::vector<uint32_t> &list);
     bool SwapOutPageCandidates();
-    void ReportError(std::string func, uint32_t errornumber);
+    void ReportError(std::string func, uint32_t errornumber) const;
 public:
     VirtualMemory() {
     }
