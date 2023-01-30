@@ -115,9 +115,9 @@ void LinearMemory::ReportError(std::string func, uint32_t errornumber) {
     LastMemoryError = &LinearMemoryErrorTable[errornumber];
     if (errornumber == MEMORY_ERROR_NONE) {
         BOOST_LOG_TRIVIAL(debug)
-            << "LinearMemory:" + func + ":Fatal:"+ LastMemoryError->msg;
+            << "LinearMemory:" + func + ": " + LastMemoryError->msg;
     } else {
         BOOST_LOG_TRIVIAL(error)
-            << "LinearMemoryL" + func + ":Fatal:" + LastMemoryError->msg;
+            << "LinearMemoryL" + func +": "+ LastMemoryError->msg;
     }
 }
