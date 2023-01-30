@@ -136,20 +136,22 @@ bool VirtualMemory::markPhysicalPageAsFree(uint32_t page) {
  * @return Success/failure
  */
 bool VirtualMemory::markPhysicalPageAsUsed(uint32_t page) {
+    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:markPhysicalPageAsUsed";
     // Make sure our page is in range
     if (page >= numPhysicalPages) {
-        LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
+        ReportError("markPhysicalPageAsUsed", MEMORY_ERROR_ADDRESS_ERROR);
         return false;
     }
     // Make sure page isn't already in use
     if (IS_FLAG_SET(physicalPageTable[page].pageState, PAGE_STATE_IN_USE)) {
-        LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_USED_PAGE_ACCECSS];
+        ReportError("markPhysicalPageAsUsed", MEMORY_ERROR_USED_PAGE_ACCECSS);
         return true;
     }
     // Make the page as used
     SET_FLAG(physicalPageTable[page].pageState, PAGE_STATE_IN_USE);
     removeAllFromVector(physicalFreePagesList, page);
     physicalUsedPagesList.push_back(page);
+    ReportError("markPhysicalPageAsUsed", MEMORY_ERROR_NONE);
     return true;
 }
 
@@ -159,14 +161,15 @@ bool VirtualMemory::markPhysicalPageAsUsed(uint32_t page) {
  * @return Success/failure
  */
 bool VirtualMemory::markVirtualPageAsFree(uint32_t page) {
+    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:markVirtualPageAsFree: Started for page "+std::to_string(page);
     // Make sure page is in range
     if (page >= numVirtualPages) {
-        LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
+        ReportError("markVirtualPageAsFree", MEMORY_ERROR_ADDRESS_ERROR);
         return false;
     }
     // Make sure the page isn't already free
     if (IS_FLAG_CLEAR(virtualPageTable[page].pageState, PAGE_STATE_IN_USE)) {
-        LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_FREE_PAGE_ACCESS];
+        ReportError("markVirtualPageAsFree", MEMORY_ERROR_FREE_PAGE_ACCESS);
         return false;
     }
     // Mark the page as free, but first get the physical page, we need to free that first
@@ -177,6 +180,7 @@ bool VirtualMemory::markVirtualPageAsFree(uint32_t page) {
     removeAllFromVector(lruCache, page);
     // Put on the free list
     physicalFreePagesList.push_back(page);
+    ReportError("markVirtualPageAsFree", MEMORY_ERROR_NONE);
     return true;
 }
 
@@ -187,31 +191,35 @@ bool VirtualMemory::markVirtualPageAsFree(uint32_t page) {
  */
 bool VirtualMemory::markVirtualPageAsUsed(uint32_t page, uint32_t physPage) {
     // Make sure page is within range
+    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:markVirtualPageAsUsed: Started for page "+std::to_string(page);
     if (page >= numVirtualPages) {
-        LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
+        ReportError("markVirtualPageAsUsed", MEMORY_ERROR_ADDRESS_ERROR);
         return false;
     }
     // Make sure the page isn't already in use
     if (IS_FLAG_SET(virtualPageTable[page].pageState, PAGE_STATE_IN_USE)) {
-        LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_USED_PAGE_ACCECSS];
+        ReportError("markVirtualPageAsUsed", MEMORY_ERROR_USED_PAGE_ACCECSS);
         return false;
     }
     // Mark the virtual page as used
     virtualPageTable[page].physicalPage = physPage;
     virtualUsedPagesList.push_back(page);
     removeAllFromVector(virtualFreePagesList, page);
+    ReportError("markVirtualPagesAsUsed", MEMORY_ERROR_NONE);
     return true;
 }
 
 bool VirtualMemory::markVirtualPageAsSwapped(uint32_t page) {
+    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:markVirtualPageAsSwapped started.  Page = "+std::to_string(page);
     // Make sure page is within range
     if (page >= numVirtualPages) {
-        LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
+        ReportError("markVirtualPageAsSwapped", MEMORY_ERROR_ADDRESS_ERROR);
         return false;
     }
     // Make sure the page isn't already in use
     if (IS_FLAG_SET(virtualPageTable[page].pageState, PAGE_STATE_IN_USE)) {
-        LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_USED_PAGE_ACCECSS];
+        BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:markVirtualPageAsSwapped: Page "+ std::to_string(page)+" in use";
+        ReportError("markPageAsSwapped", MEMORY_ERROR_USED_PAGE_ACCECSS);
         return false;
     }
     // Mark the virtual page as used
@@ -219,6 +227,7 @@ bool VirtualMemory::markVirtualPageAsSwapped(uint32_t page) {
     SET_FLAG(virtualPageTable[page].pageState, PAGE_STATE_IS_ON_DISK);
     virtualUsedPagesList.push_back(page);
     removeAllFromVector(virtualFreePagesList, page);
+    ReportError("markVirtualPageAsSwapped", MEMORY_ERROR_NONE);
     return true;
 }
 
@@ -264,8 +273,17 @@ bool VirtualMemory::Init(ConfigParameters *conf, uint32_t pNumVirtualPages, uint
     } else {
         BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:Init: Allocated "+std::to_string(numPhysicalPages)+" Physical Pages";
     }
-    std::fill(physicalFreePagesList.begin(), physicalFreePagesList.end(), ix);
-    std::fill(virtualFreePagesList.begin(), virtualFreePagesList.end(),ix);
+    /*
+     * Fill our physical free pages list and virtual free pages list with values
+     */
+    for (uint32_t ix = 0; ix < numPhysicalPages; ix++) {
+        physicalFreePagesList.push_back(ix);
+    };
+    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:Init: We now have "+std::to_string(physicalFreePagesList.size())+" free physical pages";
+    for (uint32_t ix = 0; ix < numVirtualPages; ix++) {
+        virtualFreePagesList.push_back(ix);
+    };
+    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:Init: We now have "+std::to_string(virtualFreePagesList.size())+" free virtual; pages";
     swapper.Init(conf->getStringValue("swapFileName"));
     isActive = true;
     ReportError("Init", MEMORY_ERROR_NONE);
@@ -285,34 +303,41 @@ bool VirtualMemory::Exit() {
 }
 
 bool VirtualMemory::ReadAddress(uint64_t addr, uint8_t *value) {
+    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:ReadAddress: Started";
     if (!isActive) {
-        LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_NOT_INITIALIZED];
+        ReportError("ReadAddress", MEMORY_ERROR_NOT_INITIALIZED);
         return false;
     }
     uint32_t page = addr / LOCAL_MEM_PAGE_SIZE;
+    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:ReadAddress: Reading address "+std::to_string(addr)+" Page "+
+        std::to_string(page)+" Offset: "+std::to_string(addr % LOCAL_MEM_PAGE_SIZE);
     if (page >= numVirtualPages) {
-        LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_ADDRESS_ERROR];
+        ReportError("ReadAddress", MEMORY_ERROR_ADDRESS_ERROR);
         return false;
     }
     if (IS_FLAG_CLEAR(virtualPageTable[page].pageState, PAGE_STATE_IN_USE)) {
-        LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_FREE_PAGE_ACCESS];
+        ReportError("ReadAddress", MEMORY_ERROR_FREE_PAGE_ACCESS);
+        BOOST_LOG_TRIVIAL(error) << "VirtualMemory:ReadAddress:       PageState = "+
+            std::to_string(virtualPageTable[page].pageState);
         return false;
     }
     if (IS_FLAG_SET(virtualPageTable[page].pageState, PAGE_STATE_IS_ON_DISK)) {
         if (!SwapOutPageCandidates()) {
-            LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_CANT_SWAP_IN_PAGE];
+            ReportError("ReadAddress", MEMORY_ERROR_CANT_SWAP_OUT_PAGE);
             return false;
         } else {
-            LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_CANT_SWAP_IN_PAGE];
+            ReportError("ReadAddress", MEMORY_ERROR_CANT_SWAP_IN_PAGE);
             return false;
         }
     }
     uint32_t physPage = virtualPageTable[page].physicalPage;
     if (SwapInPage(page)) {
-        LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_CANT_SWAP_IN_PAGE];
+        ReportError("ReadAddress", MEMORY_ERROR_CANT_SWAP_IN_PAGE);
         return false;
     }
     *value = physicalStorage[(physPage*LOCAL_MEM_PAGE_SIZE)+(addr/LOCAL_MEM_PAGE_SIZE)];
+    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:ReadAddress: Read value "+std::to_string(*value);
+    ReportError("ReadAddress", MEMORY_ERROR_NONE);
     return true;
 }
 
@@ -410,17 +435,20 @@ bool VirtualMemory::SavePage(uint32_t page, uint8_t *buffer) {
     return true;
 }
 
-bool VirtualMemory::AllocateNPages(uint32_t pPages, std::vector<uint32_t>&pPagelist) {
+bool VirtualMemory::AllocateNPages(uint32_t pPages, std::vector<uint32_t> *pPagelist) {
+    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:AllocateNPage started";
     // Get the next virtual page off the fre list
     if (virtualFreePagesList.empty()) {
-        LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_NO_VIRTUAL_PAGES];
+        BOOST_LOG_TRIVIAL(error) << "VirtualMemory:AllocateNPagges: Check virtual free page list -- empty";
+        ReportError("AllocateNPages", MEMORY_ERROR_NO_VIRTUAL_PAGES);
         return false;
     }
 
     // Allocate a physical page to this virtual page
+    BOOST_LOG_TRIVIAL(error) << "VirtualMemory:AllocateNPages: Try to allocate a physical page";
     if (physicalFreePagesList.size() < MIN_SWAPPABLE_PAGES) {
         if (!SwapOutPageCandidates()) {
-            LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_NO_PHYSICAL_PAGES];
+            ReportError("AllocateNPages", MEMORY_ERROR_NO_PHYSICAL_PAGES);
             return false;
         };
     }
@@ -433,11 +461,14 @@ bool VirtualMemory::AllocateNPages(uint32_t pPages, std::vector<uint32_t>&pPagel
      * In this case, we lie and say all of these pages are swapped out/
      */
     if (virtualFreePagesList.size() <= pPages) {
-        LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_NO_VIRTUAL_PAGES];
+        BOOST_LOG_TRIVIAL(error) << "VirtualMemory:AlllocateNPages: We were asked for "+std::to_string(pPages)+
+            " We only had "+std::to_string(virtualFreePagesList.size());
+        ReportError("AllocateNPages", MEMORY_ERROR_NO_VIRTUAL_PAGES);
         return false;
     }
     if ((virtualFreePagesList.size() > pPages) &&
             (physicalFreePagesList.size() >= pPages)) {
+        BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:AllocateNPages: Requesting more physical pages than we have";
         for (uint32_t ix = 0; ix < pPages; ix++) {
             uint32_t newPhys = *physicalFreePagesList.end();
             physicalFreePagesList.pop_back();
@@ -445,21 +476,24 @@ bool VirtualMemory::AllocateNPages(uint32_t pPages, std::vector<uint32_t>&pPagel
             virtualFreePagesList.pop_back();
             markPhysicalPageAsUsed(newPhys);
             markVirtualPageAsUsed(newVirt, newPhys);
-            pPagelist.push_back(newVirt);
+            pPagelist->push_back(newVirt);
         }
+        ReportError("AllocateNPages", MEMORY_ERROR_NONE);
         return true;
     }
     if ((virtualFreePagesList.size() >= pPages) &&
             (physicalFreePagesList.size() <= pPages)) {
+        BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:AllocateNPages: We have enough physical pages";
         for (uint32_t ix = 0; ix < pPages; ix++) {
             uint32_t newVirt = *virtualFreePagesList.end();
             virtualFreePagesList.pop_back();
             markVirtualPageAsSwapped(newVirt);
-            pPagelist.push_back(newVirt);
+            pPagelist->push_back(newVirt);
         }
+        ReportError("AllocateNPagtes", MEMORY_ERROR_NONE);
         return true;
     }
-    LastMemoryError = &VirtualErrorTable[MEMORY_ERROR_UNKNOWN_MEMORY_ERROR];
+    ReportError("AllocateNPages", MEMORY_ERROR_UNKNOWN_MEMORY_ERROR);
     return false;
 }
 

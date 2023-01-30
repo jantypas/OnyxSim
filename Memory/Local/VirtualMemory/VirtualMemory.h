@@ -102,7 +102,7 @@ public:
     bool WriteAddress(uint64_t addr, uint8_t value);
     bool LoadPage(uint32_t page, uint8_t *buffer);
     bool SavePage(uint32_t page, uint8_t *buffer);
-    bool AllocateNPages(uint32_t pPages, std::vector<uint32_t> &pPagelist);
+    bool AllocateNPages(uint32_t pPages, std::vector<uint32_t> *pPagelist);
     bool FreeNPages(uint32_t pPages, uint32_t *pPageList);
     bool SwapInPage(uint32_t page);
     bool SwapOutPage(uint32_t page);
