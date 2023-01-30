@@ -49,6 +49,7 @@ bool LinearMemory::ReadAddress(uint64_t addr, uint8_t *value) {
         return false;
     };
     *value = storage[addr];
+    BOOST_LOG_TRIVIAL(debug) << "LinearMemory:ReadAddress: Read value "+std::to_string(*value);
     ReportError("ReadAddress", MEMORY_ERROR_NONE);
     return true;
 }
