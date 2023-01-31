@@ -223,8 +223,14 @@ you could be as good as Steve Gibson
 (You don't even know who Steve Gibson is do you?')
 Go to http://www.grc.com and learn something!)"""",
 "99 dead routines.... crashing on my machine...",
-"This machine doesn't actually run code -- more often it stumbles around it"
-
+"This machine doesn't actually run code -- more often it stumbles around it",
+R""""(
+The Onyx1 computer.
+The worlds first undefined instruction set.
+Some are complex, sore are reduced.
+Others are working on it with SlimFast but aren't there yet.
+Others claim to be getting there but sneak cookie dough when you're not looking.
+)""""
 };
 
 std::string SnarkyBootup::getSnarkyBootMessage() {
