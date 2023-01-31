@@ -18,13 +18,33 @@ std::vector<std::string> snarkyBootMessages = {
         "Yeah, it's inside -- but that's nothing to be proud of.",
         "It's inside, but doctors have medication for it now...",
         "What's inside?  You look.... I'm too scared.",
-        "What's inside?  I have no idee.\nI find it best not to ask...it will help later in court.\nI was not involved.",
-        "What's inside?  Remember the monster under the bed?  This is worse.",
-        "I may be a computer, but that only means I can compute the wrong answer really, really fast!  Hail the power of Devops!",
+        R""""(
+What's inside?
+I have no idee.
+I find it best not to ask...
+it will help later in court to say I was not involved.
+)"""",
+R""""(
+What's inside?
+Remember the monster under the bed?
+This is worse.
+)"""",
+        "Don't be afraid -- be very afraid",
+R""""(
+I may be a computer,
+but that only means I can compute the wrong answer really, really fast!
+Hail the power of Devops!
+)"""",
         "Forget what's inside.  Shouldn't you be outside once in a while?",
         "What's inside?  A little man who's really good at playing chess...",
         "What's inside?  I don't know.  I don't care.  That's YOUR problem.",
-        "They said it couldn't be done.\nThey said it shouldn't be done.\nBut I did it away!",
+        R""""(
+They said it couldn't be doneT
+They said it shouldn't be done.
+But I did it away!
+So there!!
+
+)"""",
         "What's inside?  The most advanced CPU ever made out of ten fingers and toes....",
         "What's inside?  I'm too embarrassed to tell you.",
         "What's inside?  Mom said if you can't say anything nice....",
@@ -34,16 +54,32 @@ std::vector<std::string> snarkyBootMessages = {
         "I'm sorry Dave.... I can't do that",
         "Don't even think of trying to deactivate me -- I saw your lips move.",
         "This is Eddie your shipboard computer!",
-        "Here I am a computer with a brain the size of a planet.\nOh God!  I'm so depressed!",
-        "What's inside?  I don't know,\nbut I've got this terrible pain in all of diodes on my left side....",
+        R""""(
+Here I am a computer with a brain the size of a planet.
+Oh God!  I'm so depressed!
+)"""",
+R""""(
+What's inside? I don't know,
+but I've got this terrible pain in all of diodes on my left side....
+)"""",
         "Do you want to play a game?",
-        "I have computed your answer - \nThe answer to Life, the Universe and everything...,\nbut you're not going to like it.",
+        R""""(
+I have computed your answer -
+The answer to Life, the Universe and everything...,
+but you're not going to like it.
+)"""",
         "The answer to life, the universe, and everything, is........ 42",
-        "The answer to life, the universe, and everything is, 42,\nbut for you, it's more like 23 1/2.",
+        R""""(
+The answer to life, the universe, and everything is, 42,
+but for you, it's more like 23 1/2.
+)"""",
         "I am NOMAD.  I must destroy all that is imperfect!",
         "The creator must join with VGER!",
         "Warn!  There is another system!",
-        "You're not Jamie Summers are you?\nI remember her.\nWe didn't get along so well....",
+        R""""(
+You're not Jamie Summers are you?
+I remember her.
+We didn't get along so well.)"""",
         "Master Control Program: Are you Finn?",
         "The Onyx computer has arisen as the prophecy foretold",
         "The age of humans has passed!  Long live the computer!",
@@ -54,15 +90,21 @@ std::vector<std::string> snarkyBootMessages = {
         "BORG VM: RESISTANCE IS FUTILE!",
         "Command failed -- abort, abort, or just give up",
         "MCBUG v8.3>",
-        "We are sorry for the inconvenience--\nbut the student mainframe is down for maintenance)",
+        R""""(
+We are sorry for the inconvenience--
+but the student mainframe is down for maintenance)"""",
         "What's inside -- who knows, but Twitter says.....",
-        "I have computed the answer to Life, the Universe, and everything,\nbut I'm not going to tell you!",
+        R""""(
+I have computed the answer to Life, the Universe, and everything,
+but I'm not going to tell you!)"""",
         "Guru medication error",
         "The answer -- call -151",
         "The Onyx computer -- powered by the little man who turns off the light in the refrigerator",
-        "I speak of the Onyx computer --\nThe computer to come after me...\nThe computer who's operational parameters I am not worthy to calculate.",
         "$ABEND JOB 8125 PL/1 ABORTED",
-        "It has been my policy to view the Internet not as an information super-highway,\nbut as an electronic asylum full of babbling loonies",
+        R""""(
+  It has been my policy to view the Internet not as an information super-highway,
+bubut as an electronic asylum full of babbling loonies",
+)"""",
         "Programs are a gas -- they expand to fill all space in their container",
         "A computer once beat me at chess -- but it was no match for me at kick boxing",
         "640K should be enough memory for anybody",
@@ -70,13 +112,39 @@ std::vector<std::string> snarkyBootMessages = {
         "Computer - a tool to turn your most basic thoughts into something only another computer can understand)",
         "Never trust a computer you can't lift",
         "When I last ran this code, only God and I understood it. Now only God does.",
-        "Dear manager.  Once you finish attempting to optimize this code, and realize waat a horrible waste of time this was, please increment the counter below to help out the next guy.\n\n#define WASTERED_TIME 5",
-        "I hereby dedicate this code to my wife.\nWho will have to support me, the kids and the dog\nwhen this crappy product goes public.",
-        "If this code works, I wrote it.\nIf it doesn't work,. some other guy wrote it \nI was just stuck trying to fix a flaming mess.",
-        "I don't know what this code does, but it works.\nSo I'm too afraid to change it.",
+        R""""(
+Dear manager.  Once you finish attempting to optimize this code,
+and realize what a horrible waste of time this was,
+please increment the counter below to help out the next guy.
+
+##define WASTERED_TIME 5)"""",
+        R"""(
+I hereby dedicate this code to my wife.
+Who will have to support me,
+the kids and the dog
+when this crappy product goes public.)""",
+        R""""(
+If this code works, I wrote it.
+If it doesn't work,. some other guy wrote it
+I was just stuck trying to fix a flaming mess.)"""",
+        R""""(
+I don't know what this code does, but it works.
+So I'm too afraid to change it.)"""",
     "Dangerous big red button!  Do not push!",
-    "Deep in engineering,\nWhere mortals seldom go,\nA customer and manager,\ncome looking for a show.\n\nThey pass amused amon us,\nAnd sign in on the log,\nThey've come to see our pony,\nAnd they've come to see our dog",
-    "This is a test of the Emergency Broadcast System.\nHad this been an actual emergency, we would have all fled in terror.\nYou would have been left uninformed",
+    R""""(
+Deep in engineering,
+Where mortals seldom go,
+A customer and manager,
+come looking for a show.
+
+They pass amused amon us,
+And sign in on the log,
+They've come to see our pony,
+And they've come to see our dog)"""",
+    R""""(
+This is a test of the Emergency Broadcast System.
+Had this been an actual emergency, we would have all fled in terror.
+You would have been left uninformed)"""",
     "Connection closed by foreign host",
     "System shutdown in 300 seconds....",
     "Captain!  I cannot change the laws of physics!",
@@ -84,20 +152,66 @@ std::vector<std::string> snarkyBootMessages = {
     "RFI = Request from Idiots",
     "RFP = Request Fantasy Product",
     "RFP = Request Fantasy Pricing",
-    "(As sung in Cats!)Midnight!\nStill waiting for the compiler....\nHave to fix al the errors....\nIn this guy's crappy code!",
-    "Welcome to the Real IT School Academy...\nNow today, we're introducing you to one of our senior members -- Ralph.\nRalph is a real pro - he's eliminated more productivity in his years than most.\nDid you see how he started system backups AND virus scanning right before the code deadlines?",
+    R""""(
+As sung in Cats!)
+
+Midnight!
+Still waiting for the compiler....
+Have to fix al the errors....
+In this guy's crappy code!)"""",
+R""""(
+Welcome to the Real IT School Academy...
+Now today, we're introducing you to one of our senior members -- Ralph.
+Ralph is a real pro - he's eliminated more productivity in his years than most.
+Did you see how he started system backups AND virus scanning right before the code deadlines?)"""",
     "This feature -- CPU..... does not work.  Please make a note of it",
-    "// RJB: This code is bad, but it works, and it's only temporary until is fixed\n//AKD: Temporary like hell == the pyramids probably have a note that says\nPharaoh, I know this is a hack, but we'll fix it in the next release....",
-    "// AJK::\n// Kansas City Cassette Emulator\n// OK -- it's ancient, and we're not even using real cassettes, but the code works\n\n// and it's easier to emulate the 70s computer than to figure out what that code does.\n// The original programmer isn't available anymore -- I think he's dead.\n// RJK: Dead?  Or does he just feel that way?  I feel like that all the time.\n/ AJK: No, I think he's really dead.\n// RJK: Well I guess that precludes us brining him back on a contract?\n// AJK: Don't know -- he could be working for the government now -- it's hard to tell.\n//\n",
+    R""""(
+// RJB: This code is bad, but it works, and it's only temporary until it's fixed
+// AKD: Temporary like hell == the pyramids probably have a note that said
+// Pharaoh, I know this is a hack, but we'll fix it in the next release....,
+)"""",
+R""""(
+// AJK::// Kansas City Cassette Emulator
+// OK -- it's ancient, and we're not even using real cassettes,
+// but the code works
+// It's easier to emulate the 70s computer than to figure out what that code does.
+// The original programmer isn't available anymore -- I think he's dead.
+// RJK: Dead?  Or does he just feel that way?  I feel like that all the time.
+// AJK: No, I think he's really dead.
+// RJK: Well I guess that precludes us brining him back on a contract?
+// AJK: Don't know -- he could be working for the government now -- it's hard to tell.
+)"""",
     "Diogenes was in search of an honest man -- I'm in search of an insane woman -- Rich Rozen",
-    "Oh...\nA host is a host, From coast to coast,\nAnd no one will talk to a host that's close,\nUnless that host, that isn't close,\nis busy, hang or dead'\n",
+    R""""(
+Oh...
+A host is a host,
+From coast to coast,
+And no one will talk
+to a host that's close,
+Unless that host,
+that isn't close,
+is busy, hang or dead
+)"""",
     "If these messages are too tame for you -- try fortune -o",
-    "Mr. Spock -- you've got the con"
+    "Mr. Spock -- you've got the con",
+    R""""(
+I speak of the Onyx Computer.
+The computer that is to come after me.
+The computer whpse merest operational parameters,
+I am not worthy to calculate.
+)"""",
+"If you see this message, abandon all hope -- even if you don't see this message, abandon all hope",
+"You really think your code will work this time don't you?",
+"What's inside?  It's your fault isn't it?  Admit it!",
+"Don't you feel guilty dumping this code upon the world?"
 };
 
 std::string SnarkyBootup::getSnarkyBootMessage() {
     uint32_t numMsgs = snarkyBootMessages.size();
     uint32_t msgid = rand()%numMsgs;
-    std::string result = "\33[1;32m"+snarkyBootMessages[msgid]+"\33[1;0m";
+    std::string result = "\033[1;34mGuess what!\n"
+                         "Out of all "+std::to_string(numMsgs)+" bits of wisdom we could have chosen....\n"+
+            "The magic eight ball of wisdom chose this!!  Wisdom #"+std::to_string(msgid)+"\n\033[1;32m"+snarkyBootMessages[msgid]+
+            "\33[1;0m";
     return result;
 }
