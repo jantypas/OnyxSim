@@ -98,6 +98,6 @@ std::vector<std::string> snarkyBootMessages = {
 std::string SnarkyBootup::getSnarkyBootMessage() {
     uint32_t numMsgs = snarkyBootMessages.size();
     uint32_t msgid = rand()%numMsgs;
-    std::string result = snarkyBootMessages[msgid];
+    std::string result = "\33[1;32m"+snarkyBootMessages[msgid]+"\33[1;0m";
     return result;
 }
