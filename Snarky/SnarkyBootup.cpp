@@ -241,7 +241,8 @@ Second, who do you think I am?  Steve Gibson?
 Besides, I'm not young anymore....
 )"""",
 "What's inside?  Terry Pratchett's bees",
-"+++ HEX +++"
+"+++ HEX +++",
+"Onyx1 -- now supporting VALGOL syntax -- with FOR SURE loops and GAG ME exceptions"
 };
 
 std::string SnarkyBootup::getSnarkyBootMessage() {
