@@ -4,8 +4,9 @@
 
 #include "SnarkyBootup.h"
 #include <string>
-std::string snarkyBootMessages[] = {
-#ifdef FIXME
+#include <vector>
+
+std::vector<std::string> snarkyBootMessages = {
         "What's inside?  You really don't want to know.",
         "Nearly 100 (somewhat) correct opcodes!",
         "It's inside -- don't let it out!  You have no idea what it takes to catch it.",
@@ -92,10 +93,11 @@ std::string snarkyBootMessages[] = {
     "Oh...\nA host is a host, From coast to coast,\nAnd no one will talk to a host that's close,\nUnless that host, that isn't close,\nis busy, hang or dead'\n",
     "If these messages are too tame for you -- try fortune -o",
     "Mr. Spock -- you've got the con"
-#endif
 };
+
 std::string SnarkyBootup::getSnarkyBootMessage() {
-    uint32_t numMsgs = snarkyBootMessages->length();
+    uint32_t numMsgs = snarkyBootMessages.size();
     uint32_t msgid = rand()%numMsgs;
-    return "Boot up message: "+snarkyBootMessages[msgid]+"\n";
+    std::string result = snarkyBootMessages[msgid];
+    return result;
 }
