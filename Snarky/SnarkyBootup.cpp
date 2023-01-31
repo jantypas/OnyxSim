@@ -247,7 +247,12 @@ Besides, I'm not young anymore....
 "Powering up the Babbage Engine --- wait for us to shovel in more coal",
 "Just because you're a mad scientist doesn't mean you always have to wear that lab coat and have a lousy haircut",
 "If your code crashes on this RISC processor, shouldn't the name be a clue?",
-"Bugger off!  I'm on my break!  Be happy we're not in Chicago."
+"Bugger off!  I'm on my break!  Be happy we're not in Chicago.",
+R""""(
+You're not a real computer scientist!
+Your calculator still has an equals key on it.
+You probably snuck in from Marketing.
+)""""
 };
 
 std::string SnarkyBootup::getSnarkyBootMessage() {
