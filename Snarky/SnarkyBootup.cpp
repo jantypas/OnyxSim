@@ -4,8 +4,8 @@
 
 #include "SnarkyBootup.h"
 #include <string>
-
 std::string snarkyBootMessages[] = {
+#ifdef DOSNARKY
         "What's inside?  You really don't want to know.",
         "Nearly 100 (somewhat) correct opcodes!",
         "It's inside -- don't let it out!  You have no idea what it takes to catch it.",
@@ -204,9 +204,9 @@ And no one will talk to a host that's close,
 Unless that host, that isn't close,
 is busy, hang or dead'
 )"""",
-"If these messages are too tame for you -- try fortune -o"
+"If these messages are too tame for you -- try fortune -o";
+#endif
 };
-
 std::string SnarkyBootup::getSnarkyBootMessage() {
     uint32_t numMsgs = snarkyBootMessages->length();
     uint32_t msgid = rand()%numMsgs;

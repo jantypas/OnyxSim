@@ -108,6 +108,7 @@ public:
     bool SwapOutPage(uint32_t page);
     VirtualMemoryInfo   *GetInfo();
     VirtualMemoryError  *GetError();
+    void DumpVirtualPageTable();
 };
 
 

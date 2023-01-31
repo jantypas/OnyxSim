@@ -1,17 +1,16 @@
 #include <iostream>
 
 #include <vector>
+#include "Configuration/ConfigParameters.h"
 #include "Memory/Local/VirtualMemory/VirtualMemory.h"
 
 int main() {
     uint8_t value;
     std::vector<uint32_t> v;
-    ConfigParameters *config = new ConfigParameters();
+    auto *config = new ConfigParameters();
+    config->Init();
+    auto swapname = config->getStringValue("swapFileName");
     auto memoryInterface = new VirtualMemory();
-    auto result = memoryInterface->Init(config, 32, 16, "/tmp/sweap");
-    auto result2 = memoryInterface->AllocateNPages(1000, &v);
-    printf("We got %d pages\n", v.size());
-    result = memoryInterface->WriteAddress(5120, 12);
-    result = memoryInterface->ReadAddress(5120, &value);
-    memoryInterface->Exit();
+    auto x = memoryInterface->Init(config, 32, 16, swapname);
+    auto y = memoryInterface->AllocateNPages(10, &v);
 }

@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iterator>
 #include <memory.h>
+#include <iostream>
 #include "../../../Configuration/ConfigParameters.h"
 #include <boost/log/trivial.hpp>
 
@@ -107,7 +108,7 @@ bool VirtualMemory::findFreePagesFromTheLRU(std::vector<uint32_t> &pages) {
  * @return Success/failure
  */
 bool VirtualMemory::markPhysicalPageAsFree(uint32_t page) {
-    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:markPhysicalPagesAsFree started";
+    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:markPhysicalPagesAsFree started - Page "+std::to_string(page);
     // Make sure our page is within range
     if (page >= numPhysicalPages) {
         BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:markPhysicalPagesAsFree: Memory address error";
@@ -136,7 +137,7 @@ bool VirtualMemory::markPhysicalPageAsFree(uint32_t page) {
  * @return Success/failure
  */
 bool VirtualMemory::markPhysicalPageAsUsed(uint32_t page) {
-    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:markPhysicalPageAsUsed";
+    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:markPhysicalPageAsUsed - Page "+std::to_string(page);
     // Make sure our page is in range
     if (page >= numPhysicalPages) {
         ReportError("markPhysicalPageAsUsed", MEMORY_ERROR_ADDRESS_ERROR);
@@ -284,7 +285,7 @@ bool VirtualMemory::Init(ConfigParameters *conf, uint32_t pNumVirtualPages, uint
         virtualFreePagesList.push_back(ix);
     };
     BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:Init: We now have "+std::to_string(virtualFreePagesList.size())+" free virtual; pages";
-    swapper.Init(conf->getStringValue("swapFileName"));
+    swapper.Init(conf->getStringValue("swapF[leNema"));
     isActive = true;
     ReportError("Init", MEMORY_ERROR_NONE);
     return true;
@@ -470,7 +471,7 @@ bool VirtualMemory::AllocateNPages(uint32_t pPages, std::vector<uint32_t> *pPage
             (physicalFreePagesList.size() >= pPages)) {
         BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:AllocateNPages: Requesting more physical pages than we have";
         for (uint32_t ix = 0; ix < pPages; ix++) {
-            uint32_t newPhys = *physicalFreePagesList.end();
+            uint32_t newPhys = physicalFreePagesList[physicalFreePagesList.back()];
             physicalFreePagesList.pop_back();
             uint32_t newVirt = *virtualFreePagesList.end();
             virtualFreePagesList.pop_back();
@@ -592,5 +593,12 @@ void VirtualMemory::ReportError(std::string func, uint32_t errornumber) const {
         BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:"+func+":"+VirtualErrorTable[errornumber].msg;
     } else {
         BOOST_LOG_TRIVIAL(error) << "VirtualMemory:"+func+": "+VirtualErrorTable[errornumber].msg;
+    }
+}
+
+void VirtualMemory::DumpVirtualPageTable() {
+    std::vector<VirtualMemoryPageInfo>::iterator x = virtualPageTable.begin();
+    while (x != virtualPageTable.end()) {
+        std::cout << x + " State: "+x->pageState+" Physical Page "+*x->physicalPage << nl;
     }
 }

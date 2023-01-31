@@ -9,6 +9,7 @@
 #include <string>
 #include <utility>
 #include "../../MemoryConstants.h"
+#include <boost/log/trivial.hpp>
 
 struct SwapperInfo {
     std::string     swapFileName;
@@ -22,11 +23,19 @@ private :
     SwapperInfo     info;
 public :
     bool Init(std::string pName) {
+        BOOST_LOG_TRIVIAL(debug) << "Swapper: Started";
         info.swapFileName = std::move(pName);
         swapFileDesc = fopen(info.swapFileName.c_str(), "rw");
-        return true;
+        if (swapFileDesc == nullptr) {
+            BOOST_LOG_TRIVIAL(debug) << "Swapper: Opened swap file <"+info.swapFileName+">";
+            return true;
+        } else {
+            BOOST_LOG_TRIVIAL(error) << "Swapper:  Unable to open swap file";
+            return false;
+        }
     };
     ~Swapper() {
+        BOOST_LOG_TRIVIAL(debug) << "Swapper: Closed swap file";
         fclose(swapFileDesc);
     };
     bool ReadPageFromPage(uint32_t page, uint8_t *buffer) {
