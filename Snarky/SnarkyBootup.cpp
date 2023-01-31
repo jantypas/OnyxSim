@@ -242,7 +242,8 @@ Besides, I'm not young anymore....
 )"""",
 "What's inside?  Terry Pratchett's bees",
 "+++ HEX +++",
-"Onyx1 -- now supporting VALGOL syntax -- with FOR SURE loops and GAG ME exceptions"
+"Onyx1 -- now supporting VALGOL syntax -- with FOR SURE loops and GAG ME exceptions",
+"Powering up the Babbage Engine --- wait for us to shovel in more coal"
 };
 
 std::string SnarkyBootup::getSnarkyBootMessage() {
