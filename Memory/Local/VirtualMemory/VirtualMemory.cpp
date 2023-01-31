@@ -9,6 +9,7 @@
 #include <iterator>
 #include <memory.h>
 #include <iostream>
+#include <map>
 #include "../../../Configuration/ConfigParameters.h"
 #include <boost/log/trivial.hpp>
 
@@ -596,9 +597,21 @@ void VirtualMemory::ReportError(std::string func, uint32_t errornumber) const {
     }
 }
 
+std::string decodePageBits(uint32_t x) {
+    std::string result = "";
+    if (x & PAGE_STATE_IS_ON_DISK)  { result += "D"; };
+    if (x & PAGE_STATE_IS_LOCKED)   { result += "L"; };
+    if (x & PAGE_STATE_IN_USE)      { result += "U"; };
+    if (x & PAGE_STATE_IS_DIRTY)    { result += "W"; };
+    return result;
+}
+
 void VirtualMemory::DumpVirtualPageTable() {
-    std::vector<VirtualMemoryPageInfo>::iterator x = virtualPageTable.begin();
+    std::map<uint32_t, VirtualMemoryPageInfo>::iterator x = virtualPageTable.begin();
     while (x != virtualPageTable.end()) {
-        std::cout << x + " State: "+x->pageState+" Physical Page "+*x->physicalPage << nl;
-    }
+        auto key = x->first;
+        std::cout << "#" + std::to_string(key) + " " +
+                     decodePageBits(x->second.pageState) + " "+std::to_string(x->second.physicalPage)+"\n";
+        x++;
+    };
 }

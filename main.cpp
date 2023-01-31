@@ -13,4 +13,5 @@ int main() {
     auto memoryInterface = new VirtualMemory();
     auto x = memoryInterface->Init(config, 32, 16, swapname);
     auto y = memoryInterface->AllocateNPages(10, &v);
+    memoryInterface->DumpVirtualPageTable();
 }

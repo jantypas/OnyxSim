@@ -28,6 +28,7 @@
 #define PAGE_STATE_IS_LOCKED    0x0001
 #define PAGE_STATE_IS_ON_DISK   0x0002
 #define PAGE_STATE_IN_USE       0x0004
+#define PAGE_STATE_IS_DIRTY           0x0008
 
 class VirtualMemoryError {
 public:
