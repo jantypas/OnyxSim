@@ -222,7 +222,8 @@ you could be as good as Steve Gibson
 
 (You don't even know who Steve Gibson is do you?')
 Go to http://www.grc.com and learn something!)"""",
-"99 dead routines.... crashing on my machine..."
+"99 dead routines.... crashing on my machine...",
+"This machine doesn't actually run code -- more often it stumbles around it"
 
 };
 
