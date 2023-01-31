@@ -208,7 +208,22 @@ I am not worthy to calculate.
 "This message intentionally left blank",
 "What's inside?  My lawyer says I don't have to answer",
 "Insufficient funds",
-"Please hold, your message is important to us"
+"Please hold, your message is important to us",
+R""""(
+Three things to be wary of
+A new kid in his prime
+A man with all the answers
+And code that runs... first time
+)"""",
+R""""(
+This code teaches assembly language.
+Work at it and someday,
+you could be as good as Steve Gibson
+
+(You don't even know who Steve Gibson is do you?')
+Go to http://www.grc.com and learn something!)"""",
+"99 dead routines.... crashing on my machine..."
+
 };
 
 std::string SnarkyBootup::getSnarkyBootMessage() {
