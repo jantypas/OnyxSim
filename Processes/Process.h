@@ -34,7 +34,6 @@ public :
     uint8_t                 numSegments;
     ProcessSegment         *segments;
     uint64_t               *dataRegisters;
-    uint64_t               *addressRegisters;
     uint8_t                 privLevel;
     IOHandle                handleStdin;
     IOHandle                handleStdout;

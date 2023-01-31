@@ -13,7 +13,6 @@ int main() {
     auto memoryInterface = new VirtualMemory();
     auto x = memoryInterface->Init(config, 32, 16, swapname);
     memoryInterface->DumpVirtualPageTable();
-    printf("\n-------------\n");
     auto y = memoryInterface->AllocateNPages(10, &v);
     memoryInterface->DumpVirtualPageTable();
 }
