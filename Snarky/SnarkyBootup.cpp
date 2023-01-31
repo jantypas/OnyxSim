@@ -234,12 +234,14 @@ Others claim to be getting there but sneak cookie dough when you're not looking.
 "Generic boot up message",
 R""""(
 This toolkit does not have programming languages
-or an things like an advanced assembler
+or things like an advanced assembler
 (or linker, loader, debugger, GUI....) yet.
 First, because these things are hard.
-Who do you think I am?  Steve Gibson?
+Second, who do you think I am?  Steve Gibson?
 Besides, I'm not young anymore....
-)""""
+)"""",
+"What's inside?  Terry Pratchett's bees",
+"+++ HEX +++"
 };
 
 std::string SnarkyBootup::getSnarkyBootMessage() {
