@@ -603,6 +603,7 @@ std::string decodePageBits(uint32_t x) {
     if (x & PAGE_STATE_IS_LOCKED)   { result += "L"; };
     if (x & PAGE_STATE_IN_USE)      { result += "U"; };
     if (x & PAGE_STATE_IS_DIRTY)    { result += "W"; };
+    if (result.length() == 0) { result = "-"; };
     return result;
 }
 
@@ -610,8 +611,9 @@ void VirtualMemory::DumpVirtualPageTable() {
     std::map<uint32_t, VirtualMemoryPageInfo>::iterator x = virtualPageTable.begin();
     while (x != virtualPageTable.end()) {
         auto key = x->first;
+        auto pageState = x->second.pageState;
         std::cout << "#" + std::to_string(key) + " " +
-                     decodePageBits(x->second.pageState) + " "+std::to_string(x->second.physicalPage)+"\n";
+                     decodePageBits(pageState) + " "+std::to_string(x->second.physicalPage)+"\n";
         x++;
     };
 }
