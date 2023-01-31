@@ -230,7 +230,8 @@ The world's first undefined instruction set.
 Some are complex, some are reduced.
 Others are working on it with SlimFast but aren't there yet.
 Others claim to be getting there but sneak cookie dough when you're not looking.
-)""""
+)"""",
+"Generic boot up message"
 };
 
 std::string SnarkyBootup::getSnarkyBootMessage() {
