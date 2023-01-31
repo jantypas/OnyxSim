@@ -203,7 +203,9 @@ I am not worthy to calculate.
 "If you see this message, abandon all hope -- even if you don't see this message, abandon all hope",
 "You really think your code will work this time don't you?",
 "What's inside?  It's your fault isn't it?  Admit it!",
-"Don't you feel guilty dumping this code upon the world?"
+"Don't you feel guilty dumping this code upon the world?",
+"What's inside is not important.  Why did it is the question.",
+"This message intentionally left blank"
 };
 
 std::string SnarkyBootup::getSnarkyBootMessage() {
