@@ -207,6 +207,7 @@ bool VirtualMemory::markVirtualPageAsUsed(uint32_t page, uint32_t physPage) {
     virtualPageTable[page].physicalPage = physPage;
     virtualUsedPagesList.push_back(page);
     removeAllFromVector(virtualFreePagesList, page);
+    SET_FLAG(virtualPageTable[page].pageState, PAGE_STATE_IN_USE);
     ReportError("markVirtualPagesAsUsed", MEMORY_ERROR_NONE);
     return true;
 }
@@ -599,11 +600,10 @@ void VirtualMemory::ReportError(std::string func, uint32_t errornumber) const {
 
 std::string decodePageBits(uint32_t x) {
     std::string result = "";
-    if (x & PAGE_STATE_IS_ON_DISK)  { result += "D"; };
-    if (x & PAGE_STATE_IS_LOCKED)   { result += "L"; };
-    if (x & PAGE_STATE_IN_USE)      { result += "U"; };
-    if (x & PAGE_STATE_IS_DIRTY)    { result += "W"; };
-    if (result.length() == 0) { result = "-"; };
+    if (x & PAGE_STATE_IS_ON_DISK)  { result += "D"; } else { result += "-"; };
+    if (x & PAGE_STATE_IS_LOCKED)   { result += "L"; } else { result += "-"; };
+    if (x & PAGE_STATE_IN_USE)      { result += "U"; } else { result += "-"; };
+    if (x & PAGE_STATE_IS_DIRTY)    { result += "W"; } else { result += "-"; };
     return result;
 }
 
