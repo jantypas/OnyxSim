@@ -227,9 +227,10 @@ Go to http://www.grc.com and learn something!)"""",
 R""""(
 The Onyx1 computer.
 The world's first undefined instruction set.
-Some are complex, some are reduced.
+Some are complex, some are reduced.  Some are still finding themselves.
 Others are working on it with SlimFast but aren't there yet.
 Others claim to be getting there but sneak cookie dough when you're not looking.
+Complex like hell -- call it was it is -- FAT!
 )"""",
 "Generic boot up message",
 R""""(
@@ -243,7 +244,8 @@ Besides, I'm not young anymore....
 "What's inside?  Terry Pratchett's bees",
 "+++ HEX +++",
 "Onyx1 -- now supporting VALGOL syntax -- with FOR SURE loops and GAG ME exceptions",
-"Powering up the Babbage Engine --- wait for us to shovel in more coal"
+"Powering up the Babbage Engine --- wait for us to shovel in more coal",
+"Just because you're a mad scientist doesn't mean you always have to wear that lab coat and have a lousy haircut"
 };
 
 std::string SnarkyBootup::getSnarkyBootMessage() {
