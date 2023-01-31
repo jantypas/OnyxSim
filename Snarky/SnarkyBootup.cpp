@@ -204,8 +204,11 @@ I am not worthy to calculate.
 "You really think your code will work this time don't you?",
 "What's inside?  It's your fault isn't it?  Admit it!",
 "Don't you feel guilty dumping this code upon the world?",
-"What's inside is not important.  Why did it is the question.",
-"This message intentionally left blank"
+"What's inside is not important.  Why it's there is the question.",
+"This message intentionally left blank",
+"What's inside?  My lawyer says I don't have to answer",
+"Insufficient funds",
+"Please hold, your message is important to us"
 };
 
 std::string SnarkyBootup::getSnarkyBootMessage() {
