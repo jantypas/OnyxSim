@@ -18,8 +18,8 @@
  * Some inline defines to manage flags rather than compiled functions and
  * a couple of templates for things we're going to do over and over again.
  */
-#define CLR_FLAG(x, y)          x &= ~y;
-#define SET_FLAG(x, y)          x &= y;
+#define CLR_FLAG(x, y)          x |= ~y;
+#define SET_FLAG(x, y)          x |= y;
 #define IS_FLAG_CLEAR(x, y)     (x & y) != y
 #define IS_FLAG_SET(x, y)       (x & y) == y
 
@@ -207,7 +207,9 @@ bool VirtualMemory::markVirtualPageAsUsed(uint32_t page, uint32_t physPage) {
     virtualPageTable[page].physicalPage = physPage;
     virtualUsedPagesList.push_back(page);
     removeAllFromVector(virtualFreePagesList, page);
+    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:markVirtualPageAsUsed: PageState was "+std::to_string(virtualPageTable[page].pageState);
     SET_FLAG(virtualPageTable[page].pageState, PAGE_STATE_IN_USE);
+    BOOST_LOG_TRIVIAL(debug) << "VirtualMemory:markVirtualPageAsUsed: PageState now "+std::to_string(virtualPageTable[page].pageState);
     ReportError("markVirtualPagesAsUsed", MEMORY_ERROR_NONE);
     return true;
 }
@@ -608,12 +610,15 @@ std::string decodePageBits(uint32_t x) {
 }
 
 void VirtualMemory::DumpVirtualPageTable() {
+    printf("\n-------------------------------------");
+    printf("\nVirtual Page Table\n");
     std::map<uint32_t, VirtualMemoryPageInfo>::iterator x = virtualPageTable.begin();
+    printf("Virt  State Phys\n");
     while (x != virtualPageTable.end()) {
         auto key = x->first;
         auto pageState = x->second.pageState;
-        std::cout << "#" + std::to_string(key) + " " +
-                     decodePageBits(pageState) + " "+std::to_string(x->second.physicalPage)+"\n";
+        printf("#%04X %s  %04X\n",
+               key, decodePageBits(pageState).c_str(), x->second.physicalPage);
         x++;
     };
 }
