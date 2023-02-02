@@ -188,10 +188,14 @@ bool VirtualMemory::AllocateNPages(uint32_t pPages, std::vector<uint32_t> *pPage
 }
 
 bool VirtualMemory::SwapInPage(uint32_t page) {
+    ReportDebug("SwapInPage", "Started(Page: "+std::to_string(page)+")");
+    ReportDebug("SwapInPage", "No errors");
     return true;
 }
 
 bool VirtualMemory::SwapOutPage(uint32_t page) {
+    ReportDebug("SwapOutPage", "Started(Page: "+std::to_string(page)+")");
+    ReportDebug("SwapOutPage", "No errors");
     return true;
 }
 
