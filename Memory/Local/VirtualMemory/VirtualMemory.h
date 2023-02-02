@@ -69,7 +69,6 @@ public :
 class VirtualMemory {
 private :
     std::map<uint32_t, VirtualMemoryPageInfo>   virtualPageTable;
-    std::map<uint32_t, PhysicalMemoryPageInfo>  physicalPageTable;
     std::vector<uint32_t>                       physicalFreePagesList;
     std::vector<uint32_t>                       physicalUsedPagesList;
     std::vector<uint32_t>                       virtualFreePagesList;
@@ -83,24 +82,16 @@ private :
     bool                                        isActive;
     Swapper                                     swapper;
     VirtualMemoryInfo                           info;
-
-    bool markPhysicalPageAsFree(uint32_t page);
-    bool markPhysicalPageAsUsed(uint32_t page);
-    bool markVirtualPageAsFree(uint32_t page);
-    bool markVirtualPageAsUsed(uint32_t page, uint32_t physPage);
-    bool markVirtualPageAsSwapped(uint32_t page);
-    bool findFreePagesFromTheLRU(std::vector<uint32_t> &pages);
-    bool SwapOutPageList(std::vector<uint32_t> &list);
+    bool                                        VirtualMemoryDebug  = true;
     bool SwapOutPageCandidates();
-    void ReportError(std::string func, uint32_t errornumber) const;
+    void ReportError(std::string func, uint32_t errornumber, const std::string& comment) const;
+    void ReportDebug(std::string func, const std::string& comment) const;
 public:
-    VirtualMemory() {
-    }
     VirtualMemoryError                         *LastMemoryError;
     bool Init(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName);
     bool Exit();
-    bool ReadAddress(uint64_t addr, uint8_t *value);
-    bool WriteAddress(uint64_t addr, uint8_t value);
+    bool ReadAddress(uint32_t page, uint32_t addr, uint8_t *value);
+    bool WriteAddress(uint32_t page, uint32_t addr, uint8_t value);
     bool LoadPage(uint32_t page, uint8_t *buffer);
     bool SavePage(uint32_t page, uint8_t *buffer);
     bool AllocateNPages(uint32_t pPages, std::vector<uint32_t> *pPagelist);

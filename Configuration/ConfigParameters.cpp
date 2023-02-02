@@ -11,7 +11,7 @@ std::map<std::string, uint32_t>         systemConfigI32;
 std::map<std::string, bool>             systemConfigBool;
 
 bool ConfigParameters::Init() {
-    systemConfigStrings["swapFileName"] = "?tmp/swapfile.swp";
+    systemConfigStrings["swapFileName"] = "/tmp/swapfile.swp";
     return true;
 }
 
