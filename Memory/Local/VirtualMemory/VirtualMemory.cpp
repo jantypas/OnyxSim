@@ -59,6 +59,21 @@ VirtualMemoryError  VirtualErrorTable[] {
  *
  * These are routines our public methods will use
  *********************************************************************************************/
+void VirtualMemory::lruUpdate(uint32_t page) {
+    removeAllFromVector(lruCache, page);
+    insertAtHeadofVector(lruCache, page);
+}
+
+void VirtualMemory::getNlruCaches(uint32_t pages, std::vector<uint32_t> *list) {
+    if (pages < lruCache.size()) {
+        uint32_t x = pages;
+        while (x > 0) {
+            auto res = *list->end();
+            list->push_back(res);
+            x--;
+        }
+    };
+}
 
 /***********************************************************************************************************
  *
@@ -124,23 +139,7 @@ bool VirtualMemory::SavePage(uint32_t page, uint8_t *buffer) {
 
 bool VirtualMemory::SwapOutPageCandidates() {
     ReportDebug("SwapOutPageCandidates", "Started");
-    if (physicalUsedPagesList.size() == 0) {
-        ReportError("SwapOutPageCandidates", MEMORY_ERROR_NO_VIRTUAL_PAGES, "No virtual pages to swap out");
-        return false;
-    } else {
-        std::vector<uint32_t>::iterator  ix = virtualUsedPagesList.begin();
-        while (ix != virtualUsedPagesList.end()) {
-            uint32_t pageState = virtualPageTable[*ix].pageState;
-            if (IS_FLAG_CLEAR(pageState, PAGE_STATE_IS_ON_DISK) &&
-                IS_FLAG_CLEAR(pageState, PAGE_STATE_IS_LOCKED)) {
-                uint32_t ppage = virtualPageTable[*ix].physicalPage;
-                swapper.WritePageToSwap(ppage, &physicalStorage[ppage*LOCAL_MEM_PAGE_SIZE]);
-                SET_FLAG(virtualPageTable[ppage].pageState, PAGE_STATE_IS_ON_DISK);
-                physicalFreePagesList.push_back(ppage);
-                physicalUsedPagesList.erase(ix);
-            }
-        }
-    }
+    return true;
 }
 
 bool VirtualMemory::AllocateNPages(uint32_t pPages, std::vector<uint32_t> *pPagelist) {
@@ -286,6 +285,7 @@ bool VirtualMemory::ReadAddress(uint32_t page, uint32_t addr, uint8_t *value) {
     uint32_t ppage = virtualPageTable[page].physicalPage;
     *value = physicalStorage[ppage*LOCAL_MEM_PAGE_SIZE+addr];
     ReportDebug("ReadAddress", "Returns "+std::to_string(*value));
+    lruUpdate(page);
     return true;
 }
 
@@ -312,5 +312,6 @@ bool VirtualMemory::WriteAddress(uint32_t page, uint32_t addr, uint8_t value) {
     uint32_t ppage = virtualPageTable[page].physicalPage;
     physicalStorage[ppage*LOCAL_MEM_PAGE_SIZE+addr] = value;
     ReportDebug("WriteAddress", "No error");
+    lruUpdate(page);
     return true;
 }

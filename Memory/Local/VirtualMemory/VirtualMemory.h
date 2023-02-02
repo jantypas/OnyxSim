@@ -83,9 +83,12 @@ private :
     Swapper                                     swapper;
     VirtualMemoryInfo                           info;
     bool                                        VirtualMemoryDebug  = true;
+
     bool SwapOutPageCandidates();
     void ReportError(std::string func, uint32_t errornumber, const std::string& comment) const;
     void ReportDebug(std::string func, const std::string& comment) const;
+    void lruUpdate(uint32_t page);
+    void getNlruCaches(uint32_t pages, std::vector<uint32_t> *list);
 public:
     VirtualMemoryError                         *LastMemoryError;
     bool Init(ConfigParameters *conf, uint32_t pNumVirtualPages, uint32_t pNumPhysicalPages, std::string swapFileName);
