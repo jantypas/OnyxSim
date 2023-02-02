@@ -25,12 +25,14 @@ public :
     bool Init(std::string pName) {
         BOOST_LOG_TRIVIAL(debug) << "Swapper: Started";
         info.swapFileName = std::move(pName);
-        swapFileDesc = fopen(info.swapFileName.c_str(), "rw");
-        if (swapFileDesc == nullptr) {
-            BOOST_LOG_TRIVIAL(debug) << "Swapper: Opened swap file <"+info.swapFileName+">";
+        swapFileDesc = fopen(info.swapFileName.c_str(), "w+");
+        if (swapFileDesc != nullptr) {
+            BOOST_LOG_TRIVIAL(debug) << "Swapper: Opened swap file <"+info.swapFileName;
             return true;
         } else {
-            BOOST_LOG_TRIVIAL(error) << "Swapper:  Unable to open swap file";
+            BOOST_LOG_TRIVIAL(error) << "Swapper: Unable to open swap file";
+            std::string err = strerror(errno);
+            BOOST_LOG_TRIVIAL(error) << "Swapper: fopen returns "+err;
             return false;
         }
     };
@@ -44,6 +46,11 @@ public :
         return true;
     };
     bool WritePageToSwap(uint32_t page, uint8_t *buffer) {
+        BOOST_LOG_TRIVIAL(debug) << "Swapper:WritePage("+std::to_string(page)+")";
+        if (swapFileDesc == nullptr) {
+            BOOST_LOG_TRIVIAL(error) << "Swapper:WritePage: Swapfile descriptor is NULL";
+            return false;
+        }
         fseek(swapFileDesc, LOCAL_MEM_PAGE_SIZE*page, SEEK_SET);
         fwrite(buffer, LOCAL_MEM_PAGE_SIZE*page, 1, swapFileDesc);
         return true;

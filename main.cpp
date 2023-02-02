@@ -16,7 +16,7 @@ int main() {
     auto swapname = config->getStringValue("swapFileName");
     auto memoryInterface = new VirtualMemory();
     auto x = memoryInterface->Init(config, 32, 16, swapname);
-    auto y = memoryInterface->AllocateNPages(4, &v);
+    auto y = memoryInterface->AllocateNPages(16, &v);
     auto z = memoryInterface->WriteAddress(v[0], 128, 52);
     auto a = memoryInterface->ReadAddress(v[0], 100, &value);
     auto b = memoryInterface->ReadAddress(v[0], 128, &value);

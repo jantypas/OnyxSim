@@ -168,13 +168,14 @@ bool VirtualMemory::AllocateNPages(uint32_t pPages, std::vector<uint32_t> *pPage
             return true;
         } else {
             ReportDebug("AllocateNPages", "FreePages < requested pages");
-            ReportDebug("AllocateNPages", "FreePages > requested pages");
+            uint8_t buffer[LOCAL_MEM_PAGE_SIZE];
             for (uint32_t ix = 0; ix < pPages; ix++) {
                 uint32_t newVPage = *virtualFreePagesList.end();
                 virtualFreePagesList.pop_back();
                 virtualPageTable[newVPage].physicalPage = 0;
                 SET_FLAG(virtualPageTable[newVPage].pageState, PAGE_STATE_IN_USE);
                 SET_FLAG(virtualPageTable[newVPage].pageState, PAGE_STATE_IS_ON_DISK);
+                swapper.WritePageToSwap(newVPage, buffer);
                 pPagelist->push_back(newVPage);
             };
             ReportDebug("AllocateNPages", "No errors");
