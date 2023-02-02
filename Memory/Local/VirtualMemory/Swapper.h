@@ -41,6 +41,7 @@ public :
         fclose(swapFileDesc);
     };
     bool ReadPageFromPage(uint32_t page, uint8_t *buffer) {
+        BOOST_LOG_TRIVIAL(debug) << "Swapper:ReadPage("+std::to_string(page)+")";
         fseek(swapFileDesc, LOCAL_MEM_PAGE_SIZE*page, SEEK_SET);
         fread(buffer, LOCAL_MEM_PAGE_SIZE*page, 1, swapFileDesc);
         return true;
