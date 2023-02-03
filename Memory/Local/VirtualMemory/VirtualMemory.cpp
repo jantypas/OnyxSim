@@ -220,10 +220,21 @@ bool VirtualMemory::SwapInPage(uint32_t page) {
     } else {
         getNlruCaches(3, &newList);
         if (!newList.empty()) {
-            // No choice -- just undo the last page
-
+            // No choice -- this really shoold never happen
+            ReportError("SwapInPage", MEMORY_ERROR_CANT_SWAP_IN_PAGE, "No pages available in lruCachc");
+            return false;
         } else {
-
+            SwapOutPageCandidates();
+            uint32_t newVPage = *physicalFreePagesList.end();
+            physicalFreePagesList.pop_back();
+            virtualPageTable[page].physicalPage = newVPage;
+            if (!swapper.ReadPageFromSwap(page, &physicalStorage[newVPage*LOCAL_MEM_PAGE_SIZE])) {
+                ReportError("SwapInPage", MEMORY_ERROR_CANT_SWAP_IN_PAGE, "Swap in read from swap failed");
+                return false;
+            } else {
+                ReportDebug("SwapInPage", "No errors");
+                return true;
+            }
         }
     }
     ReportDebug("SwapInPage", "No errors");
@@ -232,6 +243,32 @@ bool VirtualMemory::SwapInPage(uint32_t page) {
 
 bool VirtualMemory::SwapOutPage(uint32_t page) {
     ReportDebug("SwapOutPage", "Started(Page: "+std::to_string(page)+")");
+    if (!isActive) {
+        ReportError("SwapOutPage", MEMORY_ERROR_CANT_SWAP_OUT_PAGE, "Can't swap out page");
+        return false;
+    };
+    uint32_t pageState = virtualPageTable[page].pageState;
+    if (IS_FLAG_CLEAR(pageState, PAGE_STATE_IN_USE)) {
+        ReportError("SwapOutPage", MEMORY_ERROR_FREE_PAGE_ACCESS, "Page is not in use");
+        return false;
+    }
+    if (IS_FLAG_SET(pageState, PAGE_STATE_IS_LOCKED)) {
+        ReportError("SwapOutPage", MEMORY_ERROR_PAGE_IS_LOCKED, "Page is locked in memory");
+        return false;
+    }
+    if (IS_FLAG_SET(pageState, PAGE_STATE_IS_ON_DISK)) {
+        ReportError("SwapOutPage", MEMORY_ERROR_CANT_SWAP_OUT_PAGE, "Page is on disk");
+        return false;
+    }
+    SET_FLAG(virtualPageTable[page].pageState, PAGE_STATE_IS_ON_DISK);
+    if (!swapper.WritePageToSwap(page, &physicalStorage[LOCAL_MEM_PAGE_SIZE*page])) {
+        ReportError("SwapOutPage", MEMORY_ERROR_CANT_SWAP_OUT_PAGE, "Swapper reported error");
+        return false;
+    };
+    std::find(physicalUsedPagesList.begin(), physicalUsedPagesList.end(), page);
+    physicalUsedPagesList.erase(physicalFreePagesList.begin());
+    physicalUsedPagesList.push_back(virtualPageTable[page].physicalPage);
+    virtualPageTable[page].physicalPage = 0;
     ReportDebug("SwapOutPage", "No errors");
     return true;
 }
