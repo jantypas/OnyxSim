@@ -138,7 +138,27 @@ bool VirtualMemory::SavePage(uint32_t page, uint8_t *buffer) {
 }
 
 bool VirtualMemory::SwapOutPageCandidates() {
+    std::vector<uint32_t> list;
+
     ReportDebug("SwapOutPageCandidates", "Started");
+    if (lruCache.empty()) {
+        ReportDebug("SwapOutPageCandidates", "No choice, no candidates, just swap out the last page");
+        auto lastPage = *virtualUsedPagesList.end();
+        SwapOutPage(lastPage);
+        ReportDebug("SwapOutPageCandidates", "Freeing page "+std::to_string(lastPage));
+        ReportDebug("SwapOutPageCandidates", "No errors");
+        return true;
+    };
+    if (lruCache.size() > MIN_SWAPPABLE_PAGES) {
+        ReportDebug("SwapOutPageCandidates", "We'll have more than enough candidates for swap");
+        getNlruCaches(MIN_SWAPPABLE_PAGES, &list);
+        for (uint32_t ix = MIN_SWAPPABLE_PAGES; ix > 0; ix++) {
+            SwapOutPage(list[ix]);
+        }
+        ReportDebug("SwapOutPageCandidates", "No errors");
+        return true;
+    };
+    ReportDebug("SwapOutPageCandidates", "No errrors");
     return true;
 }
 
@@ -188,6 +208,24 @@ bool VirtualMemory::AllocateNPages(uint32_t pPages, std::vector<uint32_t> *pPage
 
 bool VirtualMemory::SwapInPage(uint32_t page) {
     ReportDebug("SwapInPage", "Started(Page: "+std::to_string(page)+")");
+    std::vector<uint32_t> newList;
+
+    if (!physicalFreePagesList.empty()) {
+        uint32_t newPPage = *physicalFreePagesList.end();
+        physicalFreePagesList.pop_back();
+        physicalUsedPagesList.push_back(newPPage);
+        virtualPageTable[page].physicalPage = newPPage;
+        CLR_FLAG(virtualPageTable[page].pageState, PAGE_STATE_IS_ON_DISK);
+        swapper.ReadPageFromSwap(page, &physicalStorage[virtualPageTable[page].physicalPage]);
+    } else {
+        getNlruCaches(3, &newList);
+        if (!newList.empty()) {
+            // No choice -- just undo the last page
+
+        } else {
+
+        }
+    }
     ReportDebug("SwapInPage", "No errors");
     return true;
 }
