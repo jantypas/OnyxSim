@@ -129,12 +129,37 @@ bool VirtualMemory::Exit() {
 
 
 bool VirtualMemory::LoadPage(uint32_t page, uint8_t *buffer) {
+    if (!isActive) {
+        ReportError("LoadPage", MEMORY_ERROR_NOT_INITIALIZED, "");
+        return false;
+    };
+    if (page > numPhysicalPages) {
+        ReportError("LoadPage", MEMORY_ERROR_ADDRESS_ERROR, "Page out of range");
+        return false;
+    };
+    if (IS_FLAG_CLEAR(virtualPageTable[page].pageState, PAGE_STATE_IN_USE)) {
+        ReportError("LoadPage", MEMORY_ERROR_FREE_PAGE_ACCESS, "Page not in use");
+        return false;
+    };
+    memcpy(&physicalStorage[virtualPageTable[page].physicalPage*LOCAL_MEM_PAGE_SIZE], buffer, LOCAL_MEM_PAGE_SIZE);
     return true;
 }
 
 bool VirtualMemory::SavePage(uint32_t page, uint8_t *buffer) {
-    return true;
-}
+    if (!isActive) {
+        ReportError("LoadPage", MEMORY_ERROR_NOT_INITIALIZED, "");
+        return false;
+    };
+    if (page > numPhysicalPages) {
+        ReportError("LoadPage", MEMORY_ERROR_ADDRESS_ERROR, "Page out of range");
+        return false;
+    };
+    if (IS_FLAG_CLEAR(virtualPageTable[page].pageState, PAGE_STATE_IN_USE)) {
+        ReportError("LoadPage", MEMORY_ERROR_FREE_PAGE_ACCESS, "Page not in use");
+        return false;
+    };
+    memcpy(buffer, &physicalStorage[virtualPageTable[page].physicalPage*LOCAL_MEM_PAGE_SIZE], LOCAL_MEM_PAGE_SIZE);
+    return true;}
 
 bool VirtualMemory::SwapOutPageCandidates() {
     std::vector<uint32_t> list;
