@@ -32,7 +32,6 @@ template <typename T>
         v.erase(std::remove(v.begin(), v.end(), target), v.end());
     };
 
-
 template <typename T>
 void insertAtHeadofVector(std::vector <T> &v, const T &target) {
     v.insert(v.begin(), target);
@@ -265,8 +264,8 @@ bool VirtualMemory::SwapOutPage(uint32_t page) {
         ReportError("SwapOutPage", MEMORY_ERROR_CANT_SWAP_OUT_PAGE, "Swapper reported error");
         return false;
     };
-    std::find(physicalUsedPagesList.begin(), physicalUsedPagesList.end(), page);
-    physicalUsedPagesList.erase(physicalFreePagesList.begin());
+    auto pos = std::find(physicalUsedPagesList.begin(), physicalUsedPagesList.end(), page);
+    physicalUsedPagesList.erase(pos);
     physicalUsedPagesList.push_back(virtualPageTable[page].physicalPage);
     virtualPageTable[page].physicalPage = 0;
     ReportDebug("SwapOutPage", "No errors");
@@ -274,6 +273,25 @@ bool VirtualMemory::SwapOutPage(uint32_t page) {
 }
 
 bool VirtualMemory::FreeNPages(uint32_t pPages, uint32_t *pPageList) {
+    if (!isActive) {
+        ReportError("FreePage", MEMORY_ERROR_NOT_INITIALIZED, "Memory system not active");
+        return false;
+    };
+    if (pPages > numVirtualPages) {
+        ReportError("FreePage", MEMORY_ERROR_ADDRESS_ERROR, "Invalid page");
+        return false;
+    };
+    if (IS_FLAG_CLEAR(virtualPageTable[pPages].pageState, PAGE_STATE_IN_USE)) {
+        ReportError("FreePage", MEMORY_ERROR_FREE_PAGE_ACCESS, "Page is not in use");
+        return false;
+    };
+    physicalFreePagesList.push_back(virtualPageTable[pPages].physicalPage);
+    auto pos = std::find(physicalUsedPagesList.begin(), physicalUsedPagesList.end(), pPages);
+    physicalUsedPagesList.erase(pos);
+    virtualFreePagesList.push_back(pPages);
+    pos = std::find(virtualUsedPagesList.begin(), virtualUsedPagesList.end(), pPages);
+    virtualUsedPagesList.erase(pos);
+    CLR_FLAG(virtualPageTable[pPages].pageState, PAGE_STATE_IN_USE);
     return true;
 }
 
