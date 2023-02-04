@@ -4,28 +4,58 @@
 
 #ifndef ONYXSIM_SEGMENTS_H
 #define ONYXSIM_SEGMENTS_H
+#include <map>
 #include <string>
 #include <vector>
+#include "boost/log/trivial.hpp"
 
-class Segments {
-private :
-    std::string             name;
-    bool                    privReadable;
-    bool                    privWritable;
-    bool                    privExecutable;
-    uint8_t                 needPriv;
-    uint8_t                 escalatePriv;
-    bool                    locked;
-    std::vector<uint32_t>   virtPages;
-    uint16_t                processID;
-public :
-    bool                    AllocateSegment(uint32_t numPages);
-    bool                    FreeSegment();
-    bool                    GrowSegment(uint32_t pagees);
-    bool                    LockSegment(bool lockState);
-    bool                    ReadAddress(uint32_t page, uint32_t offset, uint8_t *value);
-    bool                    WriteAddress(uint32_t page, uint32_t offset, uint8_t value);
+#define SEGMENT_ERROR_NONE                  0
+#define SEGMENT_ERROR_NOT_INITIALIZED       1
+
+class SegmentError {
+public:
+    uint32_t    code;
+    bool        isFatal;
+    std::string msg;
+    SegmentError(uint32_t pCode, bool pFatal, std::string pMsg) {
+        code    = pCode;
+        isFatal = pFatal;
+        msg     = pMsg;
+    }
+    SegmentError(const SegmentError &t) {
+        code    = t.code;
+        isFatal = t.isFatal;
+        msg     = t.msg;
+    }
 };
 
+class SegmentInfo {
+public :
+    std::string             name;
+    uint16_t                privs;
+    uint8_t                 needPriv;
+    uint8_t                 escalatePriv;
+    std::vector<uint32_t>   virtPages;
+    uint16_t                processID;
+    uint32_t                numPages;
+};
 
+class Segments {
+    std::map<uint32_t, SegmentInfo> segmentTable;
+    void ReportError(std::string service, uint32_t code, std::string msg);
+    void ReportDebug(std::string service, std::string msg);
+public :
+    void        Init();
+    void        Exit();
+    bool        CreateSegment(
+                    std::string pName, uint16_t pPrivs, uint8_t pNeedPriv, uint8_t pEscalatePriv,
+                    uint32_t pNumPages, uint32_t pProcID, uint32_t *segmentID
+               );
+    bool        DestroySegment();
+    bool        LockSegment(bool isLocked);
+    bool        ReadAddress(uint32_t segmentid, uint32_t addr, uint32 offset, uint8_t *value);
+    bool        WriteAddress(uint32_t segmentid, uint32_t addr, uint32_t offset, uint8_t value);
+    bool        LoadPage(uint32_t segmentid, uint32_t page, void *buffer);
+    bool        SavePage(uint32_t segmmentid, uint32_t page, void *buffer);
+};
 #endif //ONYXSIM_SEGMENTS_H

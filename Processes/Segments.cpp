@@ -4,26 +4,32 @@
 
 #include "Segments.h"
 
-bool Segments::AllocateSegment(uint32_t numPages) {
+SegmentError  SegmentErrorTable[] {
+        {   SEGMENT_ERROR_NONE,                 false,  "No errors"                                 },
+        {   SEGMENT_ERROR_NOT_INITIALIZED,      false,  "Segment manager system not ready"           },
+};
+
+void Segments::ReportDebug(std::string service, std::string msg) {
+    BOOST_LOG_TRIVIAL(debug) << "Segments:"+service+":"+msg;
+};
+
+void Segments::ReportError(std::string service, uint32_t code, std::string msg) {
+    if (code == SEGMENT_ERROR_NONE) {
+        BOOST_LOG_TRIVIAL(debug) << "Segments:"+service+":No error";
+    } else {
+        BOOST_LOG_TRIVIAL(error) << "Segments:"+service+":"+SegmentErrorTable[code]+":"+msg;
+    }
+}
+
+bool Segments::CreateSegment(std::string pName, uint16_t pPrivs, uint8_t pNeedPriv, uint8_t pEscalatePriv,
+                             uint32_t pNumPages, uint32_t pProcID, uint32_t *segmentID) {
     return false;
 }
 
-bool Segments::FreeSegment() {
-    return false;
+void Segments::Init() {
+
 }
 
-bool Segments::GrowSegment(uint32_t pagees) {
-    return false;
-}
+void Segments::Exit() {
 
-bool Segments::LockSegment(bool lockState) {
-    return false;
-}
-
-bool Segments::WriteAddress(uint32_t page, uint32_t offset, uint8_t value) {
-    return false;
-}
-
-bool Segments::ReadAddress(uint32_t page, uint32_t offset, uint8_t *value) {
-    return false;
-}
+};
