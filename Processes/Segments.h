@@ -11,6 +11,7 @@
 
 #define SEGMENT_ERROR_NONE                  0
 #define SEGMENT_ERROR_NOT_INITIALIZED       1
+#define SEGMENT_ERROR_ADDRESS_ERROR         2
 
 class SegmentError {
 public:
