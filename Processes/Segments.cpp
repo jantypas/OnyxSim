@@ -17,7 +17,7 @@ void Segments::ReportError(std::string service, uint32_t code, std::string msg) 
     if (code == SEGMENT_ERROR_NONE) {
         BOOST_LOG_TRIVIAL(debug) << "Segments:"+service+":No error";
     } else {
-        BOOST_LOG_TRIVIAL(error) << "Segments:"+service+":"+SegmentErrorTable[code]+":"+msg;
+        BOOST_LOG_TRIVIAL(error) << "Segments:"+service+":"+SegmentErrorTable[code].msg+":"+msg;
     }
 }
 
@@ -32,4 +32,28 @@ void Segments::Init() {
 
 void Segments::Exit() {
 
+}
+
+bool Segments::DestroySegment(uint32_t segmentid) {
+    return false;
+}
+
+bool Segments::LockSegment(uint32_t segmentid, bool isLocked) {
+    return false;
+}
+
+bool Segments::ReadAddress(uint32_t segmentid, uint32_t addr, uint32_t, uint8_t *value) {
+    return false;
+}
+
+bool Segments::WriteAddress(uint32_t segmentid, uint32_t addr, uint32_t offset, uint8_t value) {
+    return false;
+}
+
+bool Segments::LoadPage(uint32_t segmentid, uint32_t page, void *buffer) {
+    return false;
+}
+
+bool Segments::SavePage(uint32_t segmmentid, uint32_t page, void *buffer) {
+    return false;
 };

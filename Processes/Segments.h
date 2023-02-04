@@ -51,9 +51,9 @@ public :
                     std::string pName, uint16_t pPrivs, uint8_t pNeedPriv, uint8_t pEscalatePriv,
                     uint32_t pNumPages, uint32_t pProcID, uint32_t *segmentID
                );
-    bool        DestroySegment();
-    bool        LockSegment(bool isLocked);
-    bool        ReadAddress(uint32_t segmentid, uint32_t addr, uint32 offset, uint8_t *value);
+    bool        DestroySegment(uint32_t segmentid);
+    bool        LockSegment(uint32_t segmentid, bool isLocked);
+    bool        ReadAddress(uint32_t segmentid, uint32_t addr, uint32_t, uint8_t *value);
     bool        WriteAddress(uint32_t segmentid, uint32_t addr, uint32_t offset, uint8_t value);
     bool        LoadPage(uint32_t segmentid, uint32_t page, void *buffer);
     bool        SavePage(uint32_t segmmentid, uint32_t page, void *buffer);
