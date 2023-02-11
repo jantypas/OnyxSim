@@ -6,16 +6,17 @@ Opcode   Unused #Reg
 Up to 7 registers can be used
 
 Registers =
-    RRMM R-
+    RRMM
         RR = Register number (00-FF)
         MM = Mode (S----MMM where S = store, MMM = Mode)
             00 = Rx
-            01 = Rx,X
-            02 = Rx,Y
+            01 = Ax,X
+            02 = Ax,Y
             03 = Rx++
             04 = Rx--
             05 = ++Rx
             06 = --Rx
+
 
 Instruction Fetch, Decode, Execute Store Steps
     - Read first 16-bits (opcode)
@@ -83,7 +84,8 @@ Condition Codes
 01C2 0  CMP32 Rx, Ry          Compare Ry to Rx -> Dx (32-bit)
 01D2 0  CMP64 Rx, Ry          Compare Ry to Rx -> Dx (32-bit)
 01E2 1  CMPP Dy, Dz           Compare page Dy to Dz result > Dx
-01F3 0  INFO Dx, Dy           Get value from Dx and return it in Dy (value = special page)
+01F3 0  GSREG Dx, Dy          Get value from special register Dx return in Dx
+01F4 0  SSREG Dx, Dy          Set value to special register Dy from Dx
 
 --- Math instructions
 0302 0 IADD64 Dx, Dy            Dx = Dx + Dy
@@ -153,13 +155,13 @@ Condition Codes
 07A0 0 TRAPRET                 Return from trap
 
 --- Messaging I/O
-0803 0 MSGSEND Dx, Ax, Dy          Send an IPC message on channel Dy, from buffer Ax, result in Dx
-0813 0 MSGRECV Dx, Ax, Dy          Get an IPC message on channel Dy and put it into Ax, result in Dx
-0823 0 MSGAVAIL Dx, Dy             Is an IPC message available on channel Dy  Result in Dx
-0833 0 MSGWAIT Dx, Dy, Dz          Wait on message channel Dy (blocking for Dz ms) -> Dx
+0803 1 MSGSEND Dx, Ax, Dy          Send an IPC message on channel Dy, from buffer Ax, result in Dx
+0813 1 MSGRECV Dx, Ax, Dy          Get an IPC message on channel Dy and put it into Ax, result in Dx
+0823 1 MSGAVAIL Dx, Dy             Is an IPC message available on channel Dy  Result in Dx
+0833 1 MSGWAIT Dx, Dy, Dz          Wait on message channel Dy (blocking for Dz ms) -> Dx
 0843 0 IOREQ Dx, Dy, Dz, Ax        Send an IO Message to Dy with command Dz, data Ax, result in Dx
-0853 0 BUFFERALLOC Dx, Dy, Ax      Allocate Dy I/O buffers to Ax, Result in Dx
-0863 0 BUFFERFREE  Dx, Ax          Free Ax I/O buffers
+0853 1 BUFFERALLOC Dx, Dy, Ax      Allocate Dy I/O buffers to Ax, Result in Dx
+0863 1 BUFFERFREE  Dx, Ax          Free Ax I/O buffers
 
 -- Utility functions
 0902 3 ENCRYPT Ax, Ay              Encrypt a block in Ax to Ay
@@ -218,17 +220,6 @@ FFF0 3 HCFB                        Halt, Catch fire, go boom!  No idea why this 
                                    We'll probably just play a sad trambone or something
 
 Pragmas
-    .manifest
-        .program name                           Defines name of program
-        .version string                         Program version (optional)
-        .author string                          Program author (optional)
-        .created string                         Program creation date (optional)
-        .modified string                        Program modification date (optional)
-        .account name password accountcode      Run as user/password
-        .errorsto email|filename                Send errors to e-mail address or file
-        .inputfrom filename                     Get stdin from filename
-        .outputto email|filenae                 Send stdout to email|filename
-        .maxtime timeunits                      Set maximum runtime to timeunits
     .proessor name ...values.                  Define parameters for a processor type
     .memory [flat|kernel|monitor]               Define memory model parameters
     .format [asm|binary]                        Format of input data
@@ -256,16 +247,6 @@ Pragmas
     @name                                       Invoke a macro
     .func [name] [calling convention]           Function calling convetion (ex: func main clinux)
     ex: main ccall
-
-OpCode[.A|R|L|Q|D|B] Reg....
-         .A absolute address
-         .R relative address (default)
-         .L(ong) 64-bits
-         .Q(uad) 32-bits
-         .D(ouble) 16-bits
-         .B(yte) 8-bits (default)
-Ex: MOVE.L D04,X D08,Z
-    JUMP.R
 
 Registers =
     0x00-0x1F   64-bit data registers Dx (32) Can be swapped

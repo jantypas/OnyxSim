@@ -7,7 +7,7 @@
 SegmentError  SegmentErrorTable[] {
         {   SEGMENT_ERROR_NONE,                 false,  "No errors"                                 },
         {   SEGMENT_ERROR_NOT_INITIALIZED,      true,   "Segment manager system not ready"          },
-        {   SEGMENT_ERROR_ADDRESS_ERROR,        true,   "Address out of range"                      }
+        {   SEGMENT_ERROR_ADDRESS_ERROR,        true,   "Address out of range"                      },
 };
 
 void Segments::ReportDebug(std::string service, std::string msg) {
