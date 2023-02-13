@@ -64,7 +64,7 @@ public :
 class CPUContextObject {
     Onyx1DecodedInstruction decoded;
     CPUEvent            events;
-    uint64_t            dataRegisters[MAX_DATA_REGISTERS];
+    int64_t             dataRegisters[MAX_DATA_REGISTERS];
     uint64_t            addressRegisters[MAX_ADDRESS_REGISTERS];
     uint64_t            controlRegisters[MAX_CONTROL_REGISTERS];
     uint64_t            instructionCount;

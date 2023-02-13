@@ -204,6 +204,7 @@ Condition Codes
 0BA4 3 ATSTSET Aw, Dx, Dy, Dz      Atomic test-and-test
                                        Test Ax for value Dx.  If true, set Ax to Dy
                                        Result in Dx
+0BB1 3 HOLD Dx                     Hold the current process (monopolize the CPU) if Dx != 0
 
 --- Lower-level OS instructions
 0C0- 3 *GURU                       Call Guru monitor supervisor function
