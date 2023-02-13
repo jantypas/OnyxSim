@@ -65,8 +65,10 @@ Condition Codes
 
 -- System instructions * = Privileged
  Op  Mod
-0000  0    STOP                        Stop the processor
-0010  0    NOOP                        No operation
+0000  0    STOP               Stop the processor
+0010  0    NOOP               No operation
+0022  0    GSREG Dx, Dy       Get value from special register Dx return in Dx
+0032  0    SSREG Dx, Dy       Set value to special register Dy from Dx
 
 -- Memory Move/Store instructions
 0102 0  MOVE8 Rx, Ry          Move Ry -> Rx (8 bits)
@@ -84,8 +86,7 @@ Condition Codes
 01C2 0  CMP32 Rx, Ry          Compare Ry to Rx -> Dx (32-bit)
 01D2 0  CMP64 Rx, Ry          Compare Ry to Rx -> Dx (32-bit)
 01E2 1  CMPP Dy, Dz           Compare page Dy to Dz result > Dx
-01F3 0  GSREG Dx, Dy          Get value from special register Dx return in Dx
-01F4 0  SSREG Dx, Dy          Set value to special register Dy from Dx
+
 
 --- Math instructions
 0302 0 IADD64 Dx, Dy            Dx = Dx + Dy
@@ -278,16 +279,17 @@ Special registers
     0x47    Process return address from CALL/JUMP
     0x48    Process return address from SERVICE routine
 
-    0x79   MMU Control Block address
-    0x7A   System message interrupt mask
-    0x7B   System message interrupt service table address
-    0x7C   System Message service table address
-    0x7D   System Trap service table address
-    0x7E   System Control
+Special Control Registers
+    0x00   MMU Control Block address
+    0x01   System message interrupt mask
+    0x02   System message interrupt service table address
+    0x03   System Message service table address
+    0x04   System Trap service table address
+    0x05   System Control
         0x----:----:----:---1   - Disable shadow stack protection
         0x----:----:----:---2   - Enable single-step
         0x8---:----:----:----   - Reset CPU to startup state
-    0x7F    System bank/process/task selector
+    0x06    System bank/process/task selector
         0x----:----:----:----   - Not used in Onyx1L, Onyx1B
 
 Traps =>

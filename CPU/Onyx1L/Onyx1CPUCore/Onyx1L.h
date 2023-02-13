@@ -61,7 +61,7 @@ public :
     } Register[8];
 };
 
-class CPUContextObjects {
+class CPUContextObject {
     Onyx1DecodedInstruction decoded;
     CPUEvent            events;
     uint64_t            dataRegisters[MAX_DATA_REGISTERS];
@@ -72,8 +72,6 @@ class CPUContextObjects {
     uint64_t             DSP;               // Data Stack pointer
     uint64_t             CSP;               // Code stack pointer
     uint64_t             SSP;               // Shadow stack of code stack pointer
-    Process             *processID;         // Current process;
-    uint8_t              privLevel;         // Processor privilege level
 };
 
 class Onyx1L : OnyxCPU {
@@ -87,10 +85,8 @@ private :
     bool Write32(uint64_t addr, uint32_t value);
     bool Write64(uint64_t addr, uint64_t value);
 public :
-    Onyx1DecodedInstruction decodedInstruction;
-    std::map<uint64_t, CPUContextObjects *> runningMap;
-    std::map<uint64_t, CPUContextObjects *> readyToRunMap;
-    std::map<uint64_t, CPUContextObjects *> waitingOnIOMap;
+    Onyx1DecodedInstruction                 decodedInstruction;
+    CPUContextObject                        context;
     uint64_t                                cpuModel;
     uint64_t                                featureSetA;
     uint64_t                                featureSetB;
@@ -102,7 +98,6 @@ public :
 
     }
     Onyx1L();
-
     bool Onyx1LEventService();
     bool Onyx1LFetch();
     bool Onyx1LDecode();
