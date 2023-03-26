@@ -15,14 +15,28 @@ bool Onyx1L::Onyx1LEventService() {
  * From the PC, fetch 16-bits and decode them to determine the number of 16-bits to follow.
  *
  */
-bool Onyx1L::Onyx1LFetch() {
-    uint8_t value1, value2;
+bool Onyx1L::Onyx1LFetch(Onyx1DecodedInstruction *instr) {
     uint16_t opcode;
-    bool result;
+    uint64_t value;
+    bool ok;
+    if (Read(&context.PC, 16, &value)) {;
+        instr->opCode = (value & 0xFFF >> 8);
+        instr->numRegisters = value & 0x7;
+        for (auto i = 0; i < instr->numRegisters; i++) {
+            if (Read(&context.PC, 16, &value)) {
+                instr->Register[i].mode = value & 0x000000000000FF00;
+                instr->Register[i].name = value & 0x00000000000000FF;
+            } else {
+                return false;
+            };
+        };
+    } else {
+        return false;
+    };
     return true;
 }
 
-bool Onyx1L::Onyx1LDecode() {
+bool Onyx1L::Onyx1LDecode(Onyx1DecodedInstruction *instr) {
 
     return true;
 }
@@ -35,125 +49,58 @@ bool Onyx1L::Onyx1LStore() {
     return true;
 }
 
-bool Onyx1L::Read8(uint64_t addr, uint8_t *value) {
-    return memory->ReadAddress(addr, value);
-}
-
-bool Onyx1L::Read16(uint64_t addr, uint16_t *value) {
-    union {
-        uint16_t    a;
-        uint8_t     b[2];
-    } temp;
-    bool error = false;
-    error = memory->ReadAddress(addr, &temp.b[0]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->ReadAddress(addr+1, &temp.b[1]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    *value = be16toh(temp.a);
-    return true;
-}
-
-bool Onyx1L::Read32(uint64_t addr, uint32_t *value) {
-    union {
-        uint32_t    a;
-        uint8_t     b[4];
-    } temp;
-    bool error = false;
-    error = memory->ReadAddress(addr, &temp.b[0]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->ReadAddress(addr+1, &temp.b[1]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->ReadAddress(addr+2, &temp.b[2]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->ReadAddress(addr+3, &temp.b[3]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    *value = be32toh(temp.a);
-    return true;
-}
-
-bool Onyx1L::Read64(uint64_t addr, uint64_t *value) {
+bool Onyx1L::Read(uint64_t *addr, int sz, uint64_t *value) {
     union {
         uint64_t    a;
         uint8_t     b[8];
     } temp;
-    bool error = false;
-    error = memory->ReadAddress(addr, &temp.b[0]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->ReadAddress(addr+1, &temp.b[1]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->ReadAddress(addr+2, &temp.b[2]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->ReadAddress(addr+3, &temp.b[3]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->ReadAddress(addr+4, &temp.b[4]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->ReadAddress(addr+5, &temp.b[5]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->ReadAddress(addr+6, &temp.b[6]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->ReadAddress(addr+7, &temp.b[7]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    *value = be64toh(temp.a);
-    return true;}
-
-bool Onyx1L::Write8(uint64_t addr, uint8_t value) {
-    return memory->WriteAddress(addr, value);
+    bool ok = false;
+    for (auto i = 0; i < sz/8; i++) {
+        ok = memory->ReadAddress(*addr, &temp.b[i]);
+        if (!ok) {
+            return ok;
+        } else {
+            addr ++;
+        };
+    };
+    switch(sz) {
+        case  8: *value = temp.a; return true;
+        case 16: *value = be16toh(temp.a); return true;
+        case 32: *value = be32toh(temp.a); return true;
+        case 64: *value = be64toh(temp.a); return true;
+        default : return false;
+    };
 }
 
-bool Onyx1L::Write16(uint64_t addr, uint16_t value) {
+bool Onyx1L::Write(uint64_t *addr, int sz, uint64_t value) {
     union {
-        uint16_t    a;
-        uint8_t     b[2];
-    } temp;
-    bool error = false;
-    temp.a = htobe16(value);
-    error = memory->WriteAddress(addr, temp.b[0]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->WriteAddress(addr+1, temp.b[1]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    return true;
-}
-
-bool Onyx1L::Write32(uint64_t addr, uint32_t value) {
-    union {
-        uint32_t    a;
-        uint8_t     b[4];
-    } temp;
-    bool error = false;
-    temp.a = htobe32(value);
-    error = memory->WriteAddress(addr, temp.b[0]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->WriteAddress(addr+1, temp.b[1]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->WriteAddress(addr+2, temp.b[2]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->WriteAddress(addr+3, temp.b[3]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    return true;
-}
-
-bool Onyx1L::Write64(uint64_t addr, uint64_t value) {
-    union {
-        uint64_t    a;
+        uint8_t     a8;
+        uint16_t    a16;
+        uint32_t    a32;
+        uint64_t    a64;
         uint8_t     b[8];
     } temp;
-    bool error = false;
-    temp.a = htobe64(value);
-    error = memory->WriteAddress(addr, temp.b[0]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->WriteAddress(addr+1, temp.b[1]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->WriteAddress(addr+2, temp.b[2]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->WriteAddress(addr+3, temp.b[3]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->WriteAddress(addr+4, temp.b[4]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->WriteAddress(addr+5, temp.b[5]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->WriteAddress(addr+6, temp.b[6]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    error = memory->WriteAddress(addr+7, temp.b[7]);
-    if (error != MEMORY_ERROR_NONE) { return error; };
-    return true;
+    bool ok = false;
+    switch (sz) {
+        case 8  :
+            temp.a8 = value;
+            ok = memory->WriteAddress(*addr, temp.b[0]);
+            addr ++;
+            return ok;
+        case 16 :
+        case 32 :
+        case 64 :
+            temp.a16 = value;
+            for (auto i = 0; i < sz/9; i++) {
+                ok = memory->WriteAddress(*addr, temp.b[i]);
+                if (!ok) {
+                    return false;
+                } else {
+                    addr ++;
+                }
+            }
+            return true;
+        default :
+            return false;
+    }
 }

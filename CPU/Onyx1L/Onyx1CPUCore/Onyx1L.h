@@ -62,28 +62,23 @@ public :
 };
 
 class CPUContextObject {
+public :
     Onyx1DecodedInstruction decoded;
     CPUEvent            events;
     int64_t             dataRegisters[MAX_DATA_REGISTERS];
     uint64_t            addressRegisters[MAX_ADDRESS_REGISTERS];
     uint64_t            controlRegisters[MAX_CONTROL_REGISTERS];
     uint64_t            instructionCount;
-    uint64_t             PC;                // Program counter
-    uint64_t             DSP;               // Data Stack pointer
-    uint64_t             CSP;               // Code stack pointer
-    uint64_t             SSP;               // Shadow stack of code stack pointer
+    uint64_t            PC;                // Program counter
+    uint64_t            DSP;               // Data Stack pointer
+    uint64_t            CSP;               // Code stack pointer
+    uint64_t            SSP;               // Shadow stack of code stack pointer
 };
 
 class Onyx1L : OnyxCPU {
 private :
-    bool Read8(uint64_t addr, uint8_t *value);
-    bool Read16(uint64_t addr, uint16_t *value);
-    bool Read32(uint64_t addr, uint32_t *value);
-    bool Read64(uint64_t addr, uint64_t *value);
-    bool Write8(uint64_t addr, uint8_t value);
-    bool Write16(uint64_t addr, uint16_t value);
-    bool Write32(uint64_t addr, uint32_t value);
-    bool Write64(uint64_t addr, uint64_t value);
+    bool Read(uint64_t *addr, int sz, uint64_t *value);
+    bool Write(uint64_t *addr, int sz, uint64_t value);
 public :
     Onyx1DecodedInstruction                 decodedInstruction;
     CPUContextObject                        context;
@@ -99,8 +94,8 @@ public :
     }
     Onyx1L();
     bool Onyx1LEventService();
-    bool Onyx1LFetch();
-    bool Onyx1LDecode();
+    bool Onyx1LFetch(Onyx1DecodedInstruction *instr);
+    bool Onyx1LDecode(Onyx1DecodedInstruction *instr);
     bool Onyx1LExecute();
     bool Onyx1LStore();
 };

@@ -103,7 +103,7 @@ but I'm not going to tell you!)"""",
         "$ABEND JOB 8125 PL/1 ABORTED",
         R""""(
   It has been my policy to view the Internet not as an information super-highway,
-bubut as an electronic asylum full of babbling loonies",
+  but as an electronic asylum full of babbling loonies",
 )"""",
         "Programs are a gas -- they expand to fill all space in their container",
         "A computer once beat me at chess -- but it was no match for me at kick boxing",

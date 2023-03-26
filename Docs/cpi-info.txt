@@ -219,7 +219,7 @@ Condition Codes
 
 --- Every other processor has something like this -- we need one too
 FFF0 3 HCFB                        Halt, Catch fire, go boom!  No idea why this is needed but everyone else has one
-                                   We'll probably just play a sad trambone or something
+                                   We'll probably just play a sad trombone or something
 
 Pragmas
     .proessor name ...values.                  Define parameters for a processor type
@@ -827,3 +827,49 @@ Runtime file biinding
     monitor takes the --bindfile option
     --bindfile programfilename nativefilename
 
+Network Protocol =>
+     u16       u16     u16        u16
+   Region ID  Area ID Group ID   Local ID
+
+   Local ID = Local unsigned 16-bit ID of node on LAN.  FFFF= Broadcast
+   Group ID = Multiple local LANs
+   Area ID = Multiple Groups
+   Region ID = Multiple Regions
+
+   Packet Structure
+
+    Src Address:    64-bits
+    Dst Address:    64-bits
+    Src Port        32-bits
+    Dst Port        32-bits
+    Protocol:       16-bits
+
+   Address prefixes
+          0000:0000:0000: - Local net only
+          F000:0000:0000: - Testing (Do not cross group router)
+          F001:0000:0000: - Security penetration (Do not cross group router)
+
+   Packet Types
+        Protocol = 0x00000000 : Test
+                 = 0x00010000 : OnyxNet v. 0
+                    SubProt: 0x0000----: Control message
+                             0x0001----: User data
+                                   0000: User data - Packet protocol
+                                   0001: User data - Stream protocol
+                                   0002: User data - Record protocol
+                            0x00------: Reserved
+                            0xFF------: User defined protocols
+
+        Features:
+                 0x0000:0000:0000:0000:0000:0000:0000:0001 = Expiidate
+                 0x0000:0000:0000:0000:0000:0000:0000:0002 = Delay tolerabt
+                 0x0000:0000:0000:0000:0000:0000:0001:0000 = Do not encrypt at layer 2
+
+        Layer-2 mapping
+            Since we don't want to write our ethernet drivers, map the upper layer address to the lower-layer physical
+            address (IPv4, IPv6).   Using somethign akin to ARP
+        Routing:
+            Since we're mapping our address space to IPv4 or IPv6 addresses, we can route between "routers".
+            A router is just an application that has point-to-point virtual links to other routers
+        DNS:
+            Router nodes can map names to local address space
