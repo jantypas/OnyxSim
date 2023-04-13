@@ -2,6 +2,7 @@
 // Created by jantypas on 12/31/22.
 //
 
+#include <new>
 #include "VirtualMemory.h"
 #include <vector>
 #include <memory.h>
@@ -87,14 +88,15 @@ bool VirtualMemory::Init(ConfigParameters *conf, uint32_t pNumVirtualPages, uint
         ":"+swapFileName);
     // Try to allocate physical storage
     uint64_t sz = LOCAL_MEM_PAGE_SIZE*pNumPhysicalPages;
-    physicalStorage = new uint8_t[sz];
-    ReportDebug("Init", "Attempting to allocate "+std::to_string(sz)+" bytes");
-    if (physicalStorage != nullptr) {
-        ReportDebug("Init", "Allocated "+std::to_string(pNumPhysicalPages)+" pages");
-    } else {
+    try {
+        physicalStorage = new uint8_t[sz];
+    } catch (std::bad_alloc &e) {
         ReportError("Init", MEMORY_ERROR_NO_PHYSICAL_PAGES, "Can't allocate page storage");
         return false;
-    };
+    }
+    ReportDebug("Init", "Attempting to allocate "+std::to_string(sz)+" bytes");
+    ReportDebug("Init", "Allocated "+std::to_string(pNumPhysicalPages)+" pages");
+
     // Allocate the virtual page map and fill the free pages section
     for (uint32_t ix = 0; ix < pNumVirtualPages; ix++) {
         virtualPageTable[ix].pageState = 0;
