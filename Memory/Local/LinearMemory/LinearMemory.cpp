@@ -3,6 +3,7 @@
 //
 
 #include "LinearMemory.h"
+#include <new>
 #include <memory.h>
 #include <cstdio>
 #include <syslog.h>
@@ -15,16 +16,17 @@ LinearMemoryError   LinearMemoryErrorTable[] = {
         {   MEMORY_ERROR_NONE,              false,  "No error"                      },
         {   MEMORY_ERROR_ADDRESS_ERROR,     false,  "Memory address violation"     },
         {   MEMORY_ERROR_NOT_INITIALIZED,   false,  "Memory system not initialized" },
-        {   MEMORY_ERROR_NO_STORAGE,        true,   "No backing storage avaialble"}
+        {   MEMORY_ERROR_NO_STORAGE,        true,   "No backing storage available"}
 };
 
 bool LinearMemory::Init(ConfigParameters *conf, uint32_t pNumPages) {
     BOOST_LOG_TRIVIAL(debug) << "LinearMemory:Init: started";
     numPages = pNumPages;
-    storage = new uint8_t [pNumPages*LOCAL_MEM_PAGE_SIZE];
-    if (storage == nullptr) {
-        ReportError("Init", MEMORY_ERROR_NO_STORAGE);
-        return false;
+    try {
+        storage = new uint8_t [pNumPages*LOCAL_MEM_PAGE_SIZE];
+    } catch (std::bad_alloc &e) {
+            ReportError("Init", MEMORY_ERROR_NO_STORAGE);
+            return false
     }
     BOOST_LOG_TRIVIAL(debug) << "LinearMemory:Init: Allocating " + std::to_string(pNumPages)+ " pages";
     isActive = true;
@@ -113,7 +115,6 @@ LinearMemInfo *LinearMemory::GetInfo() {
 }
 
 LinearMemoryError *LinearMemory::GetLastError() {
-    ReportError("GetLastError", MEMORY_ERROR_NONE);
     return LastMemoryError;
 }
 

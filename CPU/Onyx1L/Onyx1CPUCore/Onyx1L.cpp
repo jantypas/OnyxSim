@@ -19,9 +19,12 @@ bool Onyx1L::Onyx1LFetch(Onyx1DecodedInstruction *instr) {
     uint16_t opcode;
     uint64_t value;
     bool ok;
-    if (Read(&context.PC, 16, &value)) {;
+    // Read 16-bits from memory
+    if (Read(&context.PC, 16, &value)) {
+        // Break out the opcode and the number of registerse we'll use
         instr->opCode = (value & 0xFFF >> 8);
         instr->numRegisters = value & 0x7;
+        // For each register, break out the register and mode
         for (auto i = 0; i < instr->numRegisters; i++) {
             if (Read(&context.PC, 16, &value)) {
                 instr->Register[i].mode = value & 0x000000000000FF00;
