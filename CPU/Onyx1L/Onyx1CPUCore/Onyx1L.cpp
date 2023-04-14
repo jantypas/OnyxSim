@@ -6,6 +6,10 @@
 #include <endian.h>
 #include "../../../Memory/MemoryConstants.h"
 
+bool CHECK_DATA_REGISTER_RANGE(int i) {
+    return (i >=0 && i < MAX_DATA_REGISTERS);
+}
+
 bool Onyx1L::Onyx1LEventService() {
     return true;
 }
@@ -39,8 +43,33 @@ bool Onyx1L::Onyx1LFetch(Onyx1DecodedInstruction *instr) {
     return true;
 }
 
-bool Onyx1L::Onyx1LDecode(Onyx1DecodedInstruction *instr) {
+/**
+ * Onyx1LDecode - -Decode the binary instruction wrods into something we can later parse
+ *
+ * @param instr - The instruction structure that needs further decoding
+ * @return Success/Failure
+ */
+bool ProcessRegisterDecode(CPUContextObject *cpu, unsigned int ix, Onyx1DecodedInstruction *i) {
+    switch (i->Register[ix].mode) {
+        case REGMODE_DIRECT :
+            if (CHECK_DATA_REGISTER_RANGE(i->Register[ix].name)) {
 
+            } else {
+
+            }
+        case REGMODE_DIRECTX :
+        case REGMODE_DIRECTY :
+        case REGMODE_POSTDEC :
+        case REGMODE_POSTINC :
+        case REGMODE_PREDEC :
+        case REGMODE_PREINC :
+        default :
+    }
+}
+bool Onyx1L::Onyx1LDecode(Onyx1DecodedInstruction *instr) {
+    for (unsigned int ix = 0; ix < instr->numRegisters; ix++) {
+        ProcessRegisterDecode(&context, ix, instr);
+    };
     return true;
 }
 

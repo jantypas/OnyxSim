@@ -543,25 +543,25 @@ VirtualMemoryPage =>
     0xF-0000-000 System info block
         Settings:
             F000:0000:0000:0000 Max Code Pages
-            F000:0000:0000:0001 Max Data Pages
-            F000:0000:0000:0002 Max Stack Pages
-            F000:0000:0000:0003 Max Heap Pages
-            F000:0000:0000:0004 Max Shared Memory
-            F000:0000:0000:0005 Max Buffer pool
-            F000:0000:0000:0006 Max ROM Size
-            F000:0000:0000:0008-F000:0000:0000:000F CPU Model
-            F000:0000:0000:0010-F000:0000:0000:001F Feature Set Bits
-            F000:0000:0000:0020-F000:0000:0000:0023 CPU Serial Number
-           :0000:0000:0030 Rom info jump address
-            F000:0000:0000:0031 System startup address
-            F000:0000:0000:0040 Boot device
-            F000:0000:0000:0041 Memory Mode
-            F000:0000:0000:0042 Max Segments
-            F000:0000:0000:0043 Max Processes
-            F000:0000:0000:0044 Max Banks
-            F000:0000:0000:0045-F000:0000:00048 Node GUID ID
-            F000:0000:0000:0049-F000:0000:0004C Node Zone GUID ID
-            F000:0000:0000:004D Address of monitor entry point
+            F000:0000:0000:0007 Max Data Pages
+            F000:0000:0000:0010 Max Stack Pages
+            F000:0000:0000:0017 Max Heap Pages
+            F000:0000:0000:0020 Max Shared Memory
+            F000:0000:0000:0027 Max Buffer pool
+            F000:0000:0000:0030 Max ROM Size
+            F000:0000:0000:0037-F000:0000:0000:0047 CPU Model
+            F000:0000:0000:0050-F000:0000:0000:006F Feature Set Bits
+            F000:0000:0000:0070-F000:0000:0000:0073 CPU Serial Number
+            F000:0000:0000:0080 Rom info jump address
+            F000:0000:0000:0088 System startup address
+            F000:0000:0000:0090 Boot device
+            F000:0000:0000:0098 Memory Mode
+            F000:0000:0000:00A0 Max Segments
+            F000:0000:0000:00A8 Max Processes
+            F000:0000:0000:00B0 Max Banks
+            F000:0000:0000:00B8-F000:0000:000D7 Node GUID ID
+            F000:0000:0000:00D8-F000:0000:000F7 Node Zone GUID ID
+            F000:0000:0000:00F8 Address of monitor entry point
     0xF-0001-004 UEFI Bios Shadow Stack
     0xF-0001-003 UEFI Bios Stack
     0xF-0001-001 UEFI Bios Heap

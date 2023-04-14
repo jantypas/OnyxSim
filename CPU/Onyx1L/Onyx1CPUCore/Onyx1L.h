@@ -26,6 +26,9 @@
 #define MAX_REGISTERS           0x60
 #define MAX_PROCESSES           1
 
+#define REG_DATA_X              MAX_DATA_REGISTERS-2
+#define REG_DATA_Y              MAX_DATA_REGISTERS-1
+
 
 #define IS_DATA_REGISTER(x) (x < 0x20)
 #define IS_ADDRESS_REGISTER(x) ( x > 0x20 && x < 0x40)
@@ -65,9 +68,7 @@ class CPUContextObject {
 public :
     Onyx1DecodedInstruction decoded;
     CPUEvent            events;
-    int64_t             dataRegisters[MAX_DATA_REGISTERS];
-    uint64_t            addressRegisters[MAX_ADDRESS_REGISTERS];
-    uint64_t            controlRegisters[MAX_CONTROL_REGISTERS];
+    int64_t             registers[MAX_DATA_REGISTERS+MAX_ADDRESS_REGISTERS+MAX_CONTROL_REGISTERS];
     uint64_t            instructionCount;
     uint64_t            PC;                // Program counter
     uint64_t            DSP;               // Data Stack pointer
