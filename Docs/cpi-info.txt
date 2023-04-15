@@ -564,7 +564,7 @@ VirtualMemoryPage =>
             F000:0000:0000:00F8 Address of monitor entry point
     0xF-0001-004 UEFI Bios Shadow Stack
     0xF-0001-003 UEFI Bios Stack
-    0xF-0001-001 UEFI Bios Heap
+    0xF-0001-002 UEFI Bios Heap
     0xF-0001-001 UEFI Bios Data
     0xF-0001-000 UEFI Bios Code
     0xF-0002-III I/O Space (III = IO Class)
