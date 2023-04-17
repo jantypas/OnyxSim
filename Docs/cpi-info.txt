@@ -540,45 +540,45 @@ VirtualMemoryPage =>
     LastWritten         uint64
 
 
-    0xF-0000-000 System info block
+    0xF000-0000 System info block
         Settings:
             F000:0000:0000:0000 Max Code Pages
             F000:0000:0000:0007 Max Data Pages
             F000:0000:0000:0010 Max Stack Pages
-            F000:0000:0000:0017 Max Heap Pages
-            F000:0000:0000:0020 Max Shared Memory
-            F000:0000:0000:0027 Max Buffer pool
-            F000:0000:0000:0030 Max ROM Size
-            F000:0000:0000:0037-F000:0000:0000:0047 CPU Model
-            F000:0000:0000:0050-F000:0000:0000:006F Feature Set Bits
-            F000:0000:0000:0070-F000:0000:0000:0073 CPU Serial Number
-            F000:0000:0000:0080 Rom info jump address
-            F000:0000:0000:0088 System startup address
-            F000:0000:0000:0090 Boot device
-            F000:0000:0000:0098 Memory Mode
-            F000:0000:0000:00A0 Max Segments
-            F000:0000:0000:00A8 Max Processes
-            F000:0000:0000:00B0 Max Banks
-            F000:0000:0000:00B8-F000:0000:000D7 Node GUID ID
-            F000:0000:0000:00D8-F000:0000:000F7 Node Zone GUID ID
-            F000:0000:0000:00F8 Address of monitor entry point
-    0xF-0001-004 UEFI Bios Shadow Stack
-    0xF-0001-003 UEFI Bios Stack
-    0xF-0001-002 UEFI Bios Heap
-    0xF-0001-001 UEFI Bios Data
-    0xF-0001-000 UEFI Bios Code
-    0xF-0002-III I/O Space (III = IO Class)
-    0xF-0003-III Buffer Pool Space (III = IO Class)
-    0xF-0004-000 MMU Control Block
-    0xF-0005-004 Kernel Shadow Stack
-    0xF-0005-003 Kernel Stack
-    0xF-0005:002 Kernel Heap
-    0xF-0005:001 Kernel Data
-    0xF-0005:000 Kernel Code
-    0xF-0006:KKK Shared Memory (KKK = Key)
-    0xF-0067-KKK Shared ROM Space (KKK = Key)
-    0xF-0008-000 Mohitor space
-    0xF-1PPP-P00 Context space
+            F000:0000:0000:0014 Max Heap Pages
+            F000:0000:0000:0018 Max Shared Memory
+            F000:0000:0000:001C Max Buffer pool
+            F000:0000:0000:0020 Max ROM Size
+            F000:0000:0000:0024 CPU Model
+            F000:0000:0000:002C CPU Feature Set Bits
+            F000:0000:0000:004C CPU Serial Number
+            F000:0000:0000:0054 Rom info jump address
+            F000:0000:0000:0056 System startup address
+            F000:0000:0000:0058 Boot device
+            F000:0000:0000:0060 Memory Mode
+            F000:0000:0000:0064 Max Segments
+            F000:0000:0000:0066 Max Processes
+            F000:0000:0000:0068 Max Banks
+            F000:0000:0000:006A Node GUID ID
+            F000:0000:0000:0072 Node Zone GUID ID
+            F000:0000:0000:007A Address of monitor entry point
+    0xF001-0004 UEFI Bios Shadow Stack
+    0xF001-0003 UEFI Bios Stack
+    0xF001-0002 UEFI Bios Heap
+    0xF001-0001 UEFI Bios Data
+    0xF001-0000 UEFI Bios Code
+    0xF002-IIII I/O Space (III = IO Class)
+    0xF003-IIII Buffer Pool Space (III = IO Class)
+    0xF004-0000 MMU Control Block
+    0xF005-0004 Kernel Shadow Stack
+    0xF005-0003 Kernel Stack
+    0xF005:0002 Kernel Heap
+    0xF005:8001 Kernel Data
+    0xF005:0080 Kernel Code
+    0xF006:KKKK Shared Memory (KKK = Key)
+    0xF067-KKKK Shared ROM Space (KKK = Key)
+    0xF008-0000 Mohitor space
+    0xF700-PPPP Context space
 
 User Program Memory
     0x0-PPPP-0SS    Code
